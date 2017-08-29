@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_admin_home"
+            android:icon="@drawable/ic_menu_home"
+            android:title="Home" />
+
+        <item
+            android:id="@+id/nav_admin_manage_orders"
+            android:icon="@drawable/ic_menu_shop"
+            android:title="Manage Orders" />
+
+
+        <item
+            android:id="@+id/nav_admin_drivers"
+            android:icon="@drawable/ic_menu_drive"
+            app:actionLayout="@layout/layout_menu_admin"
+            android:title="Drivers" />
+
+        <item
+            android:id="@+id/nav_admin_customers"
+            android:icon="@drawable/ic_account_circle_24dp"
+            android:title="Customers" />
+
+        <item
+            android:id="@+id/nav_sales"
+            android:icon="@drawable/ic_attach_money"
+            android:title="@string/nav_title_sales" />
+
+
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_admin_call_in_order"
+                android:icon="@drawable/ic_menu_add"
+                android:title="New Phone Order" />
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Send" />
+        </menu>
+    </item>
+
+</menu>

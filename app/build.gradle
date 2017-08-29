@@ -9,12 +9,25 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+        resConfigs "auto"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    productFlavors {
+        admin {
+            applicationId 'com.programming.kantech.deliveryservice.app.admin'
+        }
+        driver {
+            applicationId 'com.programming.kantech.deliveryservice.app.driver'
+        }
+        user {
+            applicationId 'com.programming.kantech.deliveryservice.app.user'
         }
     }
 }
@@ -31,5 +44,32 @@ dependencies {
     compile("com.android.support:design:${supportLibVersion}")
     compile("com.android.support:appcompat-v7:${supportLibVersion}")
 
+
+    compile 'com.jakewharton:butterknife:6.1.0'
+
     testCompile 'junit:junit:4.12'
+
+    // Firebase
+    compile 'com.google.firebase:firebase-database:11.0.2'
+    compile 'com.google.firebase:firebase-auth:11.0.2'
+    compile 'com.google.firebase:firebase-storage:11.0.2'
+    compile 'com.google.firebase:firebase-messaging:11.0.2'
+    compile 'com.google.firebase:firebase-config:11.0.2'
+
+    // Google Places API
+    compile 'com.google.android.gms:play-services-places:11.0.2'
+    compile 'com.google.android.gms:play-services-location:11.0.2'
+
+    // Firebase UI
+    compile 'com.firebaseui:firebase-ui-auth:2.1.1'
+    compile 'com.firebaseui:firebase-ui-database:2.1.1'
+
+    compile 'com.firebase:geofire-android:2.1.1'
+
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+
+
+
 }
+
+apply plugin: 'com.google.gms.google-services'

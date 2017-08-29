@@ -1,21 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.programming.kantech.deliveryservice.app">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        tools:ignore="GoogleAppIndexingWarning"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activity_Main">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDMz2TtZ-euSTsXGk5j99v2g1xDKXPsPf0" />
+
+
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorPrimaryDark" />
+
+        <service
+            android:name=".services.Service_FirebaseMessaging">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
-        </activity>
+        </service>
+
+        <service
+            android:name="com.programming.kantech.deliveryservice.app.services.Service_FirebaseInstanceId"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Provider -->
+        <provider
+            android:name=".provider.Provider_DeliveryService"
+            android:authorities="com.programming.kantech.deliveryservice.app"
+            android:exported="true" />
+
     </application>
 
 </manifest>

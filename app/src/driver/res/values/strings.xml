@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Delivery Service Driver</string>
+    <string name="sending_new_driver_request">Sending new driver request ...</string>
+    <string name="request_new_driver_message_completed">A notification will be sent when your request has been reviewed.</string>
+    <string name="request_new_driver_title_completed">New driver request received</string>
+</resources>

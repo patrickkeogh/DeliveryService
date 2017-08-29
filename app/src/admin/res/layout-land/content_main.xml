@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--
+    This layout is a two-pane layout for the master/detail flow.
+    -->
+    <FrameLayout
+        android:id="@+id/container_master"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:scaleType="centerInside" />
+
+    <!-- A small divider -->
+    <View
+        android:layout_width="@dimen/divider_width"
+        android:layout_height="match_parent"
+        android:background="@android:color/darker_gray" />
+
+    <LinearLayout
+        android:id="@+id/layout_for_two_cols"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/container_details"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorWhite"
+            android:scaleType="centerInside" />
+
+    </LinearLayout>
+
+</LinearLayout>

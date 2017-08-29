@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">Delivery Service</string>
+
+    <string name="emailpassword_title_text">Email and Password</string>
+    <string name="sign_out">Sign Out</string>
+
+    <string name="facebook_application_id" translatable="false">458676771178173</string>
+    <string name="fb_login_protocol_scheme">fb458676771178173</string>
+    <string name="nav_title_sales">Sales</string>
+    <string name="navigation_drawer_close">Close Drawer</string>
+    <string name="navigation_drawer_open">Open Drawer</string>
+    <string name="action_log_device_id">Log Device Id</string>
+    <string name="key_pref_token_sent">key_pref_token_sent</string>
+    <string name="label_settings">Settings</string>
+    <string name="prompt_firstname">First Name</string>
+    <string name="label_customer_info">Customer Information</string>
+    <string name="prompt_lastname">Last Name</string>
+    <string name="action_add_customer">Add New Customer</string>
+    <string name="privacy">http://www.google.com/policies/privacy</string>
+    <string name="label_customer_location">Customer Address</string>
+    <string name="action_select_location">Select Location</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="order_booked">Order Booked</string>
+    <string name="order_cancelled">Order Cancelled</string>
 </resources>
