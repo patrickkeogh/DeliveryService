@@ -1,0 +1,99 @@
+{
+  "project_info": {
+    "project_number": "482377196371",
+    "firebase_url": "https://friendlychat-c0111.firebaseio.com",
+    "project_id": "friendlychat-c0111",
+    "storage_bucket": "friendlychat-c0111.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:482377196371:android:40cb5603b0010fb1",
+        "android_client_info": {
+          "package_name": "com.programming.kantech.deliveryservice.app.driver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "482377196371-6fff7j9dcd2c3rqd6rigeqedro35ip05.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.programming.kantech.deliveryservice.app.driver",
+            "certificate_hash": "88dd0c9f756a4d951f3b941c95043c49d26d2ec7"
+          }
+        },
+        {
+          "client_id": "482377196371-i7l3g12p4hf6mvgbs226ctln65o0fnr8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMz2TtZ-euSTsXGk5j99v2g1xDKXPsPf0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "482377196371-i7l3g12p4hf6mvgbs226ctln65o0fnr8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:482377196371:android:10afc40011f4ed38",
+        "android_client_info": {
+          "package_name": "com.programming.kantech.deliveryservice.app.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "482377196371-knnt466ts9oe6cvn2j6us8rcmb1pkhis.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.programming.kantech.deliveryservice.app.admin",
+            "certificate_hash": "88dd0c9f756a4d951f3b941c95043c49d26d2ec7"
+          }
+        },
+        {
+          "client_id": "482377196371-i7l3g12p4hf6mvgbs226ctln65o0fnr8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMz2TtZ-euSTsXGk5j99v2g1xDKXPsPf0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "482377196371-i7l3g12p4hf6mvgbs226ctln65o0fnr8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
