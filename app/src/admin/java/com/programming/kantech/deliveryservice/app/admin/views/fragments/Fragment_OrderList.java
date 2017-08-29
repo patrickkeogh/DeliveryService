@@ -111,6 +111,33 @@ public class Fragment_OrderList extends Fragment  implements GoogleApiClient.Con
          */
         mOrderList.setHasFixedSize(false);
 
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mFireAdapter != null) {
+            mFireAdapter.cleanup();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mClient.disconnect();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.i(Constants.LOG_TAG, "onConnected called");
+
+        setupAdapter();
+
+
+    }
+
+    private void setupAdapter() {
         mFireAdapter = new FirebaseRecyclerAdapter<Order, ViewHolder_Order>(
                 Order.class,
                 R.layout.item_order,
@@ -160,24 +187,6 @@ public class Fragment_OrderList extends Fragment  implements GoogleApiClient.Con
         };
 
         mOrderList.setAdapter(mFireAdapter);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mFireAdapter != null) {
-            mFireAdapter.cleanup();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mClient.disconnect();
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
     }
 
     @Override
