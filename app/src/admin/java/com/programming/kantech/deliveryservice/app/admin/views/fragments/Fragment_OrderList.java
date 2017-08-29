@@ -86,7 +86,6 @@ public class Fragment_OrderList extends Fragment  implements GoogleApiClient.Con
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .addApi(Places.GEO_DATA_API)
-                .enableAutoManage(getActivity(), this)
                 .build();
 
         mClient.connect();
