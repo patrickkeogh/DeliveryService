@@ -23,4 +23,5 @@
     <string name="cancel">Cancel</string>
     <string name="order_booked">Order Booked</string>
     <string name="order_cancelled">Order Cancelled</string>
+
 </resources>

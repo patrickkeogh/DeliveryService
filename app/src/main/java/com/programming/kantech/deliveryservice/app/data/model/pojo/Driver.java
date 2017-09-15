@@ -15,23 +15,31 @@ public class Driver implements Parcelable {
     private String email;
     private String device;
     private Boolean driverApproved;
+    private Boolean photoApproved;
+    private String photoUrl;
 
     public Driver() {
 
     }
 
-    public Driver(String uid, String displayName, String email, Boolean driverApproved, String device) {
+    public Driver(String uid, String displayName, String email, String device, Boolean driverApproved, Boolean photoApproved, String photoUrl) {
         this.uid = uid;
         this.displayName = displayName;
         this.email = email;
-        this.driverApproved = driverApproved;
         this.device = device;
+        this.driverApproved = driverApproved;
+        this.photoApproved = photoApproved;
+        this.photoUrl = photoUrl;
     }
 
     protected Driver(Parcel in) {
         uid = in.readString();
         displayName = in.readString();
         email = in.readString();
+        device = in.readString();
+        photoUrl = in.readString();
+        driverApproved = (Boolean) in.readValue( null );
+        photoApproved = (Boolean) in.readValue( null );
     }
 
     public static final Creator<Driver> CREATOR = new Creator<Driver>() {
@@ -70,14 +78,6 @@ public class Driver implements Parcelable {
         this.email = email;
     }
 
-    public Boolean getDriverApproved() {
-        return driverApproved;
-    }
-
-    public void setDriverApproved(Boolean driverApproved) {
-        this.driverApproved = driverApproved;
-    }
-
     public String getDevice() {
         return device;
     }
@@ -86,14 +86,28 @@ public class Driver implements Parcelable {
         this.device = device;
     }
 
-    @Override
-    public String toString() {
-        return "Driver{" +
-                "uid='" + uid + '\'' +
-                ", displayName='" + displayName + '\'' +
-                ", email='" + email + '\'' +
-                ", driverApproved=" + driverApproved +
-                '}';
+    public Boolean getDriverApproved() {
+        return driverApproved;
+    }
+
+    public void setDriverApproved(Boolean driverApproved) {
+        this.driverApproved = driverApproved;
+    }
+
+    public Boolean getPhotoApproved() {
+        return photoApproved;
+    }
+
+    public void setPhotoApproved(Boolean photoApproved) {
+        this.photoApproved = photoApproved;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 
     @Override
@@ -106,5 +120,9 @@ public class Driver implements Parcelable {
         parcel.writeString(uid);
         parcel.writeString(displayName);
         parcel.writeString(email);
+        parcel.writeString(device);
+        parcel.writeString(photoUrl);
+        parcel.writeValue(driverApproved);
+        parcel.writeValue(photoApproved);
     }
 }

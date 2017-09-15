@@ -1,7 +1,6 @@
 package com.programming.kantech.deliveryservice.app.admin.views.fragments;
 
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,8 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
@@ -35,15 +32,15 @@ import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
-
-import butterknife.Optional;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by patrick keogh on 2017-08-22.
+ *
  */
 
 public class Fragment_NewPhoneOrder extends Fragment {
@@ -80,6 +77,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
     private Button btn_get_date;
 
     private Button btn_submit_order;
+    private Button btn_cancel_order;
 
     private long mDate;
 
@@ -120,19 +118,21 @@ public class Fragment_NewPhoneOrder extends Fragment {
         // Load the saved state if there is one
         if (savedInstanceState != null) {
             Log.i(Constants.LOG_TAG, "Fragment_Ingredients savedInstanceState is not null");
-            if (savedInstanceState.containsKey(Constants.STATE_INFO_CUSTOMER_KEY)) {
+            if (savedInstanceState.containsKey(Constants.STATE_INFO_CUSTOMER)) {
                 Log.i(Constants.LOG_TAG, "we found the recipe key in savedInstanceState");
-                mSelectedCustomer = savedInstanceState.getParcelable(Constants.STATE_INFO_CUSTOMER_KEY);
+                mSelectedCustomer = savedInstanceState.getParcelable(Constants.STATE_INFO_CUSTOMER);
             }
 
         } else {
             Log.i(Constants.LOG_TAG, "Fragment_Ingredients savedInstanceState is null, get data from intent");
             Bundle args = getArguments();
-            mSelectedCustomer = args.getParcelable(Constants.EXTRA_CUSTOMER_KEY);
+            mSelectedCustomer = args.getParcelable(Constants.EXTRA_CUSTOMER);
         }
 
         // Get a reference to the locations table
         mOrderRef = FirebaseDatabase.getInstance().getReference().child("orders");
+
+        // TODO: Make sure we have a customer
 
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_order_add, container, false);
@@ -155,6 +155,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
         btn_select_location_pickup = rootView.findViewById(R.id.btn_customer_select_pickup_location);
         btn_select_location_delivery = rootView.findViewById(R.id.btn_customer_select_delivery_location);
         btn_submit_order = rootView.findViewById(R.id.btn_phone_order_add);
+        btn_cancel_order = rootView.findViewById(R.id.btn_phone_order_cancel);
 
         btn_get_date = rootView.findViewById(R.id.btn_get_pickup_date);
         btn_get_date.setOnClickListener(new View.OnClickListener() {
@@ -204,8 +205,6 @@ public class Fragment_NewPhoneOrder extends Fragment {
         btn_select_customer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //mCallback.onGetCustomerSelected();
-
                 Intent intent = new Intent(getActivity(), Activity_SelectCustomer.class);
                 startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CUSTOMER);
             }
@@ -225,6 +224,13 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
                 createNewOrder();
 
+            }
+        });
+
+        btn_cancel_order.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cancelNewOrder();
             }
         });
 
@@ -260,6 +266,8 @@ public class Fragment_NewPhoneOrder extends Fragment {
             btn_select_location_delivery.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
 
             tv_cust_name.setText(mSelectedCustomer.getCompany());
+
+            btn_select_customer.setVisibility(View.GONE);
         } else {
             tv_cust_name.setVisibility(View.GONE);
             btn_select_location_pickup.setEnabled(false);
@@ -267,6 +275,8 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
             btn_select_location_delivery.setEnabled(false);
             btn_select_location_delivery.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
+
+            btn_select_customer.setVisibility(View.VISIBLE);
         }
 
         if (mLocationPickup != null) {
@@ -277,16 +287,8 @@ public class Fragment_NewPhoneOrder extends Fragment {
         } else {
             btn_select_location_pickup.setVisibility(View.VISIBLE);
             layout_location_pickup.setVisibility(View.GONE);
-        }
 
-        if (mLocationPickup != null) {
-            btn_select_location_pickup.setVisibility(View.GONE);
-            layout_location_pickup.setVisibility(View.VISIBLE);
-            tv_cust_location_pickup_name.setText(mLocationPickupName);
-            tv_cust_location_pickup_address.setText(mLocationPickupAddress);
-        } else {
-            btn_select_location_pickup.setVisibility(View.VISIBLE);
-            layout_location_pickup.setVisibility(View.GONE);
+
         }
 
         if (mLocationDelivery != null) {
@@ -309,6 +311,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
         if(mDate == 0){
             tv_pickup_date.setVisibility(View.GONE);
+            btn_get_date.setVisibility(View.VISIBLE);
         }else{
             tv_pickup_date.setVisibility(View.VISIBLE);
             SimpleDateFormat format =  new SimpleDateFormat(Constants.DATE_FORMAT);
@@ -317,6 +320,8 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
             dateString = format.format(mDate);
             tv_pickup_date.setText(dateString);
+
+            btn_get_date.setVisibility(View.GONE);
         }
 
     }
@@ -371,6 +376,18 @@ public class Fragment_NewPhoneOrder extends Fragment {
         }
     }
 
+    private void cancelNewOrder() {
+
+        mSelectedCustomer = null;
+        mLocationPickup = null;
+        mLocationDelivery = null;
+        mDate = 0;
+
+        setupForm();
+
+
+    }
+
     private void createNewOrder() {
 
         LayoutInflater inflater = this.getLayoutInflater();
@@ -386,14 +403,23 @@ public class Fragment_NewPhoneOrder extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
+                        // get today at 00:00 hrs
+                        Calendar date = new GregorianCalendar();
+                        long mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
+
+                        //long startDateMillis = mDisplayDateStartTime.getTimeInMillis();
+                        Log.i(Constants.LOG_TAG, "StartTime for 12th:" + mDisplayDateStartTimeInMillis);
+
                         final Order order = new Order();
                         order.setCustomerId(mSelectedCustomer.getId());
                         order.setCustomerName(mSelectedCustomer.getCompany());
-                        order.setDeliveryLocationId(mLocationDelivery.getId());
-                        order.setPickupLocationId(mLocationPickup.getId());
+                        order.setDeliveryLocationId(mLocationDelivery.getPlaceId());
+                        order.setPickupLocationId(mLocationPickup.getPlaceId());
                         order.setType(Constants.ORDER_TYPE_PHONE);
                         order.setStatus(Constants.ORDER_STATUS_BOOKED);
-                        order.setPickupDate(mDate);
+                        long newDate = Utils_General.getStartTimeForDate(mDate);
+                        Log.i(Constants.LOG_TAG, "THIS:" + newDate);
+                        order.setPickupDate(newDate);
 
                         mOrderRef
                                 .push()
@@ -429,9 +455,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
                         Utils_General.showToast(getContext(), getString(R.string.order_cancelled));
 
-                        mLocationDelivery = null;
-                        mLocationPickup = null;
-                        mSelectedCustomer = null;
+                        cancelNewOrder();
 
                         setupForm();
 

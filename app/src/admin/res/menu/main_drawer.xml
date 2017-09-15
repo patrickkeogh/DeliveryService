@@ -15,22 +15,15 @@
 
 
         <item
-            android:id="@+id/nav_admin_drivers"
+            android:id="@+id/nav_admin_manage_drivers"
             android:icon="@drawable/ic_menu_drive"
             app:actionLayout="@layout/layout_menu_admin"
-            android:title="Drivers" />
+            android:title="Manage Drivers" />
 
         <item
-            android:id="@+id/nav_admin_customers"
+            android:id="@+id/nav_admin_manage_customers"
             android:icon="@drawable/ic_account_circle_24dp"
-            android:title="Customers" />
-
-        <item
-            android:id="@+id/nav_sales"
-            android:icon="@drawable/ic_attach_money"
-            android:title="@string/nav_title_sales" />
-
-
+            android:title="Manage Customers" />
     </group>
 
     <item android:title="Communicate">
@@ -43,10 +36,7 @@
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
                 android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+
         </menu>
     </item>
 

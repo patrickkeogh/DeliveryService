@@ -34,17 +34,23 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_CustomerAdd;
+import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_CustomerDetails;
+import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_CustomerList;
 import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_DriverDetails;
 import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_DriverList;
-import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_Main;
+import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_MainDetails;
+import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_MainList;
 import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_NewPhoneOrder;
+import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_OrderDetails;
 import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_OrderList;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.Customer;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.Driver;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -56,17 +62,22 @@ import butterknife.InjectView;
 
 public class Activity_Main extends AppCompatActivity implements
         Fragment_DriverList.DriverClickListener,
+        Fragment_OrderList.OrderClickListener,
+        Fragment_CustomerList.CustomerClickListener,
         Fragment_NewPhoneOrder.GetCustomerClickListener,
         Fragment_DriverDetails.VerifyDriverClickListener,
         NavigationView.OnNavigationItemSelectedListener {
 
-    // Member variables
-    private String mUsername;
     private ActionBar mActionBar;
 
     // Track whether to display a two-column or single-column UI
     private boolean mLandscapeView;
     private boolean mIsFirstTimeLoaded = true;
+
+    private boolean mShowDriverIcon = true;
+    private boolean mShowDrivers = true;
+    private boolean mShowOrderIcon = true;
+    private boolean mShowOrders = true;
 
     @InjectView(R.id.toolbar)
     Toolbar mToolbar;
@@ -85,6 +96,9 @@ public class Activity_Main extends AppCompatActivity implements
     // Member variables for the Firebase Authorization
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mFirebaseAuthListener;
+
+    private MenuItem mMenuItem_Driver;
+    private MenuItem mMenuItem_Order;
 
 
     @Override
@@ -124,12 +138,13 @@ public class Activity_Main extends AppCompatActivity implements
         mNavView.setNavigationItemSelectedListener(this);
 
         Menu nav_Menu = mNavView.getMenu();
-        nav_Menu.findItem(R.id.nav_admin_drivers).setVisible(true);
+        nav_Menu.findItem(R.id.nav_admin_manage_drivers).setVisible(true);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
 
         // TODO: Where would a better place to call this be?
-        FirebaseMessaging.getInstance().subscribeToTopic("Admin");
+        FirebaseMessaging.getInstance().subscribeToTopic(Constants.FIREBASE_NOTIFICATION_TOPIC_ADMIN);
+        FirebaseMessaging.getInstance().unsubscribeFromTopic("Admin");
 
         mUserRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_ADMIN);
         mDriverRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_DRIVERS);
@@ -142,11 +157,11 @@ public class Activity_Main extends AppCompatActivity implements
         if (savedInstanceState == null && mIsFirstTimeLoaded) {
             // add main fragment to master container on first start
             mIsFirstTimeLoaded = false;
-            Fragment_Main fragment = Fragment_Main.newInstance();
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_ADD, fragment);
+            Fragment_MainDetails fragment = Fragment_MainDetails.newInstance();
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
+
         }
     }
-
 
     @Override
     public void onBackPressed() {
@@ -162,35 +177,62 @@ public class Activity_Main extends AppCompatActivity implements
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        // if we are in 2 pane mode, remove what ever is in the details container
+        // when loading the lookup lists
+        if (mLandscapeView) {
+            clearDetailsContainer();
+        }
+
         if (id == R.id.nav_admin_call_in_order) {
             // Add new phone orders here
             Fragment_NewPhoneOrder frag_order = Fragment_NewPhoneOrder.newInstance(null);
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN, frag_order);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_ADD, frag_order, true);
+
+            setActionBarTitle("Create Phone Order");
 
         } else if (id == R.id.nav_admin_home) {
-            Fragment_Main frag_main = Fragment_Main.newInstance();
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN, frag_main);
+            Fragment_MainDetails fragment = Fragment_MainDetails.newInstance();
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
 
-        } else if (id == R.id.nav_admin_drivers) {
+            setActionBarTitle("Map View");
+
+        } else if (id == R.id.nav_admin_manage_drivers) {
+
             Fragment_DriverList frag_driver = Fragment_DriverList.newInstance();
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_DRIVER_LIST, frag_driver, false);
 
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_DRIVER_LIST, frag_driver);
+            setActionBarTitle("Manage Drivers");
 
-        } else if (id == R.id.nav_admin_customers) {
+        } else if (id == R.id.nav_admin_manage_customers) {
 
-            Fragment_CustomerAdd frag_customer = Fragment_CustomerAdd.newInstance();
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_ADD, frag_customer);
+            Fragment_CustomerList frag_customer = Fragment_CustomerList.newInstance();
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_LIST, frag_customer, false);
 
+            setActionBarTitle("Manage Customers");
 
-        }else if (id == R.id.nav_admin_manage_orders) {
+        } else if (id == R.id.nav_admin_manage_orders) {
 
             Fragment_OrderList frag_order_list = Fragment_OrderList.newInstance();
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_LIST, frag_order_list);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_LIST, frag_order_list, false);
+
+            setActionBarTitle("Manage Orders");
 
         }
 
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void clearDetailsContainer() {
+
+        if (getSupportFragmentManager().findFragmentById(R.id.container_details) != null) {
+
+            getSupportFragmentManager().beginTransaction()
+                    .remove(getSupportFragmentManager()
+                            .findFragmentById(R.id.container_details)).commit();
+        }
+
+
     }
 
     private void createAuthListener() {
@@ -217,8 +259,7 @@ public class Activity_Main extends AppCompatActivity implements
                                     .setTheme(R.style.LoginTheme)
                                     .setAvailableProviders(
                                             Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
-                                                    new AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build(),
-                                                    new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
+                                                    new AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build()))
                                     .build(),
                             Constants.REQUEST_CODE_SIGN_IN);
                 }
@@ -241,7 +282,7 @@ public class Activity_Main extends AppCompatActivity implements
                 Utils_General.showToast(this, "Signed In Cancelled!");
                 finish();
             }
-        } else if(requestCode == Constants.REQUEST_CODE_SELECT_CUSTOMER){
+        } else if (requestCode == Constants.REQUEST_CODE_SELECT_CUSTOMER) {
             if (resultCode == RESULT_OK) {
                 // Customer was successfully selected
                 Utils_General.showToast(this, "Customer Selected");
@@ -252,13 +293,13 @@ public class Activity_Main extends AppCompatActivity implements
                 //
 
                 Fragment_NewPhoneOrder fragment = Fragment_NewPhoneOrder.newInstance(customer);
-                replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_ADD, fragment);
+                replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_ADD, fragment, true);
 
             } else if (resultCode == RESULT_CANCELED) {
                 Utils_General.showToast(this, "Customer Not Selected");
                 //finish();
             }
-        } else if(requestCode == Constants.REQUEST_CODE_SELECT_PICKUP_LOCATION){
+        } else if (requestCode == Constants.REQUEST_CODE_SELECT_PICKUP_LOCATION) {
             if (resultCode == RESULT_OK) {
                 // Customer was successfully selected
                 Utils_General.showToast(this, "Pickup Location Selected");
@@ -269,7 +310,7 @@ public class Activity_Main extends AppCompatActivity implements
                 //
 
                 Fragment_NewPhoneOrder fragment = Fragment_NewPhoneOrder.newInstance(customer);
-                replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_ADD, fragment);
+                replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_ADD, fragment, true);
 
             } else if (resultCode == RESULT_CANCELED) {
                 Utils_General.showToast(this, "Customer Not Selected");
@@ -282,12 +323,63 @@ public class Activity_Main extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
+
+        mMenuItem_Driver = (MenuItem) menu.findItem(R.id.action_show_drivers);
+        mMenuItem_Order = (MenuItem) menu.findItem(R.id.action_show_orders);
+
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        Log.i(Constants.LOG_TAG, "onPrepareOptionsMenu called");
+
+        mMenuItem_Driver.setVisible(mShowDriverIcon);
+        if(!mShowDrivers){
+            mMenuItem_Driver.setIcon(R.drawable.ic_menu_drive);
+        }else{
+            mMenuItem_Driver.setIcon(R.drawable.ic_menu_drive_white);
+        }
+
+        mMenuItem_Order.setVisible(mShowOrderIcon);
+        if(!mShowOrders){
+            mMenuItem_Order.setIcon(R.drawable.ic_shopping_cart);
+        }else{
+            mMenuItem_Order.setIcon(R.drawable.ic_shopping_cart_white);
+        }
+
+
+        super.onPrepareOptionsMenu(menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_show_orders:
+                mShowOrders = !mShowOrders;
+                invalidateOptionsMenu();
+
+                Fragment_MainDetails frag_order = (Fragment_MainDetails)
+                        getSupportFragmentManager().findFragmentByTag(Constants.TAG_FRAGMENT_MAIN_DETAILS);
+
+                if(frag_order != null){
+                    frag_order.showOrders(mShowOrders);
+                }
+
+                return true;
+            case R.id.action_show_drivers:
+                mShowDrivers = !mShowDrivers;
+                invalidateOptionsMenu();
+
+                Fragment_MainDetails frag_driver = (Fragment_MainDetails)
+                        getSupportFragmentManager().findFragmentByTag(Constants.TAG_FRAGMENT_MAIN_DETAILS);
+
+                if(frag_driver != null){
+                    frag_driver.showDrivers(mShowDrivers);
+                }
+
+                return true;
             case R.id.action_sign_out:
                 AuthUI.getInstance().signOut(this);
                 return true;
@@ -325,7 +417,7 @@ public class Activity_Main extends AppCompatActivity implements
     }
 
     private void onSignedInInitialize(final FirebaseUser user) {
-        mUsername = user.getDisplayName();
+        String mUsername = user.getDisplayName();
 
         if (mActionBar != null) {
             mActionBar.setTitle(mUsername);
@@ -345,14 +437,10 @@ public class Activity_Main extends AppCompatActivity implements
                     Driver driver = dataSnapshot.getValue(Driver.class);
                     Log.i(Constants.LOG_TAG, "The driver is in the db:" + driver.toString());
 
-//                    if (!driver.getDriverApproved()) {
-//                        //checkIfAuthorized();
-//                    }
-
                 } else {
                     Log.i(Constants.LOG_TAG, "The driver is not in the database");
                     // User is not in the driver db. add them
-                    Driver driver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(), false, "");
+                    Driver driver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(), "", false, false, "");
 
                     // TODO: Not sure which way is better?????
                     mUserRef.child(user.getUid()).setValue(driver);
@@ -374,134 +462,67 @@ public class Activity_Main extends AppCompatActivity implements
 
     }
 
-    private void replaceFragment(int container, String fragment_tag, Fragment fragment_in) {
+    private void replaceFragment(int container, String fragment_tag, Fragment fragment_in, boolean showFullScreen) {
 
+        // Get a fragment transaction to replace fragments
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-        if (findViewById(R.id.container_master) != null) {
-            Log.i(Constants.LOG_TAG, "Found Master");
-        } else {
-            Log.i(Constants.LOG_TAG, "Master NOT Found");
-
-        }
-
+        // Get references to the containers used to host the fragments
         FrameLayout container_details = (FrameLayout) findViewById(R.id.container_details);
         FrameLayout container_master = (FrameLayout) findViewById(R.id.container_master);
 
-        switch (fragment_tag) {
-            case Constants.TAG_FRAGMENT_MAIN_ADD:
+        // Change the width of the master container if full screen required for landscape mode
 
-                if (mLandscapeView) {
-                    container_details.setVisibility(View.GONE);
-                    container_master.setLayoutParams(new LinearLayout.LayoutParams(
-                            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        if (mLandscapeView) {
+            if(!showFullScreen){
+                container_details.setVisibility(View.VISIBLE);
+                final float scale = getResources().getDisplayMetrics().density;
+                int requiredWidth = 0;
+                switch (fragment_tag){
+                    case Constants.TAG_FRAGMENT_ORDER_LIST:
+                    case Constants.TAG_FRAGMENT_ORDER_DETAILS:
+                        requiredWidth = getResources().getInteger(R.integer.container_width_order_list);
+                        break;
+                    case Constants.TAG_FRAGMENT_CUSTOMER_LIST:
+                    case Constants.TAG_FRAGMENT_CUSTOMER_DETAILS:
+                        requiredWidth = getResources().getInteger(R.integer.container_width_customer_list);
+                        break;
+                    default:
+                        requiredWidth = getResources().getInteger(R.integer.container_width);
+
                 }
 
-                transaction.add(container, fragment_in, fragment_tag);
+                int pixels = (int) (requiredWidth * scale + 0.5f);
 
-                Log.i(Constants.LOG_TAG, "Main Fragment added");
+                container_master.setLayoutParams(new LinearLayout.LayoutParams(
+                        pixels, FrameLayout.LayoutParams.MATCH_PARENT));
+            }else{
+                container_details.setVisibility(View.GONE);
+                container_master.setLayoutParams(new LinearLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+            }
 
-                break;
-            case Constants.TAG_FRAGMENT_MAIN:
+        }
 
-                if (mLandscapeView) {
-                    container_details.setVisibility(View.GONE);
-                    container_master.setLayoutParams(new LinearLayout.LayoutParams(
-                            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-                }
+        if(!Objects.equals(fragment_tag, Constants.TAG_FRAGMENT_MAIN_DETAILS)){
+            mShowDriverIcon = false;
+            mShowOrderIcon = false;
 
+        }else{
+            mShowDriverIcon = true;
+            mShowOrderIcon = true;
+        }
 
-                transaction.replace(container, fragment_in, fragment_tag);
+        invalidateOptionsMenu();
 
-                Log.i(Constants.LOG_TAG, "Main Fragment replaced");
-
-                break;
-            case Constants.TAG_FRAGMENT_DRIVER_LIST:
-
-                if (mLandscapeView) {
-                    container_details.setVisibility(View.VISIBLE);
-
-                    final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
-                    int pixels = (int) (300 * scale + 0.5f);
-
-                    container_master.setLayoutParams(new LinearLayout.LayoutParams(
-                            pixels, FrameLayout.LayoutParams.MATCH_PARENT));
-                }
-
-                transaction.replace(container, fragment_in, fragment_tag);
-
-                Log.i(Constants.LOG_TAG, "Drivers List Fragment replaced");
-
-                break;
-            case Constants.TAG_FRAGMENT_DRIVER_DETAILS:
-
-                if (mLandscapeView) {
-                    container_details.setVisibility(View.VISIBLE);
-
-                    final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
-                    int pixels = (int) (300 * scale + 0.5f);
-
-                    container_master.setLayoutParams(new LinearLayout.LayoutParams(
-                            pixels, FrameLayout.LayoutParams.MATCH_PARENT));
-                }
-
-                transaction.replace(container, fragment_in, fragment_tag);
-
-                Log.i(Constants.LOG_TAG, "Drivers Details Fragment replaced");
-
-                break;
-            case Constants.TAG_FRAGMENT_CUSTOMER_ADD:
-
-                if (mLandscapeView) {
-                    container_details.setVisibility(View.GONE);
-                    container_master.setLayoutParams(new LinearLayout.LayoutParams(
-                            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-                }
-
-                transaction.replace(container, fragment_in, fragment_tag);
-
-                Log.i(Constants.LOG_TAG, "Main Fragment added");
-
-                break;
-
-            case Constants.TAG_FRAGMENT_ORDER_ADD:
-
-                if (mLandscapeView) {
-                    container_details.setVisibility(View.GONE);
-                    container_master.setLayoutParams(new LinearLayout.LayoutParams(
-                            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-                }
-
-                transaction.replace(container, fragment_in, fragment_tag);
-
-                Log.i(Constants.LOG_TAG, "Add Order Fragment added");
-
-                break;
-            case Constants.TAG_FRAGMENT_ORDER_LIST:
-
-                if (mLandscapeView) {
-                    container_details.setVisibility(View.VISIBLE);
-
-                    final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
-                    int pixels = (int) (300 * scale + 0.5f);
-
-                    container_master.setLayoutParams(new LinearLayout.LayoutParams(
-                            pixels, FrameLayout.LayoutParams.MATCH_PARENT));
-                }
-
-                transaction.replace(container, fragment_in, fragment_tag);
-
-                Log.i(Constants.LOG_TAG, "Order List Fragment replaced");
-
-                break;
-            default:
-                Utils_General.showToast(this, "Fragment not found");
-
+        if(Objects.equals(fragment_tag, Constants.TAG_FRAGMENT_MAIN_LIST_START)){
+            transaction.add(container, fragment_in, fragment_tag);
+        }else{
+            transaction.replace(container, fragment_in, fragment_tag);
         }
 
         // Commit the transaction
         transaction.commit();
-
 
     }
 
@@ -511,9 +532,9 @@ public class Activity_Main extends AppCompatActivity implements
         Fragment_DriverDetails fragment = Fragment_DriverDetails.newInstance(key);
 
         if (mLandscapeView) {
-            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_DRIVER_DETAILS, fragment);
+            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_DRIVER_DETAILS, fragment, false);
         } else {
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_DRIVER_DETAILS, fragment);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_DRIVER_DETAILS, fragment, false);
 
         }
 
@@ -544,7 +565,7 @@ public class Activity_Main extends AppCompatActivity implements
 //                    FriendlyMessage friendlyMessage = dataSnapshot.getValue(FriendlyMessage.class);
 //                    mMessageAdapter.add(friendlyMessage);
 
-                    Utils_General.showToast(getApplicationContext(), "Child Changed");
+                    //Utils_General.showToast(getApplicationContext(), "Child Changed");
 
                 }
 
@@ -566,15 +587,6 @@ public class Activity_Main extends AppCompatActivity implements
 
     }
 
-//    @Override
-//    public void onCustomerSelected(Customer selectedCustomer) {
-//        Log.i(Constants.LOG_TAG, "onCustomerSelected calledd");
-//
-//        Fragment_NewPhoneOrder fragment = Fragment_NewPhoneOrder.newInstance(selectedCustomer);
-//        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_ADD, fragment);
-//
-//    }
-
     @Override
     public void onGetCustomerSelected() {
         Log.i(Constants.LOG_TAG, "onGetCustomerSelected called");
@@ -583,7 +595,7 @@ public class Activity_Main extends AppCompatActivity implements
         //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_LIST, fragment);
 
         Intent intent = new Intent(this, Activity_SelectCustomer.class);
-        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CUSTOMER );
+        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CUSTOMER);
 
     }
 
@@ -595,12 +607,59 @@ public class Activity_Main extends AppCompatActivity implements
 
         intent.putExtra(Constants.EXTRA_CUSTOMER_KEY, customer.getId());
         intent.putExtra(Constants.EXTRA_CUSTOMER_NAME, customer.getCompany());
-        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_PICKUP_LOCATION );
+        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_PICKUP_LOCATION);
 
     }
 
     @Override
     public void onGetLocationDelivery() {
 
+    }
+
+    // Callback from Fragment_CustomerList
+    @Override
+    public void onCustomerSelected(Customer customer) {
+        //Log.i(Constants.LOG_TAG, "onCustomerSelected called CustKey:" + customer);
+
+        Fragment_CustomerDetails fragment = Fragment_CustomerDetails.newInstance(customer);
+
+        if (mLandscapeView) {
+            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, false);
+        } else {
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, false);
+        }
+    }
+
+    @Override
+    public void onAddCustomerClicked() {
+        Log.i(Constants.LOG_TAG, "onAddCustomerClicked() called");
+
+        Fragment_CustomerAdd fragment = Fragment_CustomerAdd.newInstance();
+
+        Log.i(Constants.LOG_TAG, "mLandscape = " + mLandscapeView);
+
+        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_ADD, fragment, true);
+
+    }
+
+    @Override
+    public void onOrderSelected(Order order) {
+        Log.i(Constants.LOG_TAG, "onOrderSelected() called");
+
+        Fragment_OrderDetails fragment = Fragment_OrderDetails.newInstance(order);
+
+        if (mLandscapeView) {
+            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_ORDER_DETAILS, fragment, false);
+        } else {
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_DETAILS, fragment, false);
+        }
+
+    }
+
+    public void setActionBarTitle(String title) {
+
+        if (mActionBar != null) {
+            mActionBar.setTitle(title);
+        }
     }
 }

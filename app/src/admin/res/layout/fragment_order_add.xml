@@ -255,6 +255,17 @@
                     android:text="Book Phone Order"
                     android:textStyle="bold" />
 
+                <Button
+                    android:id="@+id/btn_phone_order_cancel"
+                    style="?android:textAppearanceSmall"
+                    android:background="@color/colorAccent"
+                    android:textColor="@color/colorWhite"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Cancel/Reset Form"
+                    android:textStyle="bold" />
+
 
 
 

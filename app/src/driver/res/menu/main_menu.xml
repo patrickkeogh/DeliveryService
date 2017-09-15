@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_driver_previous_day"
+        android:title="Previous Day"
+        android:icon="@drawable/ic_chevron_left"
+        android:orderInCategory="100"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_driver_next_day"
+        android:title="Previous Day"
+        android:icon="@drawable/ic_chevron_right"
+        android:orderInCategory="200"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_driver_photo"
+        android:title="@string/action_driver_myphoto"
+        android:orderInCategory="300"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_driver_orders"
+        android:title="@string/action_driver_myorders"
+        android:orderInCategory="400"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_sign_out"
+        android:title="@string/sign_out"
+        android:orderInCategory="1000"
+        app:showAsAction="never"/>
+</menu>

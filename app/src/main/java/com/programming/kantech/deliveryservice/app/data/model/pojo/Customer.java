@@ -15,18 +15,21 @@ public class Customer implements Parcelable{
     private String company;
     private String contact_name;
     private String contact_number;
+    private String placeId;
 
     public Customer() {
 
     }
 
-    public Customer(String id, String email, String company, String contact_name, String contact_number) {
+    public Customer(String id, String email, String company, String contact_name, String contact_number, String placeId) {
         this.id = id;
         this.email = email;
         this.company = company;
         this.contact_name = contact_name;
         this.contact_number = contact_number;
+        this.placeId = placeId;
     }
+
 
     protected Customer(Parcel in) {
         id = in.readString();
@@ -34,6 +37,22 @@ public class Customer implements Parcelable{
         company = in.readString();
         contact_name = in.readString();
         contact_number = in.readString();
+        placeId = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(email);
+        dest.writeString(company);
+        dest.writeString(contact_name);
+        dest.writeString(contact_number);
+        dest.writeString(placeId);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<Customer> CREATOR = new Creator<Customer>() {
@@ -88,18 +107,12 @@ public class Customer implements Parcelable{
         this.contact_number = contact_number;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(id);
-        parcel.writeString(email);
-        parcel.writeString(company);
-        parcel.writeString(contact_name);
-        parcel.writeString(contact_number);
+    public String getPlaceId() {
+        return placeId;
     }
 
     @Override
@@ -110,6 +123,7 @@ public class Customer implements Parcelable{
                 ", company='" + company + '\'' +
                 ", contact_name='" + contact_name + '\'' +
                 ", contact_number='" + contact_number + '\'' +
+                ", placeId='" + placeId + '\'' +
                 '}';
     }
 }

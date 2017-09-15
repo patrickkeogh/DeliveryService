@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+
+
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
@@ -13,6 +15,7 @@
 
         <activity
             android:name="com.programming.kantech.deliveryservice.app.driver.views.activities.Activity_Main"
+            android:launchMode="singleTop"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,6 +28,24 @@
             android:name="com.programming.kantech.deliveryservice.app.driver.views.activities.Activity_NewDriverRequest"
             android:label="@string/app_name">
         </activity>
+
+        <activity
+            android:name="com.programming.kantech.deliveryservice.app.driver.views.activities.Activity_ShowOrders"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity
+            android:name="com.programming.kantech.deliveryservice.app.driver.views.activities.Activity_Photo"
+            android:label="@string/app_name">
+        </activity>
+
+
+
+
+        <service android:name="com.programming.kantech.deliveryservice.app.driver.services.Service_DriverLocation"/>
+
+        <service android:name="com.programming.kantech.deliveryservice.app.driver.services.Service_AppClosing"
+            android:stopWithTask="false"/>
 
     </application>
 

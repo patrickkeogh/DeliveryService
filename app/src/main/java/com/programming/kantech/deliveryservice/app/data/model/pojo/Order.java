@@ -1,5 +1,8 @@
 package com.programming.kantech.deliveryservice.app.data.model.pojo;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
 /**
@@ -7,31 +10,87 @@ import com.programming.kantech.deliveryservice.app.utils.Constants;
  *
  */
 
-public class Order {
+public class Order implements Parcelable{
 
     private String id;
     private String deliveryLocationId;
     private String pickupLocationId;
     private String customerId;
     private String customerName;
+    private String driverId;
     private String type;
     private String status = Constants.ORDER_STATUS_BOOKED;
+    private boolean inProgress;
+    private String inProgressDriverId;
+    private String inProgressDateDriverId;
     private long pickupDate;
 
     public Order() {
 
     }
 
-    public Order(String id, String deliveryLocationId, String pickupLocationId, String customerId, String customerName, String type, String status, long pickupDate) {
+    public Order(String id, String deliveryLocationId, String pickupLocationId, String customerId, String customerName, String driverId, String type, String status, boolean inProgress, String inProgressDriverId, String inProgressDateDriverId, long pickupDate) {
         this.id = id;
         this.deliveryLocationId = deliveryLocationId;
         this.pickupLocationId = pickupLocationId;
         this.customerId = customerId;
         this.customerName = customerName;
+        this.driverId = driverId;
         this.type = type;
         this.status = status;
+        this.inProgress = inProgress;
+        this.inProgressDriverId = inProgressDriverId;
+        this.inProgressDateDriverId = inProgressDateDriverId;
         this.pickupDate = pickupDate;
     }
+
+    protected Order(Parcel in) {
+        id = in.readString();
+        deliveryLocationId = in.readString();
+        pickupLocationId = in.readString();
+        customerId = in.readString();
+        customerName = in.readString();
+        driverId = in.readString();
+        type = in.readString();
+        status = in.readString();
+        inProgress = in.readByte() != 0;
+        inProgressDriverId = in.readString();
+        inProgressDateDriverId = in.readString();
+        pickupDate = in.readLong();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(deliveryLocationId);
+        dest.writeString(pickupLocationId);
+        dest.writeString(customerId);
+        dest.writeString(customerName);
+        dest.writeString(driverId);
+        dest.writeString(type);
+        dest.writeString(status);
+        dest.writeByte((byte) (inProgress ? 1 : 0));
+        dest.writeString(inProgressDriverId);
+        dest.writeString(inProgressDateDriverId);
+        dest.writeLong(pickupDate);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Order> CREATOR = new Creator<Order>() {
+        @Override
+        public Order createFromParcel(Parcel in) {
+            return new Order(in);
+        }
+
+        @Override
+        public Order[] newArray(int size) {
+            return new Order[size];
+        }
+    };
 
     public String getId() {
         return id;
@@ -73,6 +132,14 @@ public class Order {
         this.customerName = customerName;
     }
 
+    public String getDriverId() {
+        return driverId;
+    }
+
+    public void setDriverId(String driverId) {
+        this.driverId = driverId;
+    }
+
     public String getType() {
         return type;
     }
@@ -87,6 +154,30 @@ public class Order {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isInProgress() {
+        return inProgress;
+    }
+
+    public void setInProgress(boolean inProgress) {
+        this.inProgress = inProgress;
+    }
+
+    public String getInProgressDriverId() {
+        return inProgressDriverId;
+    }
+
+    public void setInProgressDriverId(String inProgressDriverId) {
+        this.inProgressDriverId = inProgressDriverId;
+    }
+
+    public String getInProgressDateDriverId() {
+        return inProgressDateDriverId;
+    }
+
+    public void setInProgressDateDriverId(String inProgressDateDriverId) {
+        this.inProgressDateDriverId = inProgressDateDriverId;
     }
 
     public long getPickupDate() {

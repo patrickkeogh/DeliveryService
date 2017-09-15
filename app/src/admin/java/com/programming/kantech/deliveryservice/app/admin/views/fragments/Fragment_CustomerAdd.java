@@ -18,11 +18,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -32,21 +29,17 @@ import com.programming.kantech.deliveryservice.app.data.model.pojo.Location;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
 /**
- * Created by patri on 2017-08-18.
+ * Created by patrick keogh on 2017-08-18.
+ *
  */
 
 public class Fragment_CustomerAdd extends Fragment implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private GoogleApiClient mClient;
-
     private EditText et_fullname;
     private EditText et_email;
     private EditText et_company;
     private TextView tv_address;
-
-    private Button btn_select_location;
-    private Button btn_add_customer;
 
     private static final int PLACE_PICKER_REQUEST = 1;
 
@@ -63,8 +56,7 @@ public class Fragment_CustomerAdd extends Fragment implements GoogleApiClient.Co
      * new fragment to the client.
      */
     public static Fragment_CustomerAdd newInstance() {
-        Fragment_CustomerAdd f = new Fragment_CustomerAdd();
-        return f;
+        return new Fragment_CustomerAdd();
     }
 
     @Nullable
@@ -84,7 +76,7 @@ public class Fragment_CustomerAdd extends Fragment implements GoogleApiClient.Co
         mCustomer = new Customer();
         mLocation = new Location();
 
-        btn_select_location = rootView.findViewById(R.id.btn_select_location);
+        Button btn_select_location = rootView.findViewById(R.id.btn_select_location);
 
         btn_select_location.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,7 +85,7 @@ public class Fragment_CustomerAdd extends Fragment implements GoogleApiClient.Co
             }
         });
 
-        btn_add_customer = rootView.findViewById(R.id.btn_customer_add);
+        Button btn_add_customer = rootView.findViewById(R.id.btn_customer_add);
 
         btn_add_customer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,16 +93,6 @@ public class Fragment_CustomerAdd extends Fragment implements GoogleApiClient.Co
                 onAddCustomerClicked();
             }
         });
-
-        // Build up the LocationServices API client
-        // Uses the addApi method to request the LocationServices API
-        // Also uses enableAutoManage to automatically know when to connect/suspend the client
-        mClient = new GoogleApiClient.Builder(getContext())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .build();
 
         mCustomerRef = FirebaseDatabase.getInstance().getReference().child("customers");
         mLocationsRef = FirebaseDatabase.getInstance().getReference().child("locations");
@@ -130,24 +112,22 @@ public class Fragment_CustomerAdd extends Fragment implements GoogleApiClient.Co
             }
 
             // Extract the place information from the API
-            String placeName = place.getName().toString();
-            String placeAddress = place.getAddress().toString();
-            String placeID = place.getId();
-
-            LatLng latlng = place.getLatLng();
-
-            Double lat = latlng.latitude;
-            Double lng = latlng.longitude;
+//            String placeName = place.getName().toString();
+//            String placeAddress = place.getAddress().toString();
+//            String placeID = place.getId();
+//
+//            LatLng latlng = place.getLatLng();
+//
+//            Double lat = latlng.latitude;
+//            Double lng = latlng.longitude;
 
             mPlace = place;
 
-            Log.i(Constants.LOG_TAG, "Place:" + place.toString());
-            Log.i(Constants.LOG_TAG, "latitude:" + lat);
-            Log.i(Constants.LOG_TAG, "longitude:" + lng);
-
-            tv_address.setText(placeAddress);
+            tv_address.setText(place.getAddress().toString());
         }
     }
+
+
 
     /***
      * Called when the Google API Client is successfully connected
@@ -194,9 +174,7 @@ public class Fragment_CustomerAdd extends Fragment implements GoogleApiClient.Co
             Intent i = builder.build(getActivity());
             startActivityForResult(i, PLACE_PICKER_REQUEST);
 
-        } catch (GooglePlayServicesRepairableException e) {
-            Log.e(Constants.LOG_TAG, String.format("GooglePlayServices Not Available [%s]", e.getMessage()));
-        } catch (GooglePlayServicesNotAvailableException e) {
+        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
             Log.e(Constants.LOG_TAG, String.format("GooglePlayServices Not Available [%s]", e.getMessage()));
         } catch (Exception e) {
             Log.e(Constants.LOG_TAG, String.format("PlacePicker Exception: %s", e.getMessage()));
@@ -216,6 +194,7 @@ public class Fragment_CustomerAdd extends Fragment implements GoogleApiClient.Co
         mCustomer.setCompany(et_company.getText().toString());
         mCustomer.setEmail(et_email.getText().toString());
         mCustomer.setContact_name(et_fullname.getText().toString());
+        mCustomer.setPlaceId(mPlace.getId());
 
         mLocation.setPlaceId(mPlace.getId());
         mLocation.setMainAddress(true);
@@ -234,6 +213,7 @@ public class Fragment_CustomerAdd extends Fragment implements GoogleApiClient.Co
         //m/Customer.setUid(mCustomerRef.getKey());
         //Log.i(Constants.LOG_TAG, "key:" + mCustomerRef.child());
         //mCustomerRef.child(mGroupId).setValue(mCustomer);
+        Log.i(Constants.LOG_TAG, "Customer:" + mCustomer.toString());
 
         mCustomerRef
                 .push()
@@ -248,6 +228,8 @@ public class Fragment_CustomerAdd extends Fragment implements GoogleApiClient.Co
                         mCustomerRef.child(uniqueKey).setValue(mCustomer);
 
                         mLocation.setCustId(uniqueKey);
+
+
 
                         addLocation();
 

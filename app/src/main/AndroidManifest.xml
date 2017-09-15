@@ -4,6 +4,8 @@
     package="com.programming.kantech.deliveryservice.app">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="false"
@@ -17,8 +19,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDMz2TtZ-euSTsXGk5j99v2g1xDKXPsPf0" />
-
-
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"

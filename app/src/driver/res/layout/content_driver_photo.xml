@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="?attr/actionBarSize"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/layout_photo_showing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/iv_driver_photo"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:contentDescription="Driver Photo"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_add_a_photo_black_24dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:text="Approved"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/colorWhite" />
+
+    </LinearLayout>
+
+    <!-- A progress bar that will be shown to users to indicate that their photo is being uploaded -->
+
+    <LinearLayout
+        android:id="@+id/layout_photo_uploading"
+        android:layout_width="match_parent"
+        android:layout_height="340dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Uploading new driver id photo to the server."
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+        <ProgressBar
+            android:id="@+id/pb_loading_indicator"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginTop="@dimen/margin_8dp"
+            android:background="@xml/progress"
+            android:visibility="visible" />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_8dp"
+        android:text="@string/driver_photo_message"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+    <Button
+        android:id="@+id/btn_driver_photo_upload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@color/colorAccent"
+        android:text="@string/btn_driver_upload_photo"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/colorWhite"
+        android:textStyle="bold" />
+
+
+</LinearLayout>

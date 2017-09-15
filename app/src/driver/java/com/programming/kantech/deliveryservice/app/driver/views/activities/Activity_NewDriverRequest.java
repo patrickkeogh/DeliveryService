@@ -76,6 +76,7 @@ public class Activity_NewDriverRequest extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                Log.i(Constants.LOG_TAG, "stop progress bar");
                 //Do something after 10 secs
                 mProgressBar.setVisibility(View.GONE);
                 mTitle.setText(R.string.request_new_driver_title_completed);

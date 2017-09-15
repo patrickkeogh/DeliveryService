@@ -51,6 +51,7 @@ public class Service_FirebaseMessaging extends FirebaseMessagingService {
      */
     private void sendNotification(String title, String messageBody) {
         Intent intent = new Intent(this, Activity_Main.class);
+
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
@@ -61,7 +62,7 @@ public class Service_FirebaseMessaging extends FirebaseMessagingService {
                 + "://" + getPackageName() + "/raw/alarm_rooster");
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_menu_drive)
+                .setSmallIcon(R.drawable.ic_menu_drive_white)
                 .setContentTitle(title)
                 .setContentText(messageBody)
                 .setAutoCancel(true)

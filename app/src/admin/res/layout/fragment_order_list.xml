@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="?attr/actionBarSize"
     android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
-
-        android:id="@+id/rv_order_list"
+    <FrameLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <!-- A progress bar that will be shown to users to indicate that weather data is loading -->
-    <ProgressBar
-        android:id="@+id/pb_loading_indicator"
-        android:layout_width="@dimen/progress_bar_height_width"
-        android:layout_height="@dimen/progress_bar_height_width"
-        android:layout_gravity="center"
-        android:visibility="invisible" />
+        <android.support.v7.widget.RecyclerView
+
+            android:id="@+id/rv_order_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </FrameLayout>
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="?android:attr/windowBackground"
+        app:menu="@menu/navigation" />
 
 </LinearLayout>

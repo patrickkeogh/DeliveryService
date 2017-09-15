@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Locations;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.Customer;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.Location;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
@@ -49,8 +50,7 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
     // Member variables
     private FirebaseRecyclerAdapter<Location, ViewHolder_Locations> mFireAdapter;
     private GoogleApiClient mClient;
-    private String mCustKey;
-    private String mCustName;
+    private Customer mCustomer;
     private ActionBar mActionBar;
 
     @InjectView(R.id.rv_locations_list)
@@ -77,19 +77,17 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
         if (savedInstanceState != null) {
 
             Log.i(Constants.LOG_TAG, "Activity_Details savedInstanceState is not null");
-            if (savedInstanceState.containsKey(Constants.STATE_INFO_CUSTOMER_KEY)) {
+            if (savedInstanceState.containsKey(Constants.STATE_INFO_CUSTOMER)) {
                 Log.i(Constants.LOG_TAG, "we found the recipe key in savedInstanceState");
-                mCustKey = savedInstanceState.getString(Constants.STATE_INFO_CUSTOMER_KEY);
-                mCustName = savedInstanceState.getString(Constants.STATE_INFO_CUSTOMER_NAME);
+                mCustomer = savedInstanceState.getParcelable(Constants.STATE_INFO_CUSTOMER);
             }
 
         } else {
             Log.i(Constants.LOG_TAG, "Activity_Details savedInstanceState is null, get data from intent: ");
-            mCustKey = getIntent().getStringExtra(Constants.EXTRA_CUSTOMER_KEY);
-            mCustName = getIntent().getStringExtra(Constants.EXTRA_CUSTOMER_NAME);
+            mCustomer = getIntent().getParcelableExtra(Constants.EXTRA_CUSTOMER);
         }
 
-        Log.i(Constants.LOG_TAG, "CustKey:" + mCustKey);
+        Log.i(Constants.LOG_TAG, "CustKey:" + mCustomer.getId());
 
         // Set the support action bar
         setSupportActionBar(mToolbar);
@@ -99,7 +97,7 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
 
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(true);
-            mActionBar.setTitle("Locations for: " + mCustName);
+            mActionBar.setTitle("Locations for: " + mCustomer.getCompany());
         }
 
         // Get a reference to the locations table
@@ -120,13 +118,11 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
          */
         mRecyclerView.setHasFixedSize(false);
 
-        Log.i(Constants.LOG_TAG, "Key:" + mCustKey);
-
         mFireAdapter = new FirebaseRecyclerAdapter<Location, ViewHolder_Locations>(
                 Location.class,
                 R.layout.item_location,
                 ViewHolder_Locations.class,
-                mLocationsRef.child(mCustKey)) {
+                mLocationsRef.child(mCustomer.getId())) {
 
             @Override
             public void populateViewHolder(final ViewHolder_Locations holder, final Location location, int position) {
@@ -264,14 +260,15 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
     }
 
     private void addLocation(Place place) {
-        Log.i(Constants.LOG_TAG, "addLocation() called");
+        Log.i(Constants.LOG_TAG, "addLocation() calledplaceid:" + place.getId());
 
         final Location location = new Location();
-        location.setCustId(mCustKey);
+        location.setCustId(mCustomer.getId());
         location.setPlaceId(place.getId());
 
+
         mLocationsRef
-                .child(mCustKey)
+                .child(mCustomer.getId())
                 .push()
                 .setValue(location, new DatabaseReference.CompletionListener() {
                     @Override
@@ -281,7 +278,7 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
 
                         location.setId(uniqueKey);
 
-                        mLocationsRef.child(mCustKey).child(uniqueKey).setValue(location);
+                        mLocationsRef.child(mCustomer.getId()).child(uniqueKey).setValue(location);
 
                         Log.i(Constants.LOG_TAG, "key:" + uniqueKey);
                     }

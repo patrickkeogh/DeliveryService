@@ -8,15 +8,15 @@
     -->
     <FrameLayout
         android:id="@+id/container_master"
-        android:layout_width="300dp"
+        android:layout_width="@dimen/container_master_width"
         android:layout_height="match_parent"
         android:scaleType="centerInside" />
 
     <!-- A small divider -->
     <View
-        android:layout_width="@dimen/divider_width"
+        android:layout_width="10dp"
         android:layout_height="match_parent"
-        android:background="@android:color/darker_gray" />
+        android:background="@color/colorGreyBackground" />
 
     <LinearLayout
         android:id="@+id/layout_for_two_cols"

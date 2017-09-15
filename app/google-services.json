@@ -1,35 +1,35 @@
 {
   "project_info": {
-    "project_number": "482377196371",
-    "firebase_url": "https://friendlychat-c0111.firebaseio.com",
-    "project_id": "friendlychat-c0111",
-    "storage_bucket": "friendlychat-c0111.appspot.com"
+    "project_number": "575953247512",
+    "firebase_url": "https://kan-tech-delivery-service.firebaseio.com",
+    "project_id": "kan-tech-delivery-service",
+    "storage_bucket": "kan-tech-delivery-service.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:482377196371:android:40cb5603b0010fb1",
+        "mobilesdk_app_id": "1:575953247512:android:725ef17ab9b02c6b",
         "android_client_info": {
-          "package_name": "com.programming.kantech.deliveryservice.app.driver"
+          "package_name": "com.programming.kantech.deliveryservice.app.user"
         }
       },
       "oauth_client": [
         {
-          "client_id": "482377196371-6fff7j9dcd2c3rqd6rigeqedro35ip05.apps.googleusercontent.com",
+          "client_id": "575953247512-9ef06b844akqmah762sq5e2hl5mk0nc5.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.programming.kantech.deliveryservice.app.driver",
+            "package_name": "com.programming.kantech.deliveryservice.app.user",
             "certificate_hash": "88dd0c9f756a4d951f3b941c95043c49d26d2ec7"
           }
         },
         {
-          "client_id": "482377196371-i7l3g12p4hf6mvgbs226ctln65o0fnr8.apps.googleusercontent.com",
+          "client_id": "575953247512-l9sgj8suai96k86fm1dk844qjo5ra7bc.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDMz2TtZ-euSTsXGk5j99v2g1xDKXPsPf0"
+          "current_key": "AIzaSyDGGTudDWX42FLmx2AZl8XYTBi6UXyRr5k"
         }
       ],
       "services": {
@@ -40,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "482377196371-i7l3g12p4hf6mvgbs226ctln65o0fnr8.apps.googleusercontent.com",
+              "client_id": "575953247512-l9sgj8suai96k86fm1dk844qjo5ra7bc.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
@@ -52,28 +52,20 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:482377196371:android:10afc40011f4ed38",
+        "mobilesdk_app_id": "1:575953247512:android:40cb5603b0010fb1",
         "android_client_info": {
-          "package_name": "com.programming.kantech.deliveryservice.app.admin"
+          "package_name": "com.programming.kantech.deliveryservice.app.driver"
         }
       },
       "oauth_client": [
         {
-          "client_id": "482377196371-knnt466ts9oe6cvn2j6us8rcmb1pkhis.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.programming.kantech.deliveryservice.app.admin",
-            "certificate_hash": "88dd0c9f756a4d951f3b941c95043c49d26d2ec7"
-          }
-        },
-        {
-          "client_id": "482377196371-i7l3g12p4hf6mvgbs226ctln65o0fnr8.apps.googleusercontent.com",
+          "client_id": "575953247512-l9sgj8suai96k86fm1dk844qjo5ra7bc.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDMz2TtZ-euSTsXGk5j99v2g1xDKXPsPf0"
+          "current_key": "AIzaSyDGGTudDWX42FLmx2AZl8XYTBi6UXyRr5k"
         }
       ],
       "services": {
@@ -81,13 +73,39 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "482377196371-i7l3g12p4hf6mvgbs226ctln65o0fnr8.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:575953247512:android:10afc40011f4ed38",
+        "android_client_info": {
+          "package_name": "com.programming.kantech.deliveryservice.app.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "575953247512-l9sgj8suai96k86fm1dk844qjo5ra7bc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGGTudDWX42FLmx2AZl8XYTBi6UXyRr5k"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2

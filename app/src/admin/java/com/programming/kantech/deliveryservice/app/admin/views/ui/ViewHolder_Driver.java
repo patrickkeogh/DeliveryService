@@ -14,6 +14,7 @@ import com.programming.kantech.deliveryservice.app.R;
 public class ViewHolder_Driver extends RecyclerView.ViewHolder {
 
     private final TextView tv_driver_name;
+    private final TextView tv_driver_id;
 
     private ViewHolder_Driver.ClickListener mClickListener;
 
@@ -37,10 +38,15 @@ public class ViewHolder_Driver extends RecyclerView.ViewHolder {
         });
 
         tv_driver_name = itemView.findViewById(R.id.tv_driver_name);
+        tv_driver_id = itemView.findViewById(R.id.tv_driver_id);
     }
 
     public void setName(String name) {
         tv_driver_name.setText(name);
+    }
+
+    public void setId(String id) {
+        tv_driver_id.setText(id);
     }
 
 }
