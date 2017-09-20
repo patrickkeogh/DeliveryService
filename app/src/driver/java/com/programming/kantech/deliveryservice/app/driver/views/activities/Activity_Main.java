@@ -363,7 +363,7 @@ public class Activity_Main extends AppCompatActivity implements
                 } else {
                     Log.i(Constants.LOG_TAG, "The driver is not in the database");
                     // User is not in the driver db. add them
-                    mDriver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(),"", false, false, "");
+                    mDriver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(),"", false, false, "", "");
 
                     mDriverRef.child(user.getUid()).setValue(mDriver);
                     //mDriverDBReference.push().setValue(driver);

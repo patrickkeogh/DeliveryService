@@ -10,8 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,6 +23,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.Driver;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
+
+import java.util.Objects;
 
 /**
  * Created by patrick keogh on 2017-08-14.
@@ -35,7 +39,8 @@ public class Fragment_DriverDetails extends Fragment {
 
     // Fragment views
     private TextView tv_driver_name;
-    private TextView tv_driver_email;
+    private TextView tv_driver_id;
+    private ImageView iv_driver_details_photo;
 
 
     private Button btn_verify;
@@ -75,7 +80,8 @@ public class Fragment_DriverDetails extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_drivers_details, container, false);
 
         tv_driver_name = rootView.findViewById(R.id.tv_driver_name);
-        tv_driver_email = rootView.findViewById(R.id.tv_driver_email);
+        tv_driver_id = rootView.findViewById(R.id.tv_driver_id);
+        iv_driver_details_photo = rootView.findViewById(R.id.iv_driver_details_photo);
 
         btn_verify = rootView.findViewById(R.id.btn_verify_driver);
 
@@ -171,7 +177,11 @@ public class Fragment_DriverDetails extends Fragment {
 
         if(driver != null){
             tv_driver_name.setText(driver.getDisplayName());
-            tv_driver_email.setText(driver.getEmail());
+            tv_driver_id.setText(driver.getUid());
+
+            if(!Objects.equals(driver.getThumbUrl(), "")){
+                Glide.with(getActivity()).load(driver.getThumbUrl()).error(R.drawable.ic_menu_drive).placeholder(R.drawable.ic_attach_money).dontAnimate().into(iv_driver_details_photo);
+            }
 
             if(driver.getDriverApproved()){
                 btn_verify.setVisibility(View.GONE);

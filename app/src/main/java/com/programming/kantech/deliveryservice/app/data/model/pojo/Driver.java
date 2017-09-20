@@ -17,12 +17,14 @@ public class Driver implements Parcelable {
     private Boolean driverApproved;
     private Boolean photoApproved;
     private String photoUrl;
+    private String thumbUrl;
 
     public Driver() {
 
     }
 
-    public Driver(String uid, String displayName, String email, String device, Boolean driverApproved, Boolean photoApproved, String photoUrl) {
+    public Driver(String uid, String displayName, String email,
+                  String device, Boolean driverApproved, Boolean photoApproved, String photoUrl, String thumbUrl) {
         this.uid = uid;
         this.displayName = displayName;
         this.email = email;
@@ -30,6 +32,7 @@ public class Driver implements Parcelable {
         this.driverApproved = driverApproved;
         this.photoApproved = photoApproved;
         this.photoUrl = photoUrl;
+        this.thumbUrl = thumbUrl;
     }
 
     protected Driver(Parcel in) {
@@ -38,6 +41,7 @@ public class Driver implements Parcelable {
         email = in.readString();
         device = in.readString();
         photoUrl = in.readString();
+        thumbUrl = in.readString();
         driverApproved = (Boolean) in.readValue( null );
         photoApproved = (Boolean) in.readValue( null );
     }
@@ -110,6 +114,14 @@ public class Driver implements Parcelable {
         this.photoUrl = photoUrl;
     }
 
+    public String getThumbUrl() {
+        return thumbUrl;
+    }
+
+    public void setThumbUrl(String thumbUrl) {
+        this.thumbUrl = thumbUrl;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -122,6 +134,7 @@ public class Driver implements Parcelable {
         parcel.writeString(email);
         parcel.writeString(device);
         parcel.writeString(photoUrl);
+        parcel.writeString(thumbUrl);
         parcel.writeValue(driverApproved);
         parcel.writeValue(photoApproved);
     }

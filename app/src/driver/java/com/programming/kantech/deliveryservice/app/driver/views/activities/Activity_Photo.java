@@ -3,6 +3,8 @@ package com.programming.kantech.deliveryservice.app.driver.views.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,10 +17,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.programming.kantech.deliveryservice.app.R;
@@ -88,11 +92,11 @@ public class Activity_Photo extends AppCompatActivity {
         if (mDriver == null) {
             throw new IllegalArgumentException("Must pass EXTRA_DRIVER");
         } else {
-            if (!Objects.equals(mDriver.getPhotoUrl(), "")) {
+            if (!Objects.equals(mDriver.getThumbUrl(), "")) {
 
                 Log.i(Constants.LOG_TAG, "Load the photo with Picasso:" + mDriver.getPhotoUrl());
 
-                Glide.with(Activity_Photo.this).load(mDriver.getPhotoUrl()).dontAnimate().into(mImageView);
+                Glide.with(Activity_Photo.this).load(mDriver.getThumbUrl()).dontAnimate().into(mImageView);
             }
 
 
@@ -135,28 +139,82 @@ public class Activity_Photo extends AppCompatActivity {
             // Get a reference to store file at driver_photos/<FILENAME>
             StorageReference photoRef = mDriverPhotoStorageRef.child(selectedImageUri.getLastPathSegment());
 
+
             mLayoutShowing.setVisibility(View.GONE);
             mLayoutLoading.setVisibility(View.VISIBLE);
+
+            StorageMetadata metadata = new StorageMetadata.Builder()
+                    .setCustomMetadata("uid", mDriver.getUid())
+                    .build();
 
             // Upload file to Firebase Storage
             photoRef.putFile(selectedImageUri)
                     .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
                             // When the image has successfully uploaded, we get its download URL
-                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                            final Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                            final StorageMetadata metadata = taskSnapshot.getMetadata();
+
+                            //metadata.getName();
 
                             // Set the download URL to the message box, so that the user can send it to the database
                             assert downloadUrl != null;
+
+                            //final StorageReference thumbRef = mDriverPhotoStorageRef.child("thumb_" + metadata.getName());
+
+                            //Log.i(Constants.LOG_TAG, "ThumbUrl:" + thumbRef.toString());
+
+                            //thumbRef.getDownloadUrl()
 
                             mLayoutLoading.setVisibility(View.GONE);
                             mLayoutShowing.setVisibility(View.VISIBLE);
 
                             mDriver.setPhotoUrl(downloadUrl.toString());
+                            //mDriver.setThumbUrl(uri.toString());
                             mDriverRef.setValue(mDriver);
                             Log.i(Constants.LOG_TAG, "Photo was saved to firebase storage:" + mDriver.getPhotoUrl());
 
-                            Glide.with(Activity_Photo.this).load(mDriver.getPhotoUrl()).error(R.drawable.ic_menu_drive).placeholder(R.drawable.ic_attach_money).dontAnimate().into(mImageView);
+                            Glide.with(Activity_Photo.this)
+                                    .load(mDriver.getPhotoUrl())
+                                    .error(R.drawable.ic_menu_drive)
+                                    .placeholder(R.drawable.ic_attach_money)
+                                    .dontAnimate().into(mImageView);
+
+
+//                            final Handler handler = new Handler();
+//                            handler.postDelayed(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    thumbRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                                        @Override
+//                                        public void onSuccess(Uri uri) {
+//
+//                                            Uri thumbUrl = uri;
+//
+//                                            Log.i(Constants.LOG_TAG, "ThumbUrl:" + thumbUrl);
+//                                            mLayoutLoading.setVisibility(View.GONE);
+//                                            mLayoutShowing.setVisibility(View.VISIBLE);
+//
+//                                            mDriver.setPhotoUrl(downloadUrl.toString());
+//                                            mDriver.setThumbUrl(uri.toString());
+//                                            mDriverRef.setValue(mDriver);
+//                                            Log.i(Constants.LOG_TAG, "Photo was saved to firebase storage:" + mDriver.getPhotoUrl());
+//
+//                                            Glide.with(Activity_Photo.this).load(mDriver.getThumbUrl()).error(R.drawable.ic_menu_drive).placeholder(R.drawable.ic_attach_money).dontAnimate().into(mImageView);
+//
+//
+//                                        }
+//                                    }).addOnFailureListener(new OnFailureListener() {
+//                                        @Override
+//                                        public void onFailure(@NonNull Exception exception) {
+//                                            Log.i(Constants.LOG_TAG, "We got an error getting the thumb:" + exception.toString());
+//                                        }
+//                                    });
+//                                }
+//                            }, 5000);
+
+
                         }
 
 

@@ -61,6 +61,8 @@ public class Fragment_DriverList extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
+        Log.i(Constants.LOG_TAG, "onCreteView() in Fragment_DriverList");
+
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_drivers_master, container, false);
 

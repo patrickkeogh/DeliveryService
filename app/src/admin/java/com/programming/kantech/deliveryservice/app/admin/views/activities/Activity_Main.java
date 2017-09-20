@@ -258,8 +258,7 @@ public class Activity_Main extends AppCompatActivity implements
                                     .setIsSmartLockEnabled(!BuildConfig.DEBUG)
                                     .setTheme(R.style.LoginTheme)
                                     .setAvailableProviders(
-                                            Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
-                                                    new AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build()))
+                                            Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()))
                                     .build(),
                             Constants.REQUEST_CODE_SIGN_IN);
                 }
@@ -440,7 +439,7 @@ public class Activity_Main extends AppCompatActivity implements
                 } else {
                     Log.i(Constants.LOG_TAG, "The driver is not in the database");
                     // User is not in the driver db. add them
-                    Driver driver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(), "", false, false, "");
+                    Driver driver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(), "", false, false, "", "");
 
                     // TODO: Not sure which way is better?????
                     mUserRef.child(user.getUid()).setValue(driver);
