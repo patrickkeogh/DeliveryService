@@ -38,6 +38,8 @@ import com.programming.kantech.deliveryservice.app.data.model.pojo.Customer;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.Location;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
+import java.util.Objects;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
@@ -140,11 +142,6 @@ public class Activity_SelectCustomer extends AppCompatActivity implements Google
 
                 holder.setName(customer.getCompany());
 
-                final DatabaseReference postRef = getRef(position);
-
-                // Set click listener for the whole post view
-                final String postKey = postRef.getKey();
-
                 // Get head office from locations for this customer
                 mMainOfficeRef.child(customer.getId()).orderByChild("mainAddress").equalTo(true)
                         .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -164,7 +161,7 @@ public class Activity_SelectCustomer extends AppCompatActivity implements Google
 
                         Log.i(Constants.LOG_TAG, "Main Location:" + placeId);
 
-                        if (placeId != "") {
+                        if (!Objects.equals(placeId, "")) {
                             PendingResult<PlaceBuffer> placeResult = null;
 
                             placeResult = Places.GeoDataApi.getPlaceById(mClient, placeId);

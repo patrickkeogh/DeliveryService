@@ -148,7 +148,8 @@ public class Activity_Photo extends AppCompatActivity {
                     .build();
 
             // Upload file to Firebase Storage
-            photoRef.putFile(selectedImageUri)
+
+            photoRef.putFile(selectedImageUri, metadata)
                     .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
                         public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {

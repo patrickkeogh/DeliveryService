@@ -33,8 +33,7 @@ import com.programming.kantech.deliveryservice.app.utils.Constants;
  *
  */
 
-public class Fragment_CustomerAdd extends Fragment implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+public class Fragment_CustomerAdd extends Fragment{
 
     private EditText et_fullname;
     private EditText et_email;
@@ -125,39 +124,6 @@ public class Fragment_CustomerAdd extends Fragment implements GoogleApiClient.Co
 
             tv_address.setText(place.getAddress().toString());
         }
-    }
-
-
-
-    /***
-     * Called when the Google API Client is successfully connected
-     *
-     * @param connectionHint Bundle of data provided to clients by Google Play services
-     */
-    @Override
-    public void onConnected(@Nullable Bundle connectionHint) {
-        //refreshPlacesData();
-        Log.i(Constants.LOG_TAG, "API Client Connection Successful!");
-    }
-
-    /***
-     * Called when the Google API Client is suspended
-     *
-     * @param cause cause The reason for the disconnection. Defined by constants CAUSE_*.
-     */
-    @Override
-    public void onConnectionSuspended(int cause) {
-        Log.i(Constants.LOG_TAG, "API Client Connection Suspended!");
-    }
-
-    /***
-     * Called when the Google API Client failed to connect to Google Play Services
-     *
-     * @param result A ConnectionResult that can be used for resolving the error
-     */
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult result) {
-        Log.e(Constants.LOG_TAG, "API Client Connection Failed!");
     }
 
     /***

@@ -15,7 +15,8 @@ public class Constants {
      */
     public final static String LOG_TAG = "Tech Delivery Service:";
 
-    public final static String KEY_GOOGLE = "AIzaSyDMz2TtZ-euSTsXGk5j99v2g1xDKXPsPf0";
+
+    public final static String KEY_GOOGLE = "AIzaSyDGGTudDWX42FLmx2AZl8XYTBi6UXyRr5k";
 
     // Format used for storing dates in the database.  ALso used for converting those strings
     // back into date objects for comparison/processing.
