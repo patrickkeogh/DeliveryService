@@ -36,13 +36,17 @@ public class AppWidget_ViewFactory implements RemoteViewsService.RemoteViewsFact
     }
 
     private void populateOrdersListView(){
+
+        Log.i(Constants.LOG_TAG, "populateOrdersListView called");
         mOrdersRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_ORDERS);
+
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        mOrdersRef.addValueEventListener(new ValueEventListener() {
+        mOrdersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.i(Constants.LOG_TAG, "onDataChange called in populateOrdersListView()");
 
                 if(dataSnapshot !=  null){
                     for(DataSnapshot snapshot: dataSnapshot.getChildren()){
@@ -51,7 +55,6 @@ public class AppWidget_ViewFactory implements RemoteViewsService.RemoteViewsFact
                         mOrderList.add(order);
                     }
                 }
-
             }
 
             @Override
@@ -59,6 +62,7 @@ public class AppWidget_ViewFactory implements RemoteViewsService.RemoteViewsFact
 
             }
         });
+
     }
 
     @Override

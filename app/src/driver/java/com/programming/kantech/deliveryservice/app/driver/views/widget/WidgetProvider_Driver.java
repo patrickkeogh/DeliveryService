@@ -45,7 +45,7 @@ public class WidgetProvider_Driver extends AppWidgetProvider {
      * @return The RemoteViews for the widget
      */
     private static RemoteViews getRemoteView(Context context) {
-        Log.i(Constants.LOG_TAG, "getRemoteView() called in WidgetProvider_BakingMagic");
+        Log.i(Constants.LOG_TAG, "getRemoteView() called in WidgetProvider_Driver");
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget_driver);
 
@@ -65,7 +65,6 @@ public class WidgetProvider_Driver extends AppWidgetProvider {
 
         // Handle empty favs list
         views.setEmptyView(R.id.widget_list_view_orders, R.id.empty_view);
-
 
         return views;
 
