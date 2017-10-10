@@ -18,8 +18,8 @@ public class Constants {
     public static final String BASE_PATH_DIRECTIONS_API = "https://maps.googleapis.com/maps/api/directions/";
 
 
-    public final static String KEY_GOOGLE = "AIzaSyAY4VENShVhvMRUJkj7C_XnHjfKPNOamMU";
-    public final static String STRIPE_PUBLIC_KEY = "pk_test_f2kTNX5k5qSiF2bF5osb4htj";
+    public final static String KEY_GOOGLE = "XXXXXXX";
+    public final static String STRIPE_PUBLIC_KEY = "XXXXXXXXX";
 
     // Format used for storing dates in the database.  ALso used for converting those strings
     // back into date objects for comparison/processing.
