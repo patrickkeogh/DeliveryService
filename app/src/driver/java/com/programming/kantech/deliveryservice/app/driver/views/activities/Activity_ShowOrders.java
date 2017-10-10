@@ -117,7 +117,7 @@ public class Activity_ShowOrders extends AppCompatActivity implements GoogleApiC
                 Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + order.getCustomerName());
 
                 holder.setCustomerName(order.getCustomerName());
-                holder.setOrderDate(Utils_General.getFormattedLongDateStringFromLongDate(order.getPickupDate()));
+                //holder.setOrderDate(Utils_General.getFormattedLongDateStringFromLongDate(order.getPickupDate()));
                 holder.setOrderStatus(order.getStatus());
 
                 PendingResult<PlaceBuffer> result_pickup = Places.GeoDataApi.getPlaceById(mClient, order.getPickupLocationId());

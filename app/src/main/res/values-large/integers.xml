@@ -2,4 +2,5 @@
 <resources>
     <integer name="container_width_order_list">400</integer>
     <integer name="container_width_customer_list">500</integer>
+    <integer name="container_width_driver_list">500</integer>
 </resources>

@@ -16,4 +16,6 @@
     <dimen name="progress_bar_height_width">24dp</dimen>
 
     <dimen name="container_master_width">300dp</dimen>
+    <dimen name="divider_view_accent">2dp</dimen>
+    <dimen name="margin_top_checkout">157dp</dimen>
 </resources>

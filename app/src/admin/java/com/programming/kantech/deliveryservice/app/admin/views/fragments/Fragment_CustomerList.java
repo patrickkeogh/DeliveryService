@@ -112,49 +112,7 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
          */
         mCustomerRecyclerView.setHasFixedSize(false);
 
-        mFireAdapter = new FirebaseRecyclerAdapter<Customer, ViewHolder_Customers>(
-                Customer.class,
-                R.layout.item_customer,
-                ViewHolder_Customers.class,
-                mCustomersRef) {
 
-            @Override
-            public void populateViewHolder(final ViewHolder_Customers holder, final Customer customer, int position) {
-                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + customer.toString());
-
-                //holder.itemView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
-
-                holder.setName(customer.getCompany());
-
-
-                PendingResult<PlaceBuffer> placeResult;
-
-                placeResult = Places.GeoDataApi.getPlaceById(mClient, customer.getPlaceId());
-
-                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
-                    @Override
-                    public void onResult(@NonNull PlaceBuffer places) {
-
-                        Place myPlace = places.get(0);
-
-                        Log.i(Constants.LOG_TAG, "PLACE:" + myPlace.getAddress());
-
-                        holder.setAddress(myPlace.getAddress().toString());
-                    }
-                });
-
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Notify the activity a customer has been selected
-                        mCallback.onCustomerSelected(customer);
-                    }
-                });
-            }
-
-        };
-
-        mCustomerRecyclerView.setAdapter(mFireAdapter);
     }
 
     // Override onAttach to make sure that the container activity has implemented the callback
@@ -183,8 +141,11 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-
+        Log.i(Constants.LOG_TAG, "onConnected called");
+        loadFirebaseAdapter();
     }
+
+
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -240,5 +201,52 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
                     .addApi(Places.GEO_DATA_API)
                     .build();
         }
+    }
+    private void loadFirebaseAdapter() {
+
+        mFireAdapter = new FirebaseRecyclerAdapter<Customer, ViewHolder_Customers>(
+                Customer.class,
+                R.layout.item_customer,
+                ViewHolder_Customers.class,
+                mCustomersRef) {
+
+            @Override
+            public void populateViewHolder(final ViewHolder_Customers holder, final Customer customer, int position) {
+                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + customer.toString());
+
+                //holder.itemView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
+
+                holder.setName(customer.getCompany());
+
+
+                PendingResult<PlaceBuffer> placeResult;
+
+                placeResult = Places.GeoDataApi.getPlaceById(mClient, customer.getPlaceId());
+
+                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+                    @Override
+                    public void onResult(@NonNull PlaceBuffer places) {
+
+                        Place myPlace = places.get(0);
+
+                        Log.i(Constants.LOG_TAG, "PLACE:" + myPlace.getAddress());
+
+                        holder.setAddress(myPlace.getAddress().toString());
+                    }
+                });
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Notify the activity a customer has been selected
+                        mCallback.onCustomerSelected(customer);
+                    }
+                });
+            }
+
+        };
+
+        mCustomerRecyclerView.setAdapter(mFireAdapter);
+
     }
 }

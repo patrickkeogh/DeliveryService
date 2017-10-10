@@ -51,7 +51,6 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
     private FirebaseRecyclerAdapter<Location, ViewHolder_Locations> mFireAdapter;
     private GoogleApiClient mClient;
     private Customer mCustomer;
-    private ActionBar mActionBar;
 
     @InjectView(R.id.rv_locations_list)
     RecyclerView mRecyclerView;
@@ -87,13 +86,16 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
             mCustomer = getIntent().getParcelableExtra(Constants.EXTRA_CUSTOMER);
         }
 
-        Log.i(Constants.LOG_TAG, "CustKey:" + mCustomer.getId());
+
+        if (mCustomer == null) {
+            throw new IllegalArgumentException("Must pass EXTRA_CUSTOMER");
+        }
 
         // Set the support action bar
         setSupportActionBar(mToolbar);
 
         // Set the action bar back button to look like an up button
-        mActionBar = this.getSupportActionBar();
+        ActionBar mActionBar = this.getSupportActionBar();
 
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(true);
@@ -117,72 +119,6 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
          * change the child layout size in the RecyclerView
          */
         mRecyclerView.setHasFixedSize(false);
-
-        mFireAdapter = new FirebaseRecyclerAdapter<Location, ViewHolder_Locations>(
-                Location.class,
-                R.layout.item_location,
-                ViewHolder_Locations.class,
-                mLocationsRef.child(mCustomer.getId())) {
-
-            @Override
-            public void populateViewHolder(final ViewHolder_Locations holder, final Location location, int position) {
-                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + location.getPlaceId());
-
-
-                final DatabaseReference postRef = getRef(position);
-
-                // Set click listener for the whole post view
-                final String postKey = postRef.getKey();
-
-                final Place[] thisPlace = new Place[1];
-
-
-
-                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mClient, location.getPlaceId());
-
-                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
-                    @Override
-                    public void onResult(@NonNull PlaceBuffer places) {
-
-                        thisPlace[0] = places.get(0);
-
-                        Log.i(Constants.LOG_TAG, "PLACE:" + thisPlace[0].getAddress());
-
-                        holder.setName(thisPlace[0].getName().toString());
-                        holder.setAddress(thisPlace[0].getAddress().toString());
-
-
-                    }
-                });
-
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        // Send the selected customer back to the main activity
-                        finishTheActivity(location, thisPlace[0]);
-
-
-                    }
-                });
-
-            }
-
-        };
-
-        mRecyclerView.setAdapter(mFireAdapter);
-
-
-        // Build up the LocationServices API client
-        // Uses the addApi method to request the LocationServices API
-        // Also uses enableAutoManage to automatically know when to connect/suspend the client
-        mClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .enableAutoManage(this, this)
-                .build();
 
         mButton_PickupLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -223,7 +159,8 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-
+        Log.i(Constants.LOG_TAG, "onConnected called");
+        loadFirebaseAdapter();
     }
 
     @Override
@@ -284,5 +221,101 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
                     }
                 });
 
+    }
+
+    private void buildApiClient() {
+        if (mClient == null) {
+            Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
+
+            mClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .addApi(Places.GEO_DATA_API)
+                    .build();
+        }
+    }
+
+    private void loadFirebaseAdapter() {
+
+        mFireAdapter = new FirebaseRecyclerAdapter<Location, ViewHolder_Locations>(
+                Location.class,
+                R.layout.item_location,
+                ViewHolder_Locations.class,
+                mLocationsRef.child(mCustomer.getId())) {
+
+            @Override
+            public void populateViewHolder(final ViewHolder_Locations holder, final Location location, int position) {
+                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + location.getPlaceId());
+
+                final Place[] thisPlace = new Place[1];
+
+                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mClient, location.getPlaceId());
+
+                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+                    @Override
+                    public void onResult(@NonNull PlaceBuffer places) {
+
+                        thisPlace[0] = places.get(0);
+
+                        Log.i(Constants.LOG_TAG, "PLACE:" + thisPlace[0].getAddress());
+
+                        holder.setName(thisPlace[0].getName().toString());
+                        holder.setAddress(thisPlace[0].getAddress().toString());
+
+                    }
+                });
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        // Send the selected customer back to the main activity
+                        finishTheActivity(location, thisPlace[0]);
+
+
+                    }
+                });
+
+            }
+
+        };
+
+        mRecyclerView.setAdapter(mFireAdapter);
+
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mClient != null) {
+            mClient.disconnect();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mClient = null;
+
+        if (mFireAdapter != null) {
+            mFireAdapter.cleanup();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mClient == null) {
+            buildApiClient();
+            mClient.connect();
+        } else {
+            if (!mClient.isConnected()) {
+                mClient.connect();
+            }
+        }
     }
 }

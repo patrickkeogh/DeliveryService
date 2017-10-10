@@ -12,7 +12,7 @@
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
-            app:titleTextAppearance="@style/Toolbar.TitleText"
+            app:titleTextAppearance="@style/Toolbar.TitleText.Large"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"

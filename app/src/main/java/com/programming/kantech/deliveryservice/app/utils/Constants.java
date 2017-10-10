@@ -15,8 +15,11 @@ public class Constants {
      */
     public final static String LOG_TAG = "Tech Delivery Service:";
 
+    public static final String BASE_PATH_DIRECTIONS_API = "https://maps.googleapis.com/maps/api/directions/";
 
-    public final static String KEY_GOOGLE = "AIzaSyDGGTudDWX42FLmx2AZl8XYTBi6UXyRr5k";
+
+    public final static String KEY_GOOGLE = "AIzaSyAY4VENShVhvMRUJkj7C_XnHjfKPNOamMU";
+    public final static String STRIPE_PUBLIC_KEY = "pk_test_f2kTNX5k5qSiF2bF5osb4htj";
 
     // Format used for storing dates in the database.  ALso used for converting those strings
     // back into date objects for comparison/processing.
@@ -56,14 +59,26 @@ public class Constants {
     public static final int REQUEST_CODE_SELECT_DRIVER = 7;
     public static final int REQUEST_CODE_SELECT_PHOTO = 8;
 
+    public static final int REQUEST_CODE_USER_REGISTRATION = 10;
+    public static final int REQUEST_CODE_PLACE_PICKER = 11;
+
+    /**
+     * The Constants used for service actions
+     */
+    public static final String ACTION_UPDATE_DRIVER_WIDGET =
+            "com.programming.kantech.deliveryservice.app.action.driver.update_widget";
+
     /**
      * The Constants used for data added to savedInstanceState
      */
 
-    public static final String STATE_INFO_CUSTOMER_NAME = "com.programming.kantech.bakingmagic.app.state.customer.name";
-    public static final String STATE_INFO_CUSTOMER = "com.programming.kantech.bakingmagic.app.state.customer";
-    public static final String STATE_INFO_ORDER = "com.programming.kantech.bakingmagic.app.state.order";
-    public static final String STATE_INFO_DRIVER = "com.programming.kantech.bakingmagic.app.state.driver";
+    public static final String STATE_INFO_CUSTOMER_NAME = "com.programming.kantech.deliveryservice.app.state.customer.name";
+    public static final String STATE_INFO_CUSTOMER = "com.programming.kantech.deliveryservice.app.state.customer";
+    public static final String STATE_INFO_ORDER = "com.programming.kantech.deliveryservice.app.state.order";
+    public static final String STATE_INFO_DRIVER = "com.programming.kantech.deliveryservice.app.state.driver";
+    public static final String STATE_INFO_USER = "com.programming.kantech.deliveryservice.app.state.user";
+    public static final String STATE_INFO_LOCATION_SELECT_MESSAGE = "com.programming.kantech.deliveryservice.app.state.location.message";
+    public static final String STATE_INFO_ORDERS_LIST = "com.programming.kantech.deliveryservice.app.state.orders.list";
 
     /**
      * The Constants used for data added as extras to intents
@@ -78,6 +93,8 @@ public class Constants {
     public static final String EXTRA_LOCATION_ADDRESS = "com.programming.kantech.deliveryservice.app.extra.location.address";
     public static final String EXTRA_ACTIVITY_REF = "com.programming.kantech.deliveryservice.app.extra.activity_ref";
     public static final String EXTRA_ORDER = "com.programming.kantech.deliveryservice.app.extra.order";
+    public static final String EXTRA_USER = "com.programming.kantech.deliveryservice.app.extra.user";
+    public static final String EXTRA_LOCATION_SELECT_MESSAGE = "com.programming.kantech.deliveryservice.app.extra.location.message";
 
     /**
      * The Constants used for fragment tags
@@ -135,10 +152,16 @@ public class Constants {
     // Child Fields
     public static final String FIREBASE_CHILD_MAIN_ADDRESS = "main_address";
     public static final String FIREBASE_CHILD_DRIVER_APPROVED = "driverApproved";
+    public static final String FIREBASE_CHILD_DEVICE = "device";
+    public static final String FIREBASE_CHILD_LOCATIONS = "locations";
+
+    public static final String FIREBASE_CHILD_ORDER_STATUS = "status";
+    public static final String FIREBASE_CHILD_ORDER_CUST_ID = "customerId";
 
     // Notification topics
     public static final String FIREBASE_NOTIFICATION_TOPIC_ADMIN = "topic_admin";
     public static final String FIREBASE_NOTIFICATION_TOPIC_DRIVER = "topic_driver";
+    public static final String FIREBASE_NOTIFICATION_TOPIC_USER = "topic_customer";
 
 
 
@@ -168,10 +191,11 @@ public class Constants {
     public static final String ORDER_TYPE_PHONE = "PHONE";
     public static final String ORDER_TYPE_USER = "USER";
 
+    public static final String ORDER_STATUS_OPEN = "OPEN";
+    public static final String ORDER_STATUS_COMPLETE = "COMPLETE";
     public static final String ORDER_STATUS_BOOKED = "BOOKED";
     public static final String ORDER_STATUS_ASSIGNED = "ASSIGNED";
-
-
+    public static final String ORDER_STATUS_PICKUP_COMPLETE = "PICKUP COMPLETE";
 
 
 }

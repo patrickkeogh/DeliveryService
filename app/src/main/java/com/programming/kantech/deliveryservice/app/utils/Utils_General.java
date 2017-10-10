@@ -1,16 +1,19 @@
 package com.programming.kantech.deliveryservice.app.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.IBinder;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -28,11 +31,46 @@ import java.util.GregorianCalendar;
 
 public class Utils_General {
 
+    public static String[] getSpinnerMonths(){
+
+        String[] months = new String[12];
+
+        for (int i = 1; i <= 12; i++) {
+            String val = "";
+            if (i < 10) {
+                val = "0";
+            }
+            months[i - 1] = val + String.valueOf(i);
+
+        }
+        return months;
+    }
+
+    public static String[] getSpinnerYears(){
+
+        String[] years = new String[12];
+
+        for (int i = 1; i <= 12; i++) {
+            years[i - 1] = String.valueOf(i + 2016);
+        }
+        return years;
+    }
+
     /**
      * Show a toast message.
      */
     public static void showToast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * This method is used to hide a keyboard after a user has finished typing
+     * the url.
+     */
+    public static void hideKeyboard(Activity activity, IBinder windowToken) {
+        InputMethodManager mgr = (InputMethodManager) activity
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.hideSoftInputFromWindow(windowToken, 0);
     }
 
     /**

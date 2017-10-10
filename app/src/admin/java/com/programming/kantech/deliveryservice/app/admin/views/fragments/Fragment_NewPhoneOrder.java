@@ -184,8 +184,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
                 Intent intent = new Intent(getActivity(), Activity_SelectLocation.class);
 
-                intent.putExtra(Constants.EXTRA_CUSTOMER_KEY, mSelectedCustomer.getId());
-                intent.putExtra(Constants.EXTRA_CUSTOMER_NAME, mSelectedCustomer.getCompany());
+                intent.putExtra(Constants.EXTRA_CUSTOMER, mSelectedCustomer);
                 startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_PICKUP_LOCATION);
             }
         });
@@ -195,9 +194,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
             public void onClick(View view) {
 
                 Intent intent = new Intent(getActivity(), Activity_SelectLocation.class);
-
-                intent.putExtra(Constants.EXTRA_CUSTOMER_KEY, mSelectedCustomer.getId());
-                intent.putExtra(Constants.EXTRA_CUSTOMER_NAME, mSelectedCustomer.getCompany());
+                intent.putExtra(Constants.EXTRA_CUSTOMER, mSelectedCustomer);
                 startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_DELIVERY_LOCATION);
             }
         });
@@ -417,7 +414,9 @@ public class Fragment_NewPhoneOrder extends Fragment {
                         order.setPickupLocationId(mLocationPickup.getPlaceId());
                         order.setType(Constants.ORDER_TYPE_PHONE);
                         order.setStatus(Constants.ORDER_STATUS_BOOKED);
+
                         long newDate = Utils_General.getStartTimeForDate(mDate);
+
                         Log.i(Constants.LOG_TAG, "THIS:" + newDate);
                         order.setPickupDate(newDate);
 
@@ -466,7 +465,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
     }
 
-    // Listener
+    // Date picker listener
     private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
 
         // when dialog box is closed, below method will be called.
@@ -486,7 +485,6 @@ public class Fragment_NewPhoneOrder extends Fragment {
             mDate = c.getTimeInMillis();
 
             setupForm();
-
 
         }
     };

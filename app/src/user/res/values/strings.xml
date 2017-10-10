@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Delivery Service User</string>
+    <string name="change_card">Change details</string>
+    <string name="confirm_purchase">Confirm Purchase</string>
+    <string name="or">or</string>
+    <string name="enter_details">Enter card details</string>
+    <string name="activity_title_checkout_success">Payment Received</string>
 </resources>

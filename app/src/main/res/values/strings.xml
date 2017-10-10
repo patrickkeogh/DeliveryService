@@ -23,5 +23,11 @@
     <string name="cancel">Cancel</string>
     <string name="order_booked">Order Booked</string>
     <string name="order_cancelled">Order Cancelled</string>
+    <string name="select_pickup_location_title">Select the pickup address</string>
+    <string name="select_delivery_location_title">Select a delivery location</string>
+    <string name="label_billing_info">Billing Details</string>
+    <string name="ok">ok</string>
+    <string name="activity_title_checkout">Order Checkout</string>
+    <string name="action_driver_filter">Map Filter</string>
 
 </resources>

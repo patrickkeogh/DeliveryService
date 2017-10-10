@@ -4,15 +4,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -23,9 +20,6 @@ import com.google.android.gms.location.places.Places;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Locations;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Customer;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Location;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
@@ -49,6 +43,8 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
     private TextView tv_order_location_delivery;
     private TextView tv_order_status;
     private TextView tv_order_date;
+    private TextView tv_order_type;
+    private TextView tv_order_distance;
 
     /**
      * Static factory method that takes a driver object parameter,
@@ -90,7 +86,9 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
         tv_order_location_pickup = rootView.findViewById(R.id.tv_order_location_pickup);
         tv_order_location_delivery = rootView.findViewById(R.id.tv_order_location_delivery);
         tv_order_status = rootView.findViewById(R.id.tv_order_status);
+        tv_order_type = rootView.findViewById(R.id.tv_order_type);
         tv_order_date = rootView.findViewById(R.id.tv_order_date);
+        tv_order_distance = rootView.findViewById(R.id.tv_order_distance);
 
         if (mOrder == null) {
             throw new IllegalArgumentException("Must pass a Order Object");
@@ -98,6 +96,8 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
             tv_order_company.setText(mOrder.getCustomerName());
             tv_order_number.setText(mOrder.getId());
             tv_order_status.setText(mOrder.getStatus());
+            tv_order_type.setText(mOrder.getType());
+            tv_order_distance.setText(mOrder.getDistance_text());
             tv_order_date.setText(Utils_General.getFormattedLongDateStringFromLongDate(mOrder.getPickupDate()));
         }
 

@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
-        android:id="@+id/action_driver_previous_day"
-        android:title="Previous Day"
-        android:icon="@drawable/ic_chevron_left"
+        android:id="@+id/action_driver_filter"
+        android:icon="@drawable/ic_filter_list"
+        android:title="@string/action_driver_filter"
         android:orderInCategory="100"
         app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/action_driver_next_day"
-        android:title="Previous Day"
-        android:icon="@drawable/ic_chevron_right"
-        android:orderInCategory="200"
-        app:showAsAction="ifRoom"/>
+
 
     <item
         android:id="@+id/action_driver_photo"

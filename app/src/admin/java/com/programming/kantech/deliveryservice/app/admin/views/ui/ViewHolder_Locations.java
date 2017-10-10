@@ -18,14 +18,14 @@ public class ViewHolder_Locations extends RecyclerView.ViewHolder {
     private final TextView tv_location_name;
     private final TextView tv_location_address;
 
-    private ViewHolder_Locations.ClickListener mClickListener;
+    private ClickListener mClickListener;
 
     //Interface to send callbacks...
     public interface ClickListener {
         public void onItemClick(View view, int position);
     }
 
-    public void setOnClickListener(ViewHolder_Locations.ClickListener clickListener) {
+    public void setOnClickListener(ClickListener clickListener) {
         mClickListener = clickListener;
     }
 

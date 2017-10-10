@@ -15,6 +15,7 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
+import com.programming.kantech.deliveryservice.app.admin.views.activities.Activity_SelectDriver;
 import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Driver;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.Driver;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
@@ -39,7 +40,7 @@ public class Fragment_DriverList extends Fragment {
 
     // onDriverSelected interface, calls a method in the host activity named onDriverSelected
     public interface DriverClickListener {
-        void onDriverSelected(String key);
+        void onDriverSelected(Driver driver);
     }
 
     // Mandatory empty constructor
@@ -99,20 +100,18 @@ public class Fragment_DriverList extends Fragment {
                 mDriverRef) {
 
             @Override
-            public void populateViewHolder(ViewHolder_Driver holder, Driver driver, int position) {
+            public void populateViewHolder(ViewHolder_Driver holder, final Driver driver, int position) {
                 Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + driver.toString());
+
                 holder.setName(driver.getDisplayName());
-
-                final DatabaseReference postRef = getRef(position);
-
-                // Set click listener for the whole post view
-                final String postKey = postRef.getKey();
+                holder.setPhoto(driver.getPhotoUrl(), getActivity());
+                holder.setId(driver.getUid());
 
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         // Notify the activity a driver was clicked
-                        mCallback.onDriverSelected(postKey);
+                        mCallback.onDriverSelected(driver);
                     }
                 });
             }

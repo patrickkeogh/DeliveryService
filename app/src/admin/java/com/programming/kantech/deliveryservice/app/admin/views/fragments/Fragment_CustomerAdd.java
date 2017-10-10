@@ -40,8 +40,6 @@ public class Fragment_CustomerAdd extends Fragment{
     private EditText et_company;
     private TextView tv_address;
 
-    private static final int PLACE_PICKER_REQUEST = 1;
-
     private DatabaseReference mCustomerRef;
     private DatabaseReference mLocationsRef;
 
@@ -93,8 +91,8 @@ public class Fragment_CustomerAdd extends Fragment{
             }
         });
 
-        mCustomerRef = FirebaseDatabase.getInstance().getReference().child("customers");
-        mLocationsRef = FirebaseDatabase.getInstance().getReference().child("locations");
+        mCustomerRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_CUSTOMERS);
+        mLocationsRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_LOCATIONS);
 
         return rootView;
 
@@ -103,7 +101,7 @@ public class Fragment_CustomerAdd extends Fragment{
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.i(Constants.LOG_TAG, "onActivityResult in Frag,ment");
-        if (requestCode == PLACE_PICKER_REQUEST && resultCode == Activity.RESULT_OK) {
+        if (requestCode == Constants.REQUEST_CODE_PLACE_PICKER && resultCode == Activity.RESULT_OK) {
             Place place = PlacePicker.getPlace(getContext(), data);
             if (place == null) {
                 Log.i(Constants.LOG_TAG, "No place selected");
@@ -138,7 +136,7 @@ public class Fragment_CustomerAdd extends Fragment{
             // when a place is selected or with the user cancels.
             PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
             Intent i = builder.build(getActivity());
-            startActivityForResult(i, PLACE_PICKER_REQUEST);
+            startActivityForResult(i, Constants.REQUEST_CODE_PLACE_PICKER);
 
         } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
             Log.e(Constants.LOG_TAG, String.format("GooglePlayServices Not Available [%s]", e.getMessage()));

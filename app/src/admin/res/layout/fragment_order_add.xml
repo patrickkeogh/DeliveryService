@@ -19,7 +19,6 @@
             android:layout_height="match_parent">
 
             <LinearLayout
-                android:id="@+id/email_login_form"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -37,7 +36,7 @@
                     android:layout_height="2dip"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"
-                    android:background="@color/colorPrimaryDark" />
+                    android:background="@color/colorAccent" />
 
                 <LinearLayout
                     android:id="@+id/layout_order_customer"
@@ -80,7 +79,7 @@
                     android:layout_height="2dip"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"
-                    android:background="@color/colorPrimaryDark" />
+                    android:background="@color/colorAccent" />
 
                 <LinearLayout
                     android:id="@+id/layout_order_pickup_date"
@@ -125,7 +124,7 @@
                     android:layout_height="2dip"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"
-                    android:background="@color/colorPrimaryDark" />
+                    android:background="@color/colorAccent" />
 
                 <LinearLayout
                     android:id="@+id/layout_location_pickup"

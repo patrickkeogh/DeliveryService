@@ -35,7 +35,6 @@ public class Fragment_DriverDetails extends Fragment {
 
     // Member variables
     private Driver mDriver;
-    private String mPostKey;
 
     // Fragment views
     private TextView tv_driver_name;
@@ -61,12 +60,12 @@ public class Fragment_DriverDetails extends Fragment {
      * initializes the fragment's arguments, and returns the
      * new fragment to the client.
      */
-    public static Fragment_DriverDetails newInstance(String key) {
+    public static Fragment_DriverDetails newInstance(Driver driver) {
         Fragment_DriverDetails f = new Fragment_DriverDetails();
         Bundle args = new Bundle();
 
         // Add any required arguments for start up - None needed right now
-        args.putString(Constants.EXTRA_DRIVER_KEY, key);
+        args.putParcelable(Constants.EXTRA_DRIVER, driver);
         f.setArguments(args);
         return f;
     }
@@ -78,6 +77,19 @@ public class Fragment_DriverDetails extends Fragment {
 
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_drivers_details, container, false);
+
+        if (savedInstanceState != null) {
+
+            Log.i(Constants.LOG_TAG, "Activity_Photo savedInstanceState is not null");
+            if (savedInstanceState.containsKey(Constants.STATE_INFO_DRIVER)) {
+                Log.i(Constants.LOG_TAG, "we found the recipe key in savedInstanceState");
+                mDriver = savedInstanceState.getParcelable(Constants.STATE_INFO_DRIVER);
+            }
+
+        } else {
+            Log.i(Constants.LOG_TAG, "Activity_Photo savedInstanceState is null, get data from intent: ");
+            mDriver = getArguments().getParcelable(Constants.EXTRA_DRIVER);
+        }
 
         tv_driver_name = rootView.findViewById(R.id.tv_driver_name);
         tv_driver_id = rootView.findViewById(R.id.tv_driver_id);
@@ -96,19 +108,13 @@ public class Fragment_DriverDetails extends Fragment {
             }
         });
 
-        // Get arguments used during start up
-        Bundle args = getArguments();
-
-        // Get post key from args
-        mPostKey = args.getString(Constants.EXTRA_DRIVER_KEY);
-
-        if (mPostKey == null) {
-            throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
+        if (mDriver == null) {
+            throw new IllegalArgumentException("Must pass EXTRA_DRIVER");
         }
 
         // Get a reference to the drivers table
         mDriverRef = FirebaseDatabase.getInstance()
-                .getReference().child(Constants.FIREBASE_NODE_DRIVERS).child(mPostKey);
+                .getReference().child(Constants.FIREBASE_NODE_DRIVERS).child(mDriver.getUid());
 
         return rootView;
 
@@ -158,8 +164,8 @@ public class Fragment_DriverDetails extends Fragment {
                     Log.w(Constants.LOG_TAG, "loadPost:onDataChange");
 
                     // Get Post object and use the values to update the UI
-                    Driver driver = dataSnapshot.getValue(Driver.class);
-                    setViewData(driver);
+                    mDriver = dataSnapshot.getValue(Driver.class);
+                    setViewData();
                 }
 
                 @Override
@@ -173,23 +179,23 @@ public class Fragment_DriverDetails extends Fragment {
         }
     }
 
-    private void setViewData(Driver driver) {
+    private void setViewData() {
 
-        if(driver != null){
-            tv_driver_name.setText(driver.getDisplayName());
-            tv_driver_id.setText(driver.getUid());
+        if(mDriver != null){
+            tv_driver_name.setText(mDriver.getDisplayName());
+            tv_driver_id.setText(mDriver.getUid());
 
-            if(!Objects.equals(driver.getThumbUrl(), "")){
-                Glide.with(getActivity()).load(driver.getThumbUrl()).error(R.drawable.ic_menu_drive).placeholder(R.drawable.ic_attach_money).dontAnimate().into(iv_driver_details_photo);
-            }
 
-            if(driver.getDriverApproved()){
+                Glide.with(getActivity()).load(mDriver.getPhotoUrl())
+                        .error(R.drawable.ic_menu_drive)
+                        .placeholder(R.drawable.ic_attach_money)
+                        .dontAnimate()
+                        .into(iv_driver_details_photo);
+
+            if(mDriver.getDriverApproved()){
                 btn_verify.setVisibility(View.GONE);
             }
 
         }
-
-        mDriver = driver;
-
     }
 }

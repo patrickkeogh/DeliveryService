@@ -1,43 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="?attr/actionBarSize"
-    android:orientation="vertical">
-
-    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/rg_driver_options"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryLight"
-        android:orientation="horizontal"
-        android:weightSum="3">
-
-        <RadioButton
-            android:id="@+id/rb_driver_all"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:checked="true"
-            android:buttonTint="@color/colorAccent"
-            android:text="All Locations" />
-
-        <RadioButton
-            android:id="@+id/rb_driver_pickups"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:buttonTint="@color/colorAccent"
-            android:text="Pickup Only" />
-
-        <RadioButton
-            android:id="@+id/rb_driver_deliveries"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:buttonTint="@color/colorAccent"
-            android:text="Delivery Only" />
-    </RadioGroup>
+    android:layout_marginTop="?attr/actionBarSize">
 
     <View
         android:layout_width="fill_parent"
@@ -49,5 +14,86 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <LinearLayout
+        android:id="@+id/layout_map_filter"
+        android:background="@color/colorMapFilter"
+        android:orientation="vertical"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="50dp"
+        android:layout_width="250dp"
+        android:layout_height="200dp">
 
-</LinearLayout>
+        <TextView
+            android:textColor="@color/colorWhite"
+            android:gravity="center"
+            android:text="Map Filters"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_width="match_parent"
+            android:layout_height="40dp" />
+
+        <View
+            android:background="@color/colorPrimaryLight"
+            android:layout_width="match_parent"
+            android:layout_height="2dp" />
+
+
+
+        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/rg_driver_options"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/rb_driver_all"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:checked="true"
+                android:textColor="@color/colorWhite"
+                android:buttonTint="@color/colorWhite"
+                android:text="All Destinations" />
+
+            <View
+                android:background="@color/colorPrimaryLight"
+                android:layout_width="match_parent"
+                android:layout_height="2dp" />
+
+            <RadioButton
+                android:id="@+id/rb_driver_pickups"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:textColor="@color/colorWhite"
+                android:buttonTint="@color/colorWhite"
+                android:text="Pickup Destinations" />
+
+            <View
+                android:background="@color/colorPrimaryLight"
+                android:layout_width="match_parent"
+                android:layout_height="2dp" />
+
+            <RadioButton
+                android:id="@+id/rb_driver_delivery"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:textColor="@color/colorWhite"
+                android:buttonTint="@color/colorWhite"
+                android:text="Delivery Destinations" />
+
+            <View
+                android:background="@color/colorPrimaryLight"
+                android:layout_width="match_parent"
+                android:layout_height="2dp" />
+
+
+
+            </RadioGroup>
+
+
+
+    </LinearLayout>
+
+
+</FrameLayout>

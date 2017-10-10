@@ -17,7 +17,6 @@
         <item
             android:id="@+id/nav_admin_manage_drivers"
             android:icon="@drawable/ic_menu_drive"
-            app:actionLayout="@layout/layout_menu_admin"
             android:title="Manage Drivers" />
 
         <item
@@ -26,16 +25,12 @@
             android:title="Manage Customers" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="New">
         <menu>
             <item
                 android:id="@+id/nav_admin_call_in_order"
                 android:icon="@drawable/ic_menu_add"
                 android:title="New Phone Order" />
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
 
         </menu>
     </item>

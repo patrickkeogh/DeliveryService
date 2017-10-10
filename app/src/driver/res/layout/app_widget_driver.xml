@@ -1,0 +1,82 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent"
+    android:orientation="vertical"
+    android:padding="@dimen/widget_margin">
+
+    <TextView
+        android:id="@+id/widget_app_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/padding_8dp"
+        android:layout_marginLeft="@dimen/padding_8dp"
+        android:layout_marginStart="@dimen/padding_8dp"
+        android:layout_marginTop="@dimen/padding_8dp"
+        android:background="@color/colorPrimary"
+        android:contentDescription="@string/appwidget_text"
+        android:gravity="center"
+        android:padding="@dimen/padding_8dp"
+        android:text="Kan-Tech Delivery Service"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/colorWhite"
+        android:textStyle="bold|italic" />
+
+    <TextView
+        android:id="@+id/tv_widget_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/padding_8dp"
+        android:layout_marginLeft="@dimen/padding_8dp"
+        android:layout_marginStart="@dimen/padding_8dp"
+        android:layout_marginTop="@dimen/padding_8dp"
+        android:background="@color/colorPrimary"
+        android:contentDescription="@string/appwidget_text"
+        android:gravity="center"
+        android:padding="@dimen/padding_8dp"
+        android:text="Monday May 9th, 2017"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/colorWhite"
+        android:textStyle="bold|italic" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/padding_8dp"
+        android:layout_marginEnd="@dimen/padding_8dp"
+        android:layout_marginLeft="@dimen/padding_8dp"
+        android:layout_marginStart="@dimen/padding_8dp"
+        android:layout_marginTop="@dimen/padding_8dp"
+        android:layout_weight="1"
+        android:background="#F8F8F8">
+
+        <ListView
+            android:id="@+id/widget_list_view_orders"
+            android:divider="@drawable/divider"
+            android:dividerHeight="@dimen/divider_width"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <RelativeLayout
+            android:id="@+id/empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/empty_view_text"
+                android:textAlignment="center"
+                android:textColor="@color/colorBlack"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textStyle="bold" />
+
+
+        </RelativeLayout>
+    </FrameLayout>
+
+
+    </LinearLayout>

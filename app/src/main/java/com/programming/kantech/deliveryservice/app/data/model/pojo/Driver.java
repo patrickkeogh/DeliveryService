@@ -138,4 +138,18 @@ public class Driver implements Parcelable {
         parcel.writeValue(driverApproved);
         parcel.writeValue(photoApproved);
     }
+
+    @Override
+    public String toString() {
+        return "Driver{" +
+                "uid='" + uid + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", email='" + email + '\'' +
+                ", device='" + device + '\'' +
+                ", driverApproved=" + driverApproved +
+                ", photoApproved=" + photoApproved +
+                ", photoUrl='" + photoUrl + '\'' +
+                ", thumbUrl='" + thumbUrl + '\'' +
+                '}';
+    }
 }

@@ -57,7 +57,6 @@ import butterknife.InjectView;
 
 /**
  * Created by patrick keogh on 2017-08-18.
- *
  */
 
 public class Activity_Main extends AppCompatActivity implements
@@ -258,7 +257,8 @@ public class Activity_Main extends AppCompatActivity implements
                                     .setIsSmartLockEnabled(!BuildConfig.DEBUG)
                                     .setTheme(R.style.LoginTheme)
                                     .setAvailableProviders(
-                                            Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()))
+                                            Arrays.asList(
+                                                    new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()))
                                     .build(),
                             Constants.REQUEST_CODE_SIGN_IN);
                 }
@@ -330,20 +330,20 @@ public class Activity_Main extends AppCompatActivity implements
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu){
+    public boolean onPrepareOptionsMenu(Menu menu) {
         Log.i(Constants.LOG_TAG, "onPrepareOptionsMenu called");
 
         mMenuItem_Driver.setVisible(mShowDriverIcon);
-        if(!mShowDrivers){
+        if (!mShowDrivers) {
             mMenuItem_Driver.setIcon(R.drawable.ic_menu_drive);
-        }else{
+        } else {
             mMenuItem_Driver.setIcon(R.drawable.ic_menu_drive_white);
         }
 
         mMenuItem_Order.setVisible(mShowOrderIcon);
-        if(!mShowOrders){
+        if (!mShowOrders) {
             mMenuItem_Order.setIcon(R.drawable.ic_shopping_cart);
-        }else{
+        } else {
             mMenuItem_Order.setIcon(R.drawable.ic_shopping_cart_white);
         }
 
@@ -362,7 +362,7 @@ public class Activity_Main extends AppCompatActivity implements
                 Fragment_MainDetails frag_order = (Fragment_MainDetails)
                         getSupportFragmentManager().findFragmentByTag(Constants.TAG_FRAGMENT_MAIN_DETAILS);
 
-                if(frag_order != null){
+                if (frag_order != null) {
                     frag_order.showOrders(mShowOrders);
                 }
 
@@ -374,7 +374,7 @@ public class Activity_Main extends AppCompatActivity implements
                 Fragment_MainDetails frag_driver = (Fragment_MainDetails)
                         getSupportFragmentManager().findFragmentByTag(Constants.TAG_FRAGMENT_MAIN_DETAILS);
 
-                if(frag_driver != null){
+                if (frag_driver != null) {
                     frag_driver.showDrivers(mShowDrivers);
                 }
 
@@ -473,11 +473,11 @@ public class Activity_Main extends AppCompatActivity implements
         // Change the width of the master container if full screen required for landscape mode
 
         if (mLandscapeView) {
-            if(!showFullScreen){
+            if (!showFullScreen) {
                 container_details.setVisibility(View.VISIBLE);
                 final float scale = getResources().getDisplayMetrics().density;
                 int requiredWidth = 0;
-                switch (fragment_tag){
+                switch (fragment_tag) {
                     case Constants.TAG_FRAGMENT_ORDER_LIST:
                     case Constants.TAG_FRAGMENT_ORDER_DETAILS:
                         requiredWidth = getResources().getInteger(R.integer.container_width_order_list);
@@ -485,6 +485,10 @@ public class Activity_Main extends AppCompatActivity implements
                     case Constants.TAG_FRAGMENT_CUSTOMER_LIST:
                     case Constants.TAG_FRAGMENT_CUSTOMER_DETAILS:
                         requiredWidth = getResources().getInteger(R.integer.container_width_customer_list);
+                        break;
+                    case Constants.TAG_FRAGMENT_DRIVER_LIST:
+                    case Constants.TAG_FRAGMENT_DRIVER_DETAILS:
+                        requiredWidth = getResources().getInteger(R.integer.container_width_driver_list);
                         break;
                     default:
                         requiredWidth = getResources().getInteger(R.integer.container_width);
@@ -495,7 +499,7 @@ public class Activity_Main extends AppCompatActivity implements
 
                 container_master.setLayoutParams(new LinearLayout.LayoutParams(
                         pixels, FrameLayout.LayoutParams.MATCH_PARENT));
-            }else{
+            } else {
                 container_details.setVisibility(View.GONE);
                 container_master.setLayoutParams(new LinearLayout.LayoutParams(
                         FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
@@ -503,20 +507,20 @@ public class Activity_Main extends AppCompatActivity implements
 
         }
 
-        if(!Objects.equals(fragment_tag, Constants.TAG_FRAGMENT_MAIN_DETAILS)){
+        if (!Objects.equals(fragment_tag, Constants.TAG_FRAGMENT_MAIN_DETAILS)) {
             mShowDriverIcon = false;
             mShowOrderIcon = false;
 
-        }else{
+        } else {
             mShowDriverIcon = true;
             mShowOrderIcon = true;
         }
 
         invalidateOptionsMenu();
 
-        if(Objects.equals(fragment_tag, Constants.TAG_FRAGMENT_MAIN_LIST_START)){
+        if (Objects.equals(fragment_tag, Constants.TAG_FRAGMENT_MAIN_LIST_START)) {
             transaction.add(container, fragment_in, fragment_tag);
-        }else{
+        } else {
             transaction.replace(container, fragment_in, fragment_tag);
         }
 
@@ -526,9 +530,9 @@ public class Activity_Main extends AppCompatActivity implements
     }
 
     @Override
-    public void onDriverSelected(String key) {
+    public void onDriverSelected(Driver selectedDriver) {
 
-        Fragment_DriverDetails fragment = Fragment_DriverDetails.newInstance(key);
+        Fragment_DriverDetails fragment = Fragment_DriverDetails.newInstance(selectedDriver);
 
         if (mLandscapeView) {
             replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_DRIVER_DETAILS, fragment, false);

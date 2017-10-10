@@ -24,12 +24,19 @@ public class Order implements Parcelable{
     private String inProgressDriverId;
     private String inProgressDateDriverId;
     private long pickupDate;
+    private String distance_text;
+    private int distance;
+    private int amount;
 
     public Order() {
 
     }
 
-    public Order(String id, String deliveryLocationId, String pickupLocationId, String customerId, String customerName, String driverId, String type, String status, boolean inProgress, String inProgressDriverId, String inProgressDateDriverId, long pickupDate) {
+    public Order(String id, String deliveryLocationId, String pickupLocationId,
+                 String customerId, String customerName, String driverId,
+                 String type, String status, boolean inProgress,
+                 String inProgressDriverId, String inProgressDateDriverId,
+                 long pickupDate, String distance_text, int distance, int amount) {
         this.id = id;
         this.deliveryLocationId = deliveryLocationId;
         this.pickupLocationId = pickupLocationId;
@@ -42,6 +49,9 @@ public class Order implements Parcelable{
         this.inProgressDriverId = inProgressDriverId;
         this.inProgressDateDriverId = inProgressDateDriverId;
         this.pickupDate = pickupDate;
+        this.distance_text = distance_text;
+        this.distance = distance;
+        this.amount = amount;
     }
 
     protected Order(Parcel in) {
@@ -57,6 +67,9 @@ public class Order implements Parcelable{
         inProgressDriverId = in.readString();
         inProgressDateDriverId = in.readString();
         pickupDate = in.readLong();
+        distance_text = in.readString();
+        distance = in.readInt();
+        amount = in.readInt();
     }
 
     @Override
@@ -73,6 +86,9 @@ public class Order implements Parcelable{
         dest.writeString(inProgressDriverId);
         dest.writeString(inProgressDateDriverId);
         dest.writeLong(pickupDate);
+        dest.writeString(distance_text);
+        dest.writeInt(distance);
+        dest.writeInt(amount);
     }
 
     @Override
@@ -186,5 +202,50 @@ public class Order implements Parcelable{
 
     public void setPickupDate(long pickupDate) {
         this.pickupDate = pickupDate;
+    }
+
+    public String getDistance_text() {
+        return distance_text;
+    }
+
+    public void setDistance_text(String distance_text) {
+        this.distance_text = distance_text;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public void setDistance(int distance) {
+        this.distance = distance;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id='" + id + '\'' +
+                ", deliveryLocationId='" + deliveryLocationId + '\'' +
+                ", pickupLocationId='" + pickupLocationId + '\'' +
+                ", customerId='" + customerId + '\'' +
+                ", customerName='" + customerName + '\'' +
+                ", driverId='" + driverId + '\'' +
+                ", type='" + type + '\'' +
+                ", status='" + status + '\'' +
+                ", inProgress=" + inProgress +
+                ", inProgressDriverId='" + inProgressDriverId + '\'' +
+                ", inProgressDateDriverId='" + inProgressDateDriverId + '\'' +
+                ", pickupDate=" + pickupDate +
+                ", distance_text='" + distance_text + '\'' +
+                ", distance=" + distance +
+                ", amount=" + amount +
+                '}';
     }
 }

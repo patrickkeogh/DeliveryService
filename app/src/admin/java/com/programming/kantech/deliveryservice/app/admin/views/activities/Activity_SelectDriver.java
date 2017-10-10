@@ -29,6 +29,9 @@ import butterknife.InjectView;
 
 public class Activity_SelectDriver extends AppCompatActivity{
 
+    // Member variables
+    private FirebaseRecyclerAdapter<Driver, ViewHolder_Driver> mFireAdapter;
+
     @InjectView(R.id.rv_drivers_list)
     RecyclerView mRecyclerView;
 
@@ -55,7 +58,7 @@ public class Activity_SelectDriver extends AppCompatActivity{
 
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(true);
-            mActionBar.setTitle("Select A Driver");
+            mActionBar.setTitle(R.string.admin_select_driver);
         }
 
         // Get a reference to the driver node
@@ -76,7 +79,7 @@ public class Activity_SelectDriver extends AppCompatActivity{
          */
         mRecyclerView.setHasFixedSize(false);
 
-        FirebaseRecyclerAdapter<Driver, ViewHolder_Driver> mFireAdapter = new FirebaseRecyclerAdapter<Driver, ViewHolder_Driver>(
+        mFireAdapter = new FirebaseRecyclerAdapter<Driver, ViewHolder_Driver>(
                 Driver.class,
                 R.layout.item_driver,
                 ViewHolder_Driver.class,
@@ -85,6 +88,8 @@ public class Activity_SelectDriver extends AppCompatActivity{
             @Override
             public void populateViewHolder(final ViewHolder_Driver holder, final Driver driver, int position) {
                 Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + driver.getDisplayName());
+
+                holder.setPhoto(driver.getPhotoUrl(), Activity_SelectDriver.this);
 
                 holder.setName(driver.getDisplayName());
                 holder.setId(driver.getUid());
@@ -100,6 +105,10 @@ public class Activity_SelectDriver extends AppCompatActivity{
 
             }
 
+            @Override
+            public void onBindViewHolder(ViewHolder_Driver viewHolder, int position) {
+                super.onBindViewHolder(viewHolder, position);
+            }
         };
 
         mRecyclerView.setAdapter(mFireAdapter);
@@ -115,6 +124,15 @@ public class Activity_SelectDriver extends AppCompatActivity{
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mFireAdapter != null) {
+            mFireAdapter.cleanup();
+        }
     }
 
 
