@@ -3,6 +3,7 @@ package com.programming.kantech.deliveryservice.app.driver.views.widget;
 import android.annotation.TargetApi;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -26,6 +27,7 @@ import java.util.GregorianCalendar;
 public class WidgetProvider_Driver extends AppWidgetProvider {
 
     static AppWidgetManager mAppWidgetManager;
+    public static final String ACTION_DATA_UPDATED = "data_updated";
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
@@ -53,7 +55,6 @@ public class WidgetProvider_Driver extends AppWidgetProvider {
         Intent intent_service = new Intent(context, Service_DriverWidget.class);
         // set the listview
         views.setRemoteAdapter(R.id.widget_list_view_orders, intent_service);
-
 
         // Create the display date, today at 00:00 hrs
         Calendar date = new GregorianCalendar();
@@ -99,6 +100,20 @@ public class WidgetProvider_Driver extends AppWidgetProvider {
     @Override
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
+        Log.i(Constants.LOG_TAG, "onReceive");
+
+        if (intent.getAction().equals(ACTION_DATA_UPDATED)) {
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(
+                    new ComponentName(context, getClass()));
+
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds,R.id.widget_list_view_orders);
+        }
     }
 
     /**
