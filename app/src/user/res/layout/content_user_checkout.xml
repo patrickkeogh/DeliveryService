@@ -5,477 +5,400 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:background="@color/colorPrimary"
-        android:weightSum="3"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="96dp">
+        android:layout_height="@dimen/nav_bar_order"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:weightSum="3">
 
         <LinearLayout
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
 
 
             <ImageView
+                android:layout_width="@dimen/icon_width_height"
+                android:layout_height="@dimen/icon_width_height"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_nav_details_fade"
-                android:layout_marginTop="16dp"
-                android:layout_width="40dp"
-                android:layout_height="40dp" />
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:contentDescription="@string/content_description_order_details"
+                android:src="@drawable/ic_nav_details_fade" />
 
             <TextView
-                android:text="ORDER INFO"
-                android:gravity="center"
-                android:textColor="@color/colorWhiteFade"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/title_order_details"
+                android:textColor="@color/colorWhiteFade" />
 
         </LinearLayout>
 
         <LinearLayout
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
 
             <ImageView
+                android:layout_width="@dimen/icon_width_height"
+                android:layout_height="@dimen/icon_width_height"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_nav_payment"
-                android:layout_marginTop="16dp"
-                android:layout_width="40dp"
-                android:layout_height="40dp" />
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:contentDescription="@string/content_description_payment"
+                android:src="@drawable/ic_nav_payment" />
 
             <TextView
-                android:text="PAYMENT"
-                android:gravity="center"
-                android:textColor="@color/colorWhite"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/title_payment"
+                android:textColor="@color/colorWhite" />
 
         </LinearLayout>
 
         <LinearLayout
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
 
             <ImageView
+                android:layout_width="@dimen/icon_width_height"
+                android:layout_height="@dimen/icon_width_height"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_nav_success_fade"
-                android:layout_marginTop="16dp"
-                android:layout_width="40dp"
-                android:layout_height="40dp" />
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:contentDescription="@string/content_description_success"
+                android:src="@drawable/ic_nav_success_fade" />
 
             <TextView
-                android:text="SUCCESS"
-                android:gravity="center"
-                android:textColor="@color/colorWhiteFade"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/title_success"
+                android:textColor="@color/colorWhiteFade" />
 
         </LinearLayout>
-
 
 
     </LinearLayout>
 
-    <LinearLayout
+
+    <ScrollView
+        android:id="@+id/checkout_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="24dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="@dimen/margin_top_checkout"
-        android:orientation="vertical">
+        android:layout_marginStart="@dimen/margin_8dp"
+        android:layout_marginBottom="@dimen/margin_8dp"
+        android:layout_marginEnd="@dimen/margin_8dp"
+        android:layout_marginTop="@dimen/margin_top_checkout">
 
-        <ScrollView
-            android:id="@+id/login_form"
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:text="@string/title_order_detail"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/divider_view_accent"
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:background="@color/colorAccent" />
+
+            <TextView
+                android:id="@+id/tv_user_checkout_company"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@color/colorBlack"
+                tools:text="McDonald's Canada" />
+
+            <TextView
+                android:id="@+id/tv_user_checkout_date"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:drawablePadding="@dimen/margin_8dp"
+                android:drawableStart="@drawable/ic_date_range_24dp"
+                android:gravity="center_vertical"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="Monday July 13th, 2017" />
+
+            <TextView
+                android:id="@+id/tv_user_checkout_location_pickup"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:drawablePadding="@dimen/padding_8dp"
+                android:drawableStart="@drawable/ic_place_accent_24dp"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="Barrie, ON, Canada" />
+
+            <TextView
+                android:id="@+id/tv_user_checkout_location_delivery"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:drawablePadding="@dimen/padding_8dp"
+                android:drawableStart="@drawable/ic_place_accent_24dp"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="Barrie, ON, Canada" />
+
+            <TextView
+                android:id="@+id/tv_user_checkout_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:drawablePadding="@dimen/padding_8dp"
+                android:drawableStart="@drawable/ic_attach_money"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="157km @ $2.13/km" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:text="@string/title_credit_card_details"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/divider_view_accent"
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:background="@color/colorAccent" />
 
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Order Details"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@color/colorPrimaryDark" />
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
-
-                <TextView
-                    android:id="@+id/tv_user_checkout_company"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="McDonald's Canada"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textColor="@color/colorBlack" />
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="fill"
+                    android:layout_marginEnd="@dimen/margin_8dp"
+                    android:foregroundGravity="center_vertical"
+                    android:src="@drawable/ic_date_range_24dp"
+                    android:contentDescription="@string/content_description_expiry_date" />
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="fill"
-                        android:layout_marginEnd="@dimen/margin_8dp"
-                        android:src="@drawable/ic_date_range_24dp" />
-
-                    <TextView
-                        android:id="@+id/tv_user_checkout_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        tools:text="Monday July 13th, 2017"
-                        android:gravity="center_vertical"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="fill"
-                        android:layout_marginEnd="@dimen/margin_8dp"
-                        android:src="@drawable/ic_place_accent_24dp" />
-
-                    <TextView
-                        android:id="@+id/tv_user_checkout_location_pickup"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        tools:text="Monday July 13th, 2017"
-                        android:maxLines="1"
-                        android:gravity="center_vertical"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="fill"
-                        android:layout_marginEnd="@dimen/margin_8dp"
-                        android:src="@drawable/ic_place_accent_24dp" />
-
-                    <TextView
-                        android:id="@+id/tv_user_checkout_location_delivery"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        tools:text="Monday July 13th, 2017"
-                        android:gravity="center_vertical"
-                        android:maxLines="1"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:orientation="horizontal">
-
 
 
                     <TextView
-                        android:id="@+id/tv_user_checkout_distance"
-                        android:layout_width="wrap_content"
-                        android:layout_height="30dp"
-                        android:layout_marginStart="40dp"
-                        tools:text="157km @ $2.13/km"
-                        android:gravity="center_vertical"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="30dp"
+                        android:layout_width="0dp"
                         android:layout_height="40dp"
-                        android:layout_gravity="fill"
-                        android:layout_marginEnd="@dimen/margin_8dp"
-                        android:src="@drawable/ic_attach_money" />
-
-                    <TextView
-                        android:id="@+id/tv_user_checkout_amount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        tools:text="$234.45"
+                        android:layout_weight="0.40"
                         android:gravity="center_vertical"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                        android:text="@string/msg_mm_yyyy"
+                        android:textAllCaps="true"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/colorTextGrey"
+                        tools:ignore="NestedWeights" />
 
-                </LinearLayout>
+                    <Spinner
 
-
-
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Credit Card Details"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@color/colorPrimaryDark" />
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
-
-
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:foregroundGravity="center_vertical"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="fill"
-                        android:layout_marginEnd="@dimen/margin_8dp"
-                        android:src="@drawable/ic_date_range_24dp" />
-
-                    <LinearLayout
+                        android:id="@+id/sp_user_checkout_exp_month"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_weight="1"
-                        android:orientation="horizontal">
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="0.30"
+                        android:padding="2dp" />
 
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:gravity="center_vertical"
-                            android:layout_weight="0.40"
-                            android:paddingStart="5dp"
-                            android:text="MM/YYYY"
-                            android:textAllCaps="true"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                            android:textColor="@color/colorTextGrey" />
-
-                        <Spinner
-
-                            android:id="@+id/sp_user_checkout_exp_month"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="5dp"
-                            android:layout_weight="0.30"
-                            android:padding="2dp" />
-
-
-                        <Spinner
-                            android:id="@+id/sp_user_checkout_exp_year"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="0.30"
-                            android:padding="2dp" />
-
-                    </LinearLayout>
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:weightSum="1"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="fill"
-                        android:layout_marginEnd="@dimen/margin_8dp"
-                        android:src="@drawable/ic_checkout_credit_card" />
-
-                    <EditText
-                        android:id="@+id/et_user_checkout_card_number_1"
-                        android:layout_width="60dp"
-                        android:layout_height="wrap_content"
-                        android:hint="XXXX"
-                        android:inputType="number"
-                        android:maxLength="4"
-                        android:maxLines="1"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColorHint="@color/colorTextGrey"
-                        android:textCursorDrawable="@null" />
-
-                    <EditText
-                        android:id="@+id/et_user_checkout_card_number_2"
-                        android:layout_width="60dp"
-                        android:layout_height="wrap_content"
-                        android:hint="XXXX"
-                        android:inputType="number"
-                        android:maxLength="4"
-                        android:maxLines="1"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColorHint="@color/colorTextGrey"
-                        android:textCursorDrawable="@null" />
-
-                    <EditText
-                        android:id="@+id/et_user_checkout_card_number_3"
-                        android:layout_width="60dp"
-                        android:layout_height="wrap_content"
-                        android:hint="XXXX"
-                        android:inputType="number"
-                        android:maxLength="4"
-                        android:maxLines="1"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColorHint="@color/colorTextGrey"
-                        android:textCursorDrawable="@null" />
-
-                    <EditText
-                        android:id="@+id/et_user_checkout_card_number_4"
-                        android:layout_width="60dp"
-                        android:layout_height="wrap_content"
-                        android:hint="XXXX"
-                        android:inputType="number"
-                        android:maxLength="4"
-                        android:maxLines="1"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColorHint="@color/colorTextGrey"
-                        android:textCursorDrawable="@null" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="fill"
-                        android:layout_marginEnd="@dimen/margin_8dp"
-                        android:src="@drawable/ic_checkout_lock" />
-
-                    <EditText
-                        android:id="@+id/et_user_checkout_svc"
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content"
-                        android:hint="XXX"
-                        android:inputType="number"
-                        android:maxLength="3"
-                        android:maxLines="1"
-                        android:textColorHint="@color/colorTextGrey"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textCursorDrawable="@null" />
-
-
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/btn_user_checkout_confirm_order"
+                    <Spinner
+                        android:id="@+id/sp_user_checkout_exp_year"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_8dp"
-                        android:layout_weight=".45"
-                        android:background="@color/colorPrimaryDark"
-                        android:paddingEnd="5dp"
-                        android:text="Place Order"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@color/colorWhite"
-                        android:textStyle="bold" />
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight=".05" />
-
-                    <Button
-                        android:id="@+id/btn_user_checkout_cancel_order"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_8dp"
-                        android:layout_weight=".45"
-                        android:background="@color/colorPrimaryDark"
-                        android:text="Cancel Order"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@color/colorWhite"
-                        android:textStyle="bold" />
-
+                        android:layout_weight="0.30"
+                        android:padding="2dp" />
 
                 </LinearLayout>
 
-                <ProgressBar
-                    android:id="@+id/pb_checkout_progress_bar"
-                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:indeterminate="true"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:id="@+id/tv_user_checkout_message"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
 
             </LinearLayout>
 
-        </ScrollView>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="1">
 
-    </LinearLayout>
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="@dimen/margin_8dp"
+                    android:src="@drawable/ic_checkout_credit_card"
+                    android:contentDescription="@string/content_description_credit_card_icon" />
+
+                <EditText
+                    android:id="@+id/et_user_checkout_card_number_1"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_xxxx"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColorHint="@color/colorTextGrey"
+                    android:textCursorDrawable="@null" />
+
+                <EditText
+                    android:id="@+id/et_user_checkout_card_number_2"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_xxxx"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColorHint="@color/colorTextGrey"
+                    android:textCursorDrawable="@null" />
+
+                <EditText
+                    android:id="@+id/et_user_checkout_card_number_3"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_xxxx"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColorHint="@color/colorTextGrey"
+                    android:textCursorDrawable="@null" />
+
+                <EditText
+                    android:id="@+id/et_user_checkout_card_number_4"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_xxxx"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColorHint="@color/colorTextGrey"
+                    android:textCursorDrawable="@null" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="fill"
+                    android:layout_marginEnd="@dimen/margin_8dp"
+                    android:src="@drawable/ic_checkout_lock"
+                    android:contentDescription="@string/content_description_svc_number" />
+
+                <EditText
+                    android:id="@+id/et_user_checkout_svc"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_xxx"
+                    android:inputType="number"
+                    android:maxLength="3"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColorHint="@color/colorTextGrey"
+                    android:textCursorDrawable="@null" />
+
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginTop="4dp"
+                android:background="@color/colorAccent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_user_checkout_confirm_order"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:layout_weight=".45"
+                    android:background="@color/colorPrimaryDark"
+                    android:paddingEnd="@dimen/padding_8dp"
+                    android:text="@string/btn_place_order"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/colorWhite"
+                    android:textStyle="bold"
+                    tools:ignore="RtlSymmetry" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".05" />
+
+                <Button
+                    android:id="@+id/btn_user_checkout_cancel_order"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:layout_weight=".45"
+                    android:background="@color/colorPrimaryDark"
+                    android:text="@string/btn_cancel"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/colorWhite"
+                    android:textStyle="bold" />
+
+
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/pb_checkout_progress_bar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_user_checkout_message"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
 
 </RelativeLayout>

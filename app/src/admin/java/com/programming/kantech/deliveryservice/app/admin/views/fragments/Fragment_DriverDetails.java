@@ -4,27 +4,25 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Driver;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
-import java.util.Objects;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by patrick keogh on 2017-08-14.
@@ -37,12 +35,17 @@ public class Fragment_DriverDetails extends Fragment {
     private Driver mDriver;
 
     // Fragment views
-    private TextView tv_driver_name;
-    private TextView tv_driver_id;
-    private ImageView iv_driver_details_photo;
+    @BindView(R.id.tv_driver_name)
+    TextView tv_driver_name;
 
+    @BindView(R.id.tv_driver_id)
+    TextView tv_driver_id;
 
-    private Button btn_verify;
+    @BindView(R.id.tv_driver_msg)
+    TextView tv_driver_msg;
+
+    @BindView(R.id.btn_verify_driver)
+    Button btn_verify_driver;
 
     private DatabaseReference mDriverRef;
     private ValueEventListener mDriverDetailsListener;
@@ -78,35 +81,15 @@ public class Fragment_DriverDetails extends Fragment {
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_drivers_details, container, false);
 
-        if (savedInstanceState != null) {
+        ButterKnife.bind(this, rootView);
 
-            Log.i(Constants.LOG_TAG, "Activity_Photo savedInstanceState is not null");
+        if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(Constants.STATE_INFO_DRIVER)) {
-                Log.i(Constants.LOG_TAG, "we found the recipe key in savedInstanceState");
                 mDriver = savedInstanceState.getParcelable(Constants.STATE_INFO_DRIVER);
             }
-
         } else {
-            Log.i(Constants.LOG_TAG, "Activity_Photo savedInstanceState is null, get data from intent: ");
             mDriver = getArguments().getParcelable(Constants.EXTRA_DRIVER);
         }
-
-        tv_driver_name = rootView.findViewById(R.id.tv_driver_name);
-        tv_driver_id = rootView.findViewById(R.id.tv_driver_id);
-        iv_driver_details_photo = rootView.findViewById(R.id.iv_driver_details_photo);
-
-        btn_verify = rootView.findViewById(R.id.btn_verify_driver);
-
-        btn_verify.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View view) {
-
-                // Update driver record
-                mCallback.onVerifyDriverClicked(mDriver);
-
-            }
-        });
 
         if (mDriver == null) {
             throw new IllegalArgumentException("Must pass EXTRA_DRIVER");
@@ -133,6 +116,14 @@ public class Fragment_DriverDetails extends Fragment {
             throw new ClassCastException(context.toString()
                     + " must implement DriverClickListener");
         }
+    }
+
+    @OnClick(R.id.btn_verify_driver)
+    public void onVerifyDriverClicked(){
+
+        // Update driver record
+        mCallback.onVerifyDriverClicked(mDriver);
+
     }
 
     @Override
@@ -185,15 +176,12 @@ public class Fragment_DriverDetails extends Fragment {
             tv_driver_name.setText(mDriver.getDisplayName());
             tv_driver_id.setText(mDriver.getUid());
 
-
-                Glide.with(getActivity()).load(mDriver.getPhotoUrl())
-                        .error(R.drawable.ic_menu_drive)
-                        .placeholder(R.drawable.ic_attach_money)
-                        .dontAnimate()
-                        .into(iv_driver_details_photo);
-
             if(mDriver.getDriverApproved()){
-                btn_verify.setVisibility(View.GONE);
+                btn_verify_driver.setVisibility(View.GONE);
+                tv_driver_msg.setVisibility(View.VISIBLE);
+            }else{
+                btn_verify_driver.setVisibility(View.VISIBLE);
+                tv_driver_msg.setVisibility(View.GONE);
             }
 
         }

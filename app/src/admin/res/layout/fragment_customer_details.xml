@@ -14,12 +14,12 @@
         android:orientation="vertical">
 
         <ScrollView
-            android:id="@+id/login_form"
+            android:id="@+id/customer_form"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <LinearLayout
-                android:id="@+id/email_login_form"
+                android:id="@+id/customer_details_form"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -29,15 +29,15 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:text="@string/label_customer_info"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textColor="@color/colorPrimaryDark" />
 
                 <View
                     android:layout_width="fill_parent"
-                    android:layout_height="2dip"
+                    android:layout_height="2dp"
                     android:layout_marginBottom="4dp"
                     android:layout_marginTop="4dp"
-                    android:background="@color/colorPrimaryDark" />
+                    android:background="@color/colorAccent" />
 
                 <TextView
                     android:id="@+id/tv_customer_company"
@@ -56,73 +56,65 @@
                     android:layout_marginBottom="4dp"
                     android:layout_marginLeft="4dp"
                     android:layout_marginTop="4dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     tools:text="1234 Somewhere Ave. Barrie, ON" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_account_circle_24dp" />
-
-                    <TextView
-                        android:id="@+id/tv_customer_contact_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginBottom="4dp"
-                        android:layout_marginLeft="4dp"
-                        android:layout_marginTop="4dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        tools:text="John Snow" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_gravity="center"
-
-
-                        android:src="@drawable/ic_phone_accent" />
-
-                    <TextView
-                        android:id="@+id/tv_customer_contact_phone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginBottom="4dp"
-                        android:layout_marginLeft="4dp"
-                        android:layout_marginTop="4dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        tools:text="777-777-8989" />
-
-                </LinearLayout>
+                <TextView
+                android:id="@+id/tv_customer_contact_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginTop="4dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="John Snow" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_customer_contact_phone"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Pickup and Delivery Locations"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginTop="4dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@color/colorPrimaryDark" />
+                    tools:text="777-777-8989" />
+
+                <LinearLayout
+                    android:weightSum="10"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="9"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Pickup and Delivery Locations"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textColor="@color/colorPrimaryDark" />
+
+                    <ImageButton
+                        android:id="@+id/ib_customer_add_location"
+                        android:background="@color/colorWhite"
+                        android:layout_gravity="end"
+                        android:src="@drawable/ic_add_accent"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent" />
+
+                </LinearLayout>
+
+
 
                 <View
                     android:layout_width="fill_parent"
-                    android:layout_height="2dip"
+                    android:layout_height="2dp"
                     android:layout_marginBottom="4dp"
                     android:layout_marginTop="4dp"
-                    android:background="@color/colorPrimaryDark" />
+                    android:background="@color/colorAccent" />
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/rv_customer_locations_list"

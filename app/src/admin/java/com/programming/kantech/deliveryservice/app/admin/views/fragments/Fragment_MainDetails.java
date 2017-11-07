@@ -38,8 +38,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Driver;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Order;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 

@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
         android:layout_marginBottom="24dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
+        android:layout_marginTop="?attr/actionBarSize"
         android:orientation="vertical">
 
         <ScrollView
@@ -34,42 +35,62 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="2dip"
-                    android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
                     android:background="@color/colorAccent" />
 
                 <LinearLayout
                     android:id="@+id/layout_order_customer"
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:orientation="horizontal"
+                    android:padding="8dp"
+                    android:weightSum="10">
 
-                    <TextView
-                        android:id="@+id/tv_customer_name"
+                    <ImageView
+                        android:id="@+id/iv_select_customer"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="fill"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_account_circle_24dp" />
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:layout_marginLeft="4dp"
-                        android:layout_marginTop="4dp"
-                        android:text="customer"
-                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                        android:layout_weight="9"
+                        android:orientation="vertical"
+                        android:paddingEnd="@dimen/padding_8dp"
+                        android:paddingStart="8dp">
 
-                    <Button
-                        android:id="@+id/btn_customer_select_customer"
-                        style="?android:textAppearanceSmall"
-                        android:background="@color/colorAccent"
-                        android:textColor="@color/colorWhite"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Select Customer"
-                        android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_admin_customer_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                            android:textColor="@android:color/black"
+                            tools:text="Harvey's" />
+
+                        <TextView
+                            android:id="@+id/tv_admin_customer_address"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                            tools:text="Monday September 11th, 2014" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
+
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/margin_8dp"
                     android:text="Select Pickup date"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/colorPrimaryDark" />
@@ -77,38 +98,41 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="2dip"
-                    android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
                     android:background="@color/colorAccent" />
 
                 <LinearLayout
-                    android:id="@+id/layout_order_pickup_date"
-                    android:orientation="vertical"
+                    android:id="@+id/layout_order_date"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:orientation="horizontal"
+                    android:padding="8dp"
+                    android:weightSum="10">
+
+                    <ImageView
+                        android:id="@+id/iv_select_date"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="fill"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_date_range_24dp" />
 
                     <TextView
                         android:id="@+id/tv_pickup_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginBottom="4dp"
                         android:layout_marginStart="4dp"
                         android:layout_marginTop="4dp"
-                        android:text="customer"
-                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                        android:text="Monday March 17th, 2018"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textColor="@android:color/black" />
 
-                    <Button
-                        android:id="@+id/btn_get_pickup_date"
-                        style="?android:textAppearanceSmall"
-                        android:background="@color/colorAccent"
-                        android:textColor="@color/colorWhite"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Select Pickup Date"
-                        android:textStyle="bold" />
+
                 </LinearLayout>
-
 
 
                 <TextView
@@ -122,59 +146,55 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="2dip"
-                    android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
                     android:background="@color/colorAccent" />
 
                 <LinearLayout
-                    android:id="@+id/layout_location_pickup"
+                    android:id="@+id/layout_order_location_pickup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:orientation="horizontal">
+                    android:layout_marginEnd="5dp"
+                    android:orientation="horizontal"
+                    android:padding="8dp"
+                    android:weightSum="10">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:id="@+id/iv_select_location_pickup"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
                         android:layout_gravity="fill"
                         android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
                         android:src="@drawable/ic_place_accent_24dp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:layout_weight="9"
+                        android:orientation="vertical"
+                        android:paddingEnd="@dimen/padding_8dp"
+                        android:paddingStart="8dp">
 
                         <TextView
                             android:id="@+id/tv_cust_location_pickup_name"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="start"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                            android:textColor="@android:color/black" />
+                            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                            android:textColor="@android:color/black"
+                            tools:text="Harvey's" />
 
                         <TextView
                             android:id="@+id/tv_cust_location_pickup_address"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="start"
-                            android:maxLines="1"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                            tools:text="Monday September 11th, 2014" />
+
                     </LinearLayout>
 
                 </LinearLayout>
-
-                <Button
-                    android:id="@+id/btn_customer_select_pickup_location"
-                    style="?android:textAppearanceSmall"
-                    android:background="@color/colorAccent"
-                    android:textColor="@color/colorWhite"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Select Pickup Location"
-                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -187,91 +207,82 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="2dip"
-                    android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"
-                    android:background="@color/colorPrimaryDark" />
+                    android:layout_marginTop="4dp"
+                    android:background="@color/colorAccent" />
 
                 <LinearLayout
-                    android:id="@+id/layout_location_delivery"
+                    android:id="@+id/layout_order_location_delivery"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:orientation="horizontal">
+                    android:layout_marginEnd="5dp"
+                    android:orientation="horizontal"
+                    android:padding="8dp"
+                    android:weightSum="10">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:id="@+id/iv_select_location_delivery"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
                         android:layout_gravity="fill"
                         android:layout_marginEnd="16dp"
-                        android:layout_marginRight="16dp"
                         android:src="@drawable/ic_place_accent_24dp" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:layout_weight="9"
+                        android:orientation="vertical"
+                        android:paddingEnd="@dimen/padding_8dp"
+                        android:paddingStart="8dp">
 
                         <TextView
                             android:id="@+id/tv_cust_location_delivery_name"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="start"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                            android:textColor="@android:color/black" />
+                            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                            android:textColor="@android:color/black"
+                            tools:text="Harvey's" />
 
                         <TextView
                             android:id="@+id/tv_cust_location_delivery_address"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="start"
-                            android:maxLines="1"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                            tools:text="Monday September 11th, 2014" />
+
                     </LinearLayout>
 
                 </LinearLayout>
 
-                <Button
-                    android:id="@+id/btn_customer_select_delivery_location"
-                    style="?android:textAppearanceSmall"
-                    android:background="@color/colorAccent"
-                    android:textColor="@color/colorWhite"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Select Delivery Location"
-                    android:textStyle="bold" />
-
-
 
                 <Button
                     android:id="@+id/btn_phone_order_add"
-                    style="?android:textAppearanceSmall"
-                    android:background="@color/colorPrimaryDark"
-                    android:textColor="@color/colorWhite"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    android:background="@color/colorPrimaryDark"
                     android:text="Book Phone Order"
+                    android:textColor="@color/colorWhite"
                     android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/btn_phone_order_cancel"
-                    style="?android:textAppearanceSmall"
-                    android:background="@color/colorAccent"
-                    android:textColor="@color/colorWhite"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    android:background="@color/colorAccent"
                     android:text="Cancel/Reset Form"
+                    android:textColor="@color/colorWhite"
                     android:textStyle="bold" />
-
-
-
 
 
             </LinearLayout>
         </ScrollView>
-
 
 
     </LinearLayout>

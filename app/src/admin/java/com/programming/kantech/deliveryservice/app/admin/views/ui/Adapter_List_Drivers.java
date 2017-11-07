@@ -10,11 +10,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Driver;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**

@@ -39,21 +39,20 @@ import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragmen
 import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_DriverDetails;
 import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_DriverList;
 import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_MainDetails;
-import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_MainList;
 import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_NewPhoneOrder;
 import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_OrderDetails;
 import com.programming.kantech.deliveryservice.app.admin.views.fragments.Fragment_OrderList;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Customer;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Driver;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Order;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import java.util.Arrays;
 import java.util.Objects;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 /**
  * Created by patrick keogh on 2017-08-18.
@@ -65,6 +64,8 @@ public class Activity_Main extends AppCompatActivity implements
         Fragment_CustomerList.CustomerClickListener,
         Fragment_NewPhoneOrder.GetCustomerClickListener,
         Fragment_DriverDetails.VerifyDriverClickListener,
+        Fragment_CustomerAdd.SaveCustomerListener,
+        Fragment_CustomerDetails.LocationAddedListener,
         NavigationView.OnNavigationItemSelectedListener {
 
     private ActionBar mActionBar;
@@ -78,23 +79,20 @@ public class Activity_Main extends AppCompatActivity implements
     private boolean mShowOrderIcon = true;
     private boolean mShowOrders = true;
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-    @InjectView(R.id.drawer_layout)
+    @BindView(R.id.drawer_layout)
     DrawerLayout mDrawer;
 
-    @InjectView(R.id.nav_view)
+    @BindView(R.id.nav_view)
     NavigationView mNavView;
+
 
     // Member variables for the Firebase database
     private DatabaseReference mUserRef;
     private DatabaseReference mDriverRef;
     private ChildEventListener mDriversTableEventListener;
-
-    // Member variables for the Firebase Authorization
-    private FirebaseAuth mFirebaseAuth;
-    private FirebaseAuth.AuthStateListener mFirebaseAuthListener;
 
     private MenuItem mMenuItem_Driver;
     private MenuItem mMenuItem_Order;
@@ -107,15 +105,7 @@ public class Activity_Main extends AppCompatActivity implements
 
         Log.i(Constants.LOG_TAG, "onCreate() in Admin Activity_Main");
 
-        ButterKnife.inject(this);
-
-        // ToDo: Add code here
-//        if (savedInstanceState != null) {
-//
-//        } else {
-//
-//
-//        }
+        ButterKnife.bind(this);
 
         // Set the support action bar
         setSupportActionBar(mToolbar);
@@ -139,16 +129,9 @@ public class Activity_Main extends AppCompatActivity implements
         Menu nav_Menu = mNavView.getMenu();
         nav_Menu.findItem(R.id.nav_admin_manage_drivers).setVisible(true);
 
-        mFirebaseAuth = FirebaseAuth.getInstance();
-
-        // TODO: Where would a better place to call this be?
-        FirebaseMessaging.getInstance().subscribeToTopic(Constants.FIREBASE_NOTIFICATION_TOPIC_ADMIN);
-        FirebaseMessaging.getInstance().unsubscribeFromTopic("Admin");
 
         mUserRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_ADMIN);
         mDriverRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_DRIVERS);
-
-        createAuthListener();
 
         // Determine if you're creating a two-pane or single-pane display
         mLandscapeView = (findViewById(R.id.layout_for_two_cols) != null);
@@ -204,7 +187,7 @@ public class Activity_Main extends AppCompatActivity implements
 
         } else if (id == R.id.nav_admin_manage_customers) {
 
-            Fragment_CustomerList frag_customer = Fragment_CustomerList.newInstance();
+            Fragment_CustomerList frag_customer = Fragment_CustomerList.newInstance(null);
             replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_LIST, frag_customer, false);
 
             setActionBarTitle("Manage Customers");
@@ -234,54 +217,12 @@ public class Activity_Main extends AppCompatActivity implements
 
     }
 
-    private void createAuthListener() {
-
-        mFirebaseAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-
-                if (user != null) {
-                    // Signed In
-                    //Utils_General.showToast(Activity_Main_old.this, "You are now signed in");
-
-                    onSignedInInitialize(user);
-                } else {
-                    // Not signed in
-                    onSignedOutCleanup();
-
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setIsSmartLockEnabled(!BuildConfig.DEBUG)
-                                    .setTheme(R.style.LoginTheme)
-                                    .setAvailableProviders(
-                                            Arrays.asList(
-                                                    new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()))
-                                    .build(),
-                            Constants.REQUEST_CODE_SIGN_IN);
-                }
-            }
-        };
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == Constants.REQUEST_CODE_SIGN_IN) {
-
-            if (resultCode == RESULT_OK) {
-                // Sign-in succeeded, set up the UI
-                Utils_General.showToast(this, "Signed In!");
-
-            } else if (resultCode == RESULT_CANCELED) {
-                // Sign in was canceled by the user, finish the activity
-                Utils_General.showToast(this, "Signed In Cancelled!");
-                finish();
-            }
-        } else if (requestCode == Constants.REQUEST_CODE_SELECT_CUSTOMER) {
+        if (requestCode == Constants.REQUEST_CODE_SELECT_CUSTOMER) {
             if (resultCode == RESULT_OK) {
                 // Customer was successfully selected
                 Utils_General.showToast(this, "Customer Selected");
@@ -391,18 +332,12 @@ public class Activity_Main extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-
-        if (mFirebaseAuthListener != null) {
-            mFirebaseAuth.removeAuthStateListener(mFirebaseAuthListener);
-        }
-
         detachDatabaseReadListeners();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mFirebaseAuth.addAuthStateListener(mFirebaseAuthListener);
         attachDatabaseReadListeners();
     }
 
@@ -412,52 +347,6 @@ public class Activity_Main extends AppCompatActivity implements
         //mMessageAdapter.clear();
         detachDatabaseReadListeners();
 
-
-    }
-
-    private void onSignedInInitialize(final FirebaseUser user) {
-        String mUsername = user.getDisplayName();
-
-        if (mActionBar != null) {
-            mActionBar.setTitle(mUsername);
-        }
-
-        DatabaseReference adminRef = mUserRef.child(user.getUid());
-
-        adminRef.addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i(Constants.LOG_TAG, "onDataChange()called for driver");
-
-                if (dataSnapshot.exists()) {
-                    // run some code
-
-                    Driver driver = dataSnapshot.getValue(Driver.class);
-                    Log.i(Constants.LOG_TAG, "The driver is in the db:" + driver.toString());
-
-                } else {
-                    Log.i(Constants.LOG_TAG, "The driver is not in the database");
-                    // User is not in the driver db. add them
-                    Driver driver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(), "", false, false, "", "");
-
-                    // TODO: Not sure which way is better?????
-                    mUserRef.child(user.getUid()).setValue(driver);
-                    //mDriverDBReference.push().setValue(driver);
-
-                    //checkIfAuthorized();
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        //checkIfAuthorized();
-        attachDatabaseReadListeners();
 
     }
 
@@ -638,15 +527,19 @@ public class Activity_Main extends AppCompatActivity implements
         Log.i(Constants.LOG_TAG, "onAddCustomerClicked() called");
 
         Fragment_CustomerAdd fragment = Fragment_CustomerAdd.newInstance();
-
-        Log.i(Constants.LOG_TAG, "mLandscape = " + mLandscapeView);
-
         replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_ADD, fragment, true);
 
     }
 
+    public void setActionBarTitle(String title) {
+
+        if (mActionBar != null) {
+            mActionBar.setTitle(title);
+        }
+    }
+
     @Override
-    public void onOrderSelected(Order order) {
+    public void onOrderClicked(Order order) {
         Log.i(Constants.LOG_TAG, "onOrderSelected() called");
 
         Fragment_OrderDetails fragment = Fragment_OrderDetails.newInstance(order);
@@ -656,13 +549,21 @@ public class Activity_Main extends AppCompatActivity implements
         } else {
             replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_DETAILS, fragment, false);
         }
-
     }
 
-    public void setActionBarTitle(String title) {
+    @Override
+    public void onCustomerSaved(Customer customer) {
 
-        if (mActionBar != null) {
-            mActionBar.setTitle(title);
-        }
+        // load the customer list
+        Fragment_CustomerList frag_customer = Fragment_CustomerList.newInstance(customer);
+        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_LIST, frag_customer, false);
+
+        //frag_customer.setSelectedCustomer(customer);
+    }
+
+    @Override
+    public void onLocationAdded(Customer customer) {
+        onCustomerSelected(customer);
+
     }
 }

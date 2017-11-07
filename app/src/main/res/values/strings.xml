@@ -19,6 +19,7 @@
     <string name="privacy">http://www.google.com/policies/privacy</string>
     <string name="label_customer_location">Customer Address</string>
     <string name="action_select_location">Select Location</string>
+    <string name="action_select_address">Select Address</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="order_booked">Order Booked</string>
@@ -29,5 +30,31 @@
     <string name="ok">ok</string>
     <string name="activity_title_checkout">Order Checkout</string>
     <string name="action_driver_filter">Map Filter</string>
+    <string name="title_delivery_date">Delivery Date</string>
+    <string name="content_description_select_order_date">select order date</string>
+    <string name="title_order_details">ORDER DETAILS</string>
+    <string name="content_description_order_details">order details</string>
+    <string name="content_description_payment">payment</string>
+    <string name="title_payment">PAYMENT</string>
+    <string name="content_description_success">success</string>
+    <string name="title_success">SUCCESS</string>
+    <string name="title_pickup_location">Pickup Location</string>
+    <string name="title_delivery_location">Delivery Location</string>
+    <string name="btn_next_payment">NEXT - PAYMENT</string>
+    <string name="btn_add_location">ADD LOCATION</string>
+    <string name="title_user_location_list">User Location List</string>
+    <string name="content_description_select_pickup_location">select pickup location</string>
+    <string name="contednt_description_select_delivery_location">select delivery location</string>
+    <string name="msg_all_fields_are_required">All fields are required.</string>
+    <string name="title_order_detail">Order Details</string>
+    <string name="title_credit_card_details">Credit Card Details</string>
+    <string name="content_description_expiry_date">expiry date</string>
+    <string name="msg_mm_yyyy">MM/YYYY</string>
+    <string name="hint_xxxx">XXXX</string>
+    <string name="content_description_credit_card_icon">credit card icon</string>
+    <string name="content_description_svc_number">svc number</string>
+    <string name="btn_place_order">PLACE ORDER</string>
+    <string name="btn_cancel">CANCEL</string>
+    <string name="hint_xxx">XXX</string>
 
 </resources>

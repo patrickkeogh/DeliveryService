@@ -18,9 +18,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Order;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
@@ -36,8 +35,12 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
     private Order mOrder;
     private GoogleApiClient mClient;
     private DatabaseReference mLocationsRef;
+    private DatabaseReference mCustomerRef;
 
-    private TextView tv_order_company;
+    private TextView tv_order_details_company;
+    private TextView tv_order_details_contact;
+    private TextView tv_order_details_phone;
+
     private TextView tv_order_number;
     private TextView tv_order_location_pickup;
     private TextView tv_order_location_delivery;
@@ -45,6 +48,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
     private TextView tv_order_date;
     private TextView tv_order_type;
     private TextView tv_order_distance;
+    private TextView tv_order_amount;
 
     /**
      * Static factory method that takes a driver object parameter,
@@ -81,7 +85,11 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_order_details, container, false);
 
-        tv_order_company = rootView.findViewById(R.id.tv_order_company);
+        tv_order_details_company = rootView.findViewById(R.id.tv_order_details_company);
+        tv_order_details_contact = rootView.findViewById(R.id.tv_order_details_contact);
+        tv_order_details_phone = rootView.findViewById(R.id.tv_order_details_phone);
+
+
         tv_order_number = rootView.findViewById(R.id.tv_order_number);
         tv_order_location_pickup = rootView.findViewById(R.id.tv_order_location_pickup);
         tv_order_location_delivery = rootView.findViewById(R.id.tv_order_location_delivery);
@@ -89,21 +97,27 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
         tv_order_type = rootView.findViewById(R.id.tv_order_type);
         tv_order_date = rootView.findViewById(R.id.tv_order_date);
         tv_order_distance = rootView.findViewById(R.id.tv_order_distance);
+        tv_order_amount = rootView.findViewById(R.id.tv_order_amount);
 
         if (mOrder == null) {
             throw new IllegalArgumentException("Must pass a Order Object");
         } else {
-            tv_order_company.setText(mOrder.getCustomerName());
+
+
+            tv_order_details_company.setText(mOrder.getCustomerName());
+
+
+            tv_order_details_contact.setText(mOrder.getCustomerContact());
+            tv_order_details_phone.setText(mOrder.getCustomerPhone());
+
+
             tv_order_number.setText(mOrder.getId());
             tv_order_status.setText(mOrder.getStatus());
             tv_order_type.setText(mOrder.getType());
             tv_order_distance.setText(mOrder.getDistance_text());
+            tv_order_amount.setText(Utils_General.getCostString(getContext(), mOrder.getAmount()));
             tv_order_date.setText(Utils_General.getFormattedLongDateStringFromLongDate(mOrder.getPickupDate()));
         }
-
-        // Get a reference to the drivers table
-        mLocationsRef = FirebaseDatabase.getInstance()
-                .getReference().child(Constants.FIREBASE_NODE_ORDERS).child(mOrder.getId());
 
         return rootView;
 
@@ -141,6 +155,8 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
                 tv_order_location_delivery.setText(places.get(0).getAddress().toString());
             }
         });
+
+
 
     }
 

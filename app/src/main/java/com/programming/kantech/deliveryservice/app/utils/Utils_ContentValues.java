@@ -2,7 +2,7 @@ package com.programming.kantech.deliveryservice.app.utils;
 
 import android.content.ContentValues;
 
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Driver;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
 import com.programming.kantech.deliveryservice.app.provider.Contract_DeliveryService;
 
 public class Utils_ContentValues {

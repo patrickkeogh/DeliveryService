@@ -19,9 +19,11 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 /**
  * Created by patrick keogh on 2017-08-09.
@@ -198,6 +200,24 @@ public class Utils_General {
         DrawableCompat.setTint(vectorDrawable, color);
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    /**
+     * Formats an integer to a currency
+     */
+    public static String getCostString(Context context, int amount_in) {
+
+        double amount = (double) (amount_in);
+
+        amount = amount / 100;
+
+        Log.i(Constants.LOG_TAG, "Amount after converting to double:" + amount);
+
+        NumberFormat currency = NumberFormat.getCurrencyInstance(new Locale("en", "US"));
+        currency.setMaximumFractionDigits(2);
+        currency.setMinimumFractionDigits(2);
+
+        return currency.format(amount);
     }
 
     /**

@@ -21,6 +21,7 @@
     <color name="colorWhiteFade">#80FAFAFA</color>
 
     <color name="colorMapFilter">#CC283593</color>
+    <color name="colorMapTitleFilter">#CCFF1744</color>
 
 
 </resources>

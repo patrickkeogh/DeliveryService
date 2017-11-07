@@ -16,11 +16,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Driver;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Driver;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 /**
  * Created by patrick keogh on 2017-09-06.
@@ -32,10 +32,10 @@ public class Activity_SelectDriver extends AppCompatActivity{
     // Member variables
     private FirebaseRecyclerAdapter<Driver, ViewHolder_Driver> mFireAdapter;
 
-    @InjectView(R.id.rv_drivers_list)
+    @BindView(R.id.rv_drivers_list)
     RecyclerView mRecyclerView;
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
     /**
@@ -48,7 +48,7 @@ public class Activity_SelectDriver extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_driver);
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         // Set the support action bar
         setSupportActionBar(mToolbar);

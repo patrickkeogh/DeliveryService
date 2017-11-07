@@ -1,267 +1,305 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:background="@color/colorPrimary"
-        android:weightSum="3"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="96dp">
+        android:layout_height="@dimen/nav_bar_order"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:weightSum="3">
 
         <LinearLayout
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
 
 
             <ImageView
-                android:layout_gravity="center"
-                android:src="@drawable/ic_nav_details"
-                android:layout_marginTop="16dp"
                 android:layout_width="40dp"
-                android:layout_height="40dp" />
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/content_description_order_details"
+                android:src="@drawable/ic_nav_details" />
 
             <TextView
-                android:text="ORDER INFO"
-                android:gravity="center"
-                android:textColor="@color/colorWhite"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/title_order_details"
+                android:textColor="@color/colorWhite" />
 
         </LinearLayout>
 
         <LinearLayout
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
 
 
             <ImageView
-                android:layout_gravity="center"
-                android:src="@drawable/ic_nav_payment_fade"
-                android:layout_marginTop="16dp"
                 android:layout_width="40dp"
-                android:layout_height="40dp" />
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:contentDescription="@string/content_description_payment"
+                android:src="@drawable/ic_nav_payment_fade" />
 
             <TextView
-                android:text="PAYMENT"
-                android:gravity="center"
-                android:textColor="@color/colorWhiteFade"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/title_payment"
+                android:textColor="@color/colorWhiteFade" />
 
         </LinearLayout>
 
         <LinearLayout
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
 
 
             <ImageView
+                android:layout_width="@dimen/icon_width_height"
+                android:layout_height="@dimen/icon_width_height"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_nav_success_fade"
-                android:layout_marginTop="16dp"
-                android:layout_width="40dp"
-                android:layout_height="40dp" />
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:contentDescription="@string/content_description_success"
+                android:src="@drawable/ic_nav_success_fade" />
 
             <TextView
-                android:text="SUCCESS"
-                android:gravity="center"
-                android:textColor="@color/colorWhiteFade"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/title_success"
+                android:textColor="@color/colorWhiteFade" />
 
         </LinearLayout>
-
-
 
     </LinearLayout>
 
 
-
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="157dp"
-        android:layout_marginBottom="24dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginBottom="@dimen/margin_8dp"
+        android:layout_marginEnd="@dimen/margin_8dp"
+        android:layout_marginStart="@dimen/margin_8dp"
+        android:layout_marginTop="@dimen/margin_top_checkout"
+        tools:ignore="UselessParent">
 
-        android:orientation="vertical">
-
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/tv_user_order_company"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="ABC Electronics" />
+
+            <TextView
+                android:id="@+id/tv_user_order_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="Full Name" />
+
+            <TextView
+                android:id="@+id/tv_user_order_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="Full Name" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:text="@string/title_delivery_date"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/divider_view_accent"
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:background="@color/colorAccent" />
+
+            <LinearLayout
+                android:id="@+id/layout_order_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:id="@+id/iv_user_get_date"
+                    android:layout_width="@dimen/icon_width_height"
+                    android:layout_height="@dimen/icon_width_height"
+                    android:layout_marginEnd="@dimen/margin_8dp"
+                    android:contentDescription="@string/content_description_select_order_date"
+                    android:src="@drawable/ic_date_range_24dp" />
 
                 <TextView
-                    android:id="@+id/tv_user_order_company"
+                    android:id="@+id/tv_selected_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    tools:text="ABC Electronics"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                    android:layout_gravity="center"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@android:color/black"
+                    tools:text="Monday 1" />
+            </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tv_user_order_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    tools:text="Full Name"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:text="@string/title_pickup_location"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorPrimaryDark" />
 
-                <TextView
-                    android:id="@+id/tv_user_order_phone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    tools:text="Full Name"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/divider_view_accent"
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:background="@color/colorAccent" />
 
+            <LinearLayout
+                android:id="@+id/layout_order_location_pickup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Delivery Date"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/colorPrimaryDark" />
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dip"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:background="@color/colorAccent" />
+                <ImageView
+                    android:id="@+id/iv_user_get_pickup_location"
+                    android:layout_width="@dimen/icon_width_height"
+                    android:layout_height="@dimen/icon_width_height"
+                    android:layout_marginEnd="@dimen/margin_8dp"
+                    android:contentDescription="@string/content_description_select_pickup_location"
+                    android:src="@drawable/ic_place_accent_24dp" />
 
                 <LinearLayout
-                    android:id="@+id/layout_order_pickup_date"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <include layout="@layout/item_date" />
-
-                    <Button
-                        android:id="@+id/btn_user_get_date"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:background="@color/colorAccent"
-                        android:textColor="@color/colorWhite"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_8dp"
-                        android:text="Select Delivery Date"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Pickup Location"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@color/colorPrimaryDark" />
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:background="@color/colorAccent" />
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <include layout="@layout/item_location_pickup" />
-
-                    <Button
-                        android:id="@+id/btn_user_get_pickup_location"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:background="@color/colorAccent"
-                        android:textColor="@color/colorWhite"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_8dp"
-                        android:text="Select Pickup Location"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Delivery Location"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@color/colorPrimaryDark" />
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:background="@color/colorAccent" />
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <include layout="@layout/item_location_delivery" />
-
-                    <Button
-                        android:id="@+id/btn_user_get_delivery_location"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:background="@color/colorAccent"
-                        android:textColor="@color/colorWhite"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_8dp"
-                        android:text="Select Delivery Location"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/btn_user_place_order"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:background="@color/colorPrimaryDark"
-                    android:textColor="@color/colorWhite"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_8dp"
-                    android:text="NEXT - PAYMENT"
-                    android:textStyle="bold" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_location_name_pickup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/colorBlack" />
+
+                    <TextView
+                        android:id="@+id/tv_location_address_pickup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+                </LinearLayout>
 
             </LinearLayout>
 
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:text="@string/title_delivery_location"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/divider_view_accent"
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:background="@color/colorAccent" />
+
+            <LinearLayout
+                android:id="@+id/layout_order_location_delivery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/iv_user_get_delivery_location"
+                    android:layout_width="@dimen/icon_width_height"
+                    android:layout_height="@dimen/icon_width_height"
+                    android:layout_marginEnd="@dimen/margin_8dp"
+                    android:contentDescription="@string/contednt_description_select_delivery_location"
+                    android:src="@drawable/ic_place_accent_24dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_location_name_delivery"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/colorBlack" />
+
+                    <TextView
+                        android:id="@+id/tv_location_address_delivery"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_user_place_order"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:background="@color/colorPrimaryDark"
+                android:text="@string/btn_next_payment"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/colorWhite"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:gravity="center_horizontal"
+                android:maxLines="1"
+                android:text="@string/msg_all_fields_are_required"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/colorAccent" />
+
+        </LinearLayout>
 
 
+    </ScrollView>
 
-
-        </ScrollView>
-
-    </LinearLayout>
 
 </RelativeLayout>

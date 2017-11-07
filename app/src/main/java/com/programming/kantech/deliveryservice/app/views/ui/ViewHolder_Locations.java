@@ -39,10 +39,10 @@ public class ViewHolder_Locations extends RecyclerView.ViewHolder {
             }
         });
 
-        tv_location_name = itemView.findViewById(R.id.tv_location_name_pickup);
+        tv_location_name = itemView.findViewById(R.id.tv_location_pickup_name);
 
 
-        tv_location_address = itemView.findViewById(R.id.tv_location_address_pickup);
+        tv_location_address = itemView.findViewById(R.id.tv_location_pickup_address);
     }
 
     public void setName(String name) {

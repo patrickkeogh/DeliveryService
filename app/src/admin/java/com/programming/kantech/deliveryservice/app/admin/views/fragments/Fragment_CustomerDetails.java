@@ -1,5 +1,9 @@
 package com.programming.kantech.deliveryservice.app.admin.views.fragments;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,23 +14,29 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Customer;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Location;
+import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Locations;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Location;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
-import com.programming.kantech.deliveryservice.app.views.ui.ViewHolder_Locations;
 
 /**
  * Created by patrick keogh on 2017-08-14.
@@ -44,6 +54,18 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     private DatabaseReference mLocationsRef;
 
     private TextView tv_customer_address;
+    private TextView tv_customer_company;
+    private TextView tv_customer_contact_name;
+    private TextView tv_customer_contact_phone;
+
+    private ImageButton ib_customer_add_location;
+
+    // Define a new interface onCustomerSelected that triggers a callback in the host activity
+    LocationAddedListener mCallback;
+
+    public interface LocationAddedListener {
+        void onLocationAdded(Customer customer);
+    }
 
     /**
      * Static factory method that takes a driver object parameter,
@@ -83,16 +105,28 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_customer_details, container, false);
 
-        TextView tv_customer_company = rootView.findViewById(R.id.tv_customer_company);
+        tv_customer_company = rootView.findViewById(R.id.tv_customer_company);
         tv_customer_address = rootView.findViewById(R.id.tv_customer_address);
-        TextView tv_customer_contact_name = rootView.findViewById(R.id.tv_customer_contact_name);
+        tv_customer_contact_name = rootView.findViewById(R.id.tv_customer_contact_name);
+        tv_customer_contact_phone = rootView.findViewById(R.id.tv_customer_contact_phone);
+
+        ib_customer_add_location = rootView.findViewById(R.id.ib_customer_add_location);
 
         if (mCustomer == null) {
-            throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
+            throw new IllegalArgumentException("Must pass EXTRA_CUSTOMER");
         } else {
             tv_customer_company.setText(mCustomer.getCompany());
             tv_customer_contact_name.setText(mCustomer.getContact_name());
+            tv_customer_contact_phone.setText(mCustomer.getContact_number());
         }
+
+        ib_customer_add_location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Get a new location using google places
+                onGetLocationButtonClicked();
+            }
+        });
 
         // Get a reference to the RecyclerView in the fragment_order_list xml layout file
         mLocationRecyclerView = rootView.findViewById(R.id.rv_customer_locations_list);
@@ -105,6 +139,21 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
 
         return rootView;
 
+    }
+
+    // Override onAttach to make sure that the container activity has implemented the callback
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // This makes sure that the host activity has implemented the callback interface
+        // If not, it throws an exception
+        try {
+            mCallback = (Fragment_CustomerDetails.LocationAddedListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement LocationAddedListener");
+        }
     }
 
     @Override
@@ -123,44 +172,10 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
          */
         mLocationRecyclerView.setHasFixedSize(false);
 
-        mFireAdapter = new FirebaseRecyclerAdapter<Location, ViewHolder_Locations>(
-                Location.class,
-                R.layout.item_location,
-                ViewHolder_Locations.class,
-                mLocationsRef) {
-
-            @Override
-            public void populateViewHolder(final ViewHolder_Locations holder, Location location, int position) {
-                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + location.toString());
-
-                //holder.itemView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
-
-                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mClient, location.getPlaceId());
-
-                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
-                    @Override
-                    public void onResult(@NonNull PlaceBuffer places) {
-
-                        Log.i(Constants.LOG_TAG, "PLACE:" + places.get(0).getAddress().toString());
-
-                        holder.setName(places.get(0).getName().toString());
-                        holder.setAddress(places.get(0).getAddress().toString());
-
-
-                    }
-                });
-
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                    }
-                });
-            }
-
-        };
-
-        mLocationRecyclerView.setAdapter(mFireAdapter);
+        loadFirebaseAdapter();
     }
+
+
 
     /**
      * Save the current state of this fragment
@@ -187,6 +202,8 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
 
             }
         });
+
+        loadFirebaseAdapter();
 
     }
 
@@ -252,5 +269,117 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
                     .addApi(Places.GEO_DATA_API)
                     .build();
         }
+    }
+    private void loadFirebaseAdapter() {
+
+        if(mFireAdapter != null){
+            mFireAdapter.cleanup();
+        }
+
+        mFireAdapter = new FirebaseRecyclerAdapter<Location, ViewHolder_Locations>(
+                Location.class,
+                R.layout.item_location,
+                ViewHolder_Locations.class,
+                mLocationsRef) {
+
+            @Override
+            public void populateViewHolder(final ViewHolder_Locations holder, Location location, int position) {
+                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + location.toString());
+
+                //holder.itemView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
+
+                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mClient, location.getPlaceId());
+
+                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+                    @Override
+                    public void onResult(@NonNull PlaceBuffer places) {
+
+                        Log.i(Constants.LOG_TAG, "PLACE:" + places.get(0).getAddress().toString());
+
+                        holder.setName(places.get(0).getName().toString());
+                        holder.setAddress(places.get(0).getAddress().toString());
+
+
+                    }
+                });
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                    }
+                });
+            }
+
+        };
+
+        mLocationRecyclerView.setAdapter(mFireAdapter);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(Constants.LOG_TAG, "onActivityResult in Frag,ment");
+        if (requestCode == Constants.REQUEST_CODE_LOCATION_PICKER && resultCode == Activity.RESULT_OK) {
+            Place place = PlacePicker.getPlace(getContext(), data);
+
+            if (place == null) {
+                Log.i(Constants.LOG_TAG, "No place selected");
+                return;
+            }
+
+            addLocation(place);
+        }
+
+    }
+
+    public void onGetLocationButtonClicked() {
+        Log.i(Constants.LOG_TAG, "onGetLocationButtonClicked() called");
+        try {
+
+            // Start a new Activity for the Place Picker API, this will trigger {@code #onActivityResult}
+            // when a place is selected or with the user cancels.
+            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+            Intent i = builder.build(getActivity());
+            startActivityForResult(i, Constants.REQUEST_CODE_LOCATION_PICKER);
+
+        } catch (GooglePlayServicesRepairableException e) {
+            Log.e(Constants.LOG_TAG, String.format("GooglePlayServices Not Available [%s]", e.getMessage()));
+        } catch (GooglePlayServicesNotAvailableException e) {
+            Log.e(Constants.LOG_TAG, String.format("GooglePlayServices Not Available [%s]", e.getMessage()));
+        } catch (Exception e) {
+            Log.e(Constants.LOG_TAG, String.format("PlacePicker Exception: %s", e.getMessage()));
+        }
+    }
+
+    private void addLocation(Place place) {
+        Log.i(Constants.LOG_TAG, "addLocation() calledplaceid:" + place.getId());
+
+        final Location location = new Location();
+        location.setCustId(mCustomer.getId());
+        location.setPlaceId(place.getId());location.setMainAddress(false);
+
+        mLocationsRef
+                .push()
+                .setValue(location, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError,
+                                           DatabaseReference databaseReference) {
+                        String uniqueKey = databaseReference.getKey();
+
+                        location.setId(uniqueKey);
+
+                        mLocationsRef.child(uniqueKey).setValue(location, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+
+                                mCallback.onLocationAdded(mCustomer);
+                                //mFireAdapter.notifyDataSetChanged();
+
+                            }
+                        });
+
+                        Log.i(Constants.LOG_TAG, "key:" + uniqueKey);
+                    }
+                });
+
     }
 }

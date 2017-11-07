@@ -2,29 +2,23 @@ package com.programming.kantech.deliveryservice.app.user.views.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Order;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
-import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 /**
@@ -36,13 +30,13 @@ public class Activity_CheckoutSuccess extends AppCompatActivity {
     private Order mOrder;
     private ActionBar mActionBar;
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-    @InjectView(R.id.tv_user_checkout_success_message)
+    @BindView(R.id.tv_user_checkout_success_message)
     TextView tv_user_checkout_success_message;
 
-    @InjectView(R.id.iv_user_checkout_home)
+    @BindView(R.id.iv_user_checkout_home)
     ImageView iv_user_checkout_home;
 
     @Override
@@ -53,7 +47,7 @@ public class Activity_CheckoutSuccess extends AppCompatActivity {
 
         Log.i(Constants.LOG_TAG, "onCreate() in User activity_checkout_success");
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(Constants.STATE_INFO_ORDER)) {

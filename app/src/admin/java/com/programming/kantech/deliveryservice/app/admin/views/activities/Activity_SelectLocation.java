@@ -31,12 +31,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Locations;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Customer;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Location;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Location;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 /**
  * Created by patri on 2017-08-23.
@@ -52,13 +52,13 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
     private GoogleApiClient mClient;
     private Customer mCustomer;
 
-    @InjectView(R.id.rv_locations_list)
+    @BindView(R.id.rv_locations_list)
     RecyclerView mRecyclerView;
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-    @InjectView(R.id.btn_customer_select_pickup_location)
+    @BindView(R.id.btn_customer_select_pickup_location)
     Button mButton_PickupLocation;
 
     /**
@@ -71,7 +71,7 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_location_pickup);
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         if (savedInstanceState != null) {
 
@@ -103,7 +103,7 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
         }
 
         // Get a reference to the locations table
-        mLocationsRef = FirebaseDatabase.getInstance().getReference().child("locations");
+        mLocationsRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_LOCATIONS);
 
         // Set up the recycler view
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -202,7 +202,6 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
         final Location location = new Location();
         location.setCustId(mCustomer.getId());
         location.setPlaceId(place.getId());
-
 
         mLocationsRef
                 .child(mCustomer.getId())

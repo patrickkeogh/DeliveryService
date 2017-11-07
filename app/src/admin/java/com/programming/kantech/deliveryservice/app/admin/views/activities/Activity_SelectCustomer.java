@@ -30,13 +30,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Customers;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Customer;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
 import java.util.Objects;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 /**
  * Created by patrick keogh on 2017-08-23.
@@ -55,13 +55,13 @@ public class Activity_SelectCustomer extends AppCompatActivity implements Google
 
     private GoogleApiClient mClient;
 
-    @InjectView(R.id.rv_customers_list)
+    @BindView(R.id.rv_customers_list)
     RecyclerView mRecyclerView;
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-    @InjectView(R.id.btn_customer_add)
+    @BindView(R.id.btn_customer_add)
     Button mButtonCustomerAdd;
 
     /**
@@ -74,7 +74,7 @@ public class Activity_SelectCustomer extends AppCompatActivity implements Google
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_customer);
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
 //        if (savedInstanceState != null) {
 //
@@ -127,7 +127,7 @@ public class Activity_SelectCustomer extends AppCompatActivity implements Google
 
         mFireAdapter = new FirebaseRecyclerAdapter<Customer, ViewHolder_Customers>(
                 Customer.class,
-                R.layout.item_customer,
+                R.layout.item_admin_customer,
                 ViewHolder_Customers.class,
                 mCustomersRef) {
 

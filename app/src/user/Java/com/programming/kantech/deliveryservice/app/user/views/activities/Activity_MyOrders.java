@@ -27,14 +27,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.AppUser;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Order;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.AppUser;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.user.views.ui.ViewHolder_Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 /**
  * Created by patri on 2017-10-04.
@@ -53,10 +53,10 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
 
     private DatabaseReference mOrdersRef;
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-    @InjectView(R.id.rv_user_orders)
+    @BindView(R.id.rv_user_orders)
     RecyclerView mRecyclerView;
 
     @Override
@@ -65,7 +65,7 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
 
         setContentView(R.layout.activity_orders);
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         if (savedInstanceState != null) {
 

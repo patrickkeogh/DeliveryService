@@ -1,6 +1,5 @@
 package com.programming.kantech.deliveryservice.app.user.views.activities;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,7 +22,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -33,17 +31,16 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pogo.stripe.Charge;
-import com.programming.kantech.deliveryservice.app.data.model.pogo.stripe.Outcome;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.AppUser;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Order;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.AppUser;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.stripe.Charge;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.stripe.Outcome;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 import com.stripe.android.Stripe;
@@ -61,8 +58,8 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Objects;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 /**
@@ -92,52 +89,49 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
     private DatabaseReference mOrderRef;
     private ValueEventListener mChargeEventListener;
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-    @InjectView(R.id.btn_user_checkout_confirm_order)
+    @BindView(R.id.btn_user_checkout_confirm_order)
     Button btn_user_checkout_confirm_order;
 
-    @InjectView(R.id.sp_user_checkout_exp_month)
+    @BindView(R.id.sp_user_checkout_exp_month)
     Spinner sp_user_checkout_exp_month;
 
-    @InjectView(R.id.sp_user_checkout_exp_year)
+    @BindView(R.id.sp_user_checkout_exp_year)
     Spinner sp_user_checkout_exp_year;
 
-    @InjectView(R.id.et_user_checkout_card_number_1)
+    @BindView(R.id.et_user_checkout_card_number_1)
     EditText et_user_checkout_card_number_1;
 
-    @InjectView(R.id.et_user_checkout_card_number_2)
+    @BindView(R.id.et_user_checkout_card_number_2)
     EditText et_user_checkout_card_number_2;
 
-    @InjectView(R.id.et_user_checkout_card_number_3)
+    @BindView(R.id.et_user_checkout_card_number_3)
     EditText et_user_checkout_card_number_3;
 
-    @InjectView(R.id.et_user_checkout_card_number_4)
+    @BindView(R.id.et_user_checkout_card_number_4)
     EditText et_user_checkout_card_number_4;
 
-    @InjectView(R.id.pb_checkout_progress_bar)
+    @BindView(R.id.pb_checkout_progress_bar)
     ProgressBar pb_checkout_progress_bar;
 
-    @InjectView(R.id.tv_user_checkout_company)
+    @BindView(R.id.tv_user_checkout_company)
     TextView tv_user_checkout_company;
 
-    @InjectView(R.id.tv_user_checkout_date)
+    @BindView(R.id.tv_user_checkout_date)
     TextView tv_user_checkout_date;
 
-    @InjectView(R.id.tv_user_checkout_location_pickup)
+    @BindView(R.id.tv_user_checkout_location_pickup)
     TextView tv_user_checkout_location_pickup;
 
-    @InjectView(R.id.tv_user_checkout_location_delivery)
+    @BindView(R.id.tv_user_checkout_location_delivery)
     TextView tv_user_checkout_location_delivery;
 
-    @InjectView(R.id.tv_user_checkout_distance)
-    TextView tv_user_checkout_distance;
-
-    @InjectView(R.id.tv_user_checkout_amount)
+    @BindView(R.id.tv_user_checkout_amount)
     TextView tv_user_checkout_amount;
 
-    @InjectView(R.id.et_user_checkout_svc)
+    @BindView(R.id.et_user_checkout_svc)
     EditText et_user_checkout_svc;
 
     @Override
@@ -147,7 +141,7 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
 
         Log.i(Constants.LOG_TAG, "onCreate() in User Activity_Checkout");
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(Constants.STATE_INFO_ORDER)) {
@@ -192,7 +186,9 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
 
             String display_amount = currency.format(amount);
 
-            tv_user_checkout_distance.setText(distance_text);
+            display_amount += " (" + distance_text + ")";
+
+            //tv_user_checkout_distance.setText(distance_text);
 
             tv_user_checkout_amount.setText(display_amount);
 

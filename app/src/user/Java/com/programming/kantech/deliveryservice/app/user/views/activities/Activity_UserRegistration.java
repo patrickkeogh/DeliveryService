@@ -28,15 +28,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.AppUser;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Location;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.AppUser;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Location;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import java.util.Objects;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 /**
@@ -50,25 +50,25 @@ public class Activity_UserRegistration extends AppCompatActivity {
     private FirebaseUser mUser;
     private Place mPlace;
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-    @InjectView(R.id.et_user_add_fullname)
+    @BindView(R.id.et_user_add_fullname)
     EditText et_user_add_fullname;
 
-    @InjectView(R.id.et_user_add_company)
+    @BindView(R.id.et_user_add_company)
     EditText et_user_add_company;
 
-    @InjectView(R.id.et_user_add_phone)
+    @BindView(R.id.et_user_add_phone)
     EditText et_user_add_phone;
 
-    @InjectView(R.id.tv_location_name_pickup)
-    TextView tv_location_name_pickup;
+    @BindView(R.id.tv_registration_address_name)
+    TextView tv_registration_address_name;
 
-    @InjectView(R.id.tv_location_address_pickup)
-    TextView tv_location_address_pickup;
+    @BindView(R.id.tv_registration_address)
+    TextView tv_registration_address;
 
-    @InjectView(R.id.btn_user_register)
+    @BindView(R.id.btn_user_register)
     Button btn_user_register;
 
 
@@ -79,7 +79,7 @@ public class Activity_UserRegistration extends AppCompatActivity {
 
         Log.i(Constants.LOG_TAG, "onCreate() in User Activity_Main");
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -132,9 +132,9 @@ public class Activity_UserRegistration extends AppCompatActivity {
 
             mPlace = place;
 
-            tv_location_name_pickup.setText(place.getName().toString());
+            tv_registration_address_name.setText(place.getName().toString());
 
-            tv_location_address_pickup.setText(place.getAddress().toString());
+            tv_registration_address.setText(place.getAddress().toString());
 
             setupForm();
         }
@@ -146,7 +146,7 @@ public class Activity_UserRegistration extends AppCompatActivity {
         finish();
     }
 
-    @OnClick(R.id.btn_user_get_address)
+    @OnClick(R.id.layout_registration_address)
     public void getCustomerAddress() {
         mPlace = null;
         onGetLocationButtonClicked();

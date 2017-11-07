@@ -24,15 +24,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.AppUser;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.AppUser;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 import com.programming.kantech.deliveryservice.app.utils.Utils_Preferences;
 
 import java.util.Arrays;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 /**
@@ -50,7 +50,7 @@ public class Activity_Main extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mFirebaseAuthListener;
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
     @Override
@@ -60,7 +60,7 @@ public class Activity_Main extends AppCompatActivity {
 
         Log.i(Constants.LOG_TAG, "onCreate() in User Activity_Main");
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         // Set the support action bar
         setSupportActionBar(mToolbar);

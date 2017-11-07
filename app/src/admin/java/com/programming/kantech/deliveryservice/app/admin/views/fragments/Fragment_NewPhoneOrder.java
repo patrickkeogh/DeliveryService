@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -24,16 +26,32 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.admin.views.activities.Activity_SelectCustomer;
 import com.programming.kantech.deliveryservice.app.admin.views.activities.Activity_SelectLocation;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Customer;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Location;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Order;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Location;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.directions.Distance;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.directions.Leg;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.directions.Results;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.directions.Route;
+import com.programming.kantech.deliveryservice.app.data.retrofit.ApiClient;
+import com.programming.kantech.deliveryservice.app.data.retrofit.ApiInterface;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -47,7 +65,10 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
     private DatabaseReference mOrderRef;
 
+    private ApiInterface apiService;
+
     private Customer mSelectedCustomer;
+    private Distance mDistance;
 
     private Location mLocationPickup;
     private String mLocationPickupName;
@@ -57,27 +78,38 @@ public class Fragment_NewPhoneOrder extends Fragment {
     private String mLocationDeliveryName;
     private String mLocationDeliveryAddress;
 
-    private TextView tv_cust_name;
-    private TextView tv_pickup_date;
+    @BindView(R.id.tv_admin_customer_name)
+    TextView tv_admin_customer_name;
 
-    private TextView tv_cust_location_pickup_name;
-    private TextView tv_cust_location_pickup_address;
+    @BindView(R.id.tv_admin_customer_address)
+    TextView tv_admin_customer_address;
 
-    private TextView tv_cust_location_delivery_name;
-    private TextView tv_cust_location_delivery_address;
+    @BindView(R.id.tv_pickup_date)
+    TextView tv_pickup_date;
 
-    private LinearLayout layout_order_customer;
-    private LinearLayout layout_location_pickup;
-    private LinearLayout layout_location_delivery;
+    @BindView(R.id.tv_cust_location_pickup_name)
+    TextView tv_cust_location_pickup_name;
 
-    private Button btn_select_customer;
-    private Button btn_select_location_pickup;
-    private Button btn_select_location_delivery;
+    @BindView(R.id.tv_cust_location_pickup_address)
+    TextView tv_cust_location_pickup_address;
 
-    private Button btn_get_date;
+    @BindView(R.id.iv_select_location_pickup)
+    ImageView iv_select_location_pickup;
 
-    private Button btn_submit_order;
-    private Button btn_cancel_order;
+    @BindView(R.id.tv_cust_location_delivery_name)
+    TextView tv_cust_location_delivery_name;
+
+    @BindView(R.id.tv_cust_location_delivery_address)
+    TextView tv_cust_location_delivery_address;
+
+    @BindView(R.id.iv_select_location_delivery)
+    ImageView iv_select_location_delivery;
+
+    @BindView(R.id.btn_phone_order_add)
+    Button btn_phone_order_add;
+
+    @BindView(R.id.btn_phone_order_cancel)
+    Button btn_phone_order_cancel;
 
     private long mDate;
 
@@ -115,127 +147,83 @@ public class Fragment_NewPhoneOrder extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        // Load the saved state if there is one
-        if (savedInstanceState != null) {
-            Log.i(Constants.LOG_TAG, "Fragment_Ingredients savedInstanceState is not null");
-            if (savedInstanceState.containsKey(Constants.STATE_INFO_CUSTOMER)) {
-                Log.i(Constants.LOG_TAG, "we found the recipe key in savedInstanceState");
-                mSelectedCustomer = savedInstanceState.getParcelable(Constants.STATE_INFO_CUSTOMER);
-            }
+//        // Load the saved state if there is one
+//        if (savedInstanceState != null) {
+//            Log.i(Constants.LOG_TAG, "Fragment_Ingredients savedInstanceState is not null");
+//            if (savedInstanceState.containsKey(Constants.STATE_INFO_CUSTOMER)) {
+//                mSelectedCustomer = savedInstanceState.getParcelable(Constants.STATE_INFO_CUSTOMER);
+//            }
+//        } else {
+//            Bundle args = getArguments();
+//            mSelectedCustomer = args.getParcelable(Constants.EXTRA_CUSTOMER);
+//        }
+//
+//        if (mSelectedCustomer == null) {
+//            throw new IllegalArgumentException("Must pass EXTRA_CUSTOMER");
+//        }
 
-        } else {
-            Log.i(Constants.LOG_TAG, "Fragment_Ingredients savedInstanceState is null, get data from intent");
-            Bundle args = getArguments();
-            mSelectedCustomer = args.getParcelable(Constants.EXTRA_CUSTOMER);
-        }
+        apiService = ApiClient.getClient().create(ApiInterface.class);
 
         // Get a reference to the locations table
-        mOrderRef = FirebaseDatabase.getInstance().getReference().child("orders");
-
-        // TODO: Make sure we have a customer
+        mOrderRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_ORDERS);
 
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_order_add, container, false);
 
-        tv_cust_name = rootView.findViewById(R.id.tv_customer_name);
-        tv_pickup_date = rootView.findViewById(R.id.tv_pickup_date);
-
-
-        tv_cust_location_pickup_name = rootView.findViewById(R.id.tv_cust_location_pickup_name);
-        tv_cust_location_pickup_address = rootView.findViewById(R.id.tv_cust_location_pickup_address);
-
-        tv_cust_location_delivery_name = rootView.findViewById(R.id.tv_cust_location_delivery_name);
-        tv_cust_location_delivery_address = rootView.findViewById(R.id.tv_cust_location_delivery_address);
-
-        layout_order_customer = rootView.findViewById(R.id.layout_order_customer);
-        layout_location_pickup = rootView.findViewById(R.id.layout_location_pickup);
-        layout_location_delivery = rootView.findViewById(R.id.layout_location_delivery);
-
-        btn_select_customer = rootView.findViewById(R.id.btn_customer_select_customer);
-        btn_select_location_pickup = rootView.findViewById(R.id.btn_customer_select_pickup_location);
-        btn_select_location_delivery = rootView.findViewById(R.id.btn_customer_select_delivery_location);
-        btn_submit_order = rootView.findViewById(R.id.btn_phone_order_add);
-        btn_cancel_order = rootView.findViewById(R.id.btn_phone_order_cancel);
-
-        btn_get_date = rootView.findViewById(R.id.btn_get_pickup_date);
-        btn_get_date.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date
-
-                // Create the DatePickerDialog instance
-                DatePickerDialog datePicker = new DatePickerDialog(getContext(),
-                        R.style.ThemeOverlay_AppCompat_Dialog_Alert, datePickerListener,
-                        cal.get(Calendar.YEAR),
-                        cal.get(Calendar.MONTH),
-                        cal.get(Calendar.DAY_OF_MONTH));
-                datePicker.setCancelable(false);
-                datePicker.setTitle("Select A Pickup Date");
-                datePicker.show();
-
-
-            }
-        });
-
-        btn_select_location_pickup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(getActivity(), Activity_SelectLocation.class);
-
-                intent.putExtra(Constants.EXTRA_CUSTOMER, mSelectedCustomer);
-                startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_PICKUP_LOCATION);
-            }
-        });
-
-        btn_select_location_delivery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(getActivity(), Activity_SelectLocation.class);
-                intent.putExtra(Constants.EXTRA_CUSTOMER, mSelectedCustomer);
-                startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_DELIVERY_LOCATION);
-            }
-        });
-
-        btn_select_customer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), Activity_SelectCustomer.class);
-                startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CUSTOMER);
-            }
-        });
-
-        layout_order_customer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), Activity_SelectCustomer.class);
-                startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CUSTOMER);
-            }
-        });
-
-        btn_submit_order.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                createNewOrder();
-
-            }
-        });
-
-        btn_cancel_order.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cancelNewOrder();
-            }
-        });
+        ButterKnife.bind(this, rootView);
 
         setupForm();
 
         return rootView;
     }
 
+    @OnClick(R.id.iv_select_date)
+    public void onSelectDateClicked() {
+
+        Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date
+
+        // Create the DatePickerDialog instance
+        DatePickerDialog datePicker = new DatePickerDialog(getContext(),
+                R.style.ThemeOverlay_AppCompat_Dialog_Alert, datePickerListener,
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH));
+        datePicker.setCancelable(false);
+        datePicker.setTitle("Select A Pickup Date");
+        datePicker.show();
+    }
+
+    @OnClick(R.id.iv_select_customer)
+    public void onSelectCustomerClicked() {
+        Intent intent = new Intent(getActivity(), Activity_SelectCustomer.class);
+        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CUSTOMER);
+    }
+
+    @OnClick(R.id.iv_select_location_pickup)
+    public void onSelectPickupLocationClicked() {
+        Intent intent = new Intent(getActivity(), Activity_SelectLocation.class);
+
+        intent.putExtra(Constants.EXTRA_CUSTOMER, mSelectedCustomer);
+        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_PICKUP_LOCATION);
+    }
+
+    @OnClick(R.id.iv_select_location_delivery)
+    public void onSelectDeliveryLocationClicked() {
+        Intent intent = new Intent(getActivity(), Activity_SelectLocation.class);
+
+        intent.putExtra(Constants.EXTRA_CUSTOMER, mSelectedCustomer);
+        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_DELIVERY_LOCATION);
+    }
+
+    @OnClick(R.id.btn_phone_order_add)
+    public void btnAddOrderClicked() {
+        createNewOrder();
+    }
+
+    @OnClick(R.id.btn_phone_order_cancel)
+    public void btnCancelOrderClicked() {
+        cancelNewOrder();
+    }
 
     // Override onAttach to make sure that the container activity has implemented the callback
     @Override
@@ -255,73 +243,121 @@ public class Fragment_NewPhoneOrder extends Fragment {
     private void setupForm() {
 
         if (mSelectedCustomer != null) {
-            tv_cust_name.setVisibility(View.VISIBLE);
-            btn_select_location_pickup.setEnabled(true);
-            btn_select_location_pickup.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+            iv_select_location_pickup.setEnabled(true);
+            iv_select_location_pickup.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_place_accent_24dp));
 
-            btn_select_location_delivery.setEnabled(true);
-            btn_select_location_delivery.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+            iv_select_location_delivery.setEnabled(true);
+            iv_select_location_delivery.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_place_accent_24dp));
 
-            tv_cust_name.setText(mSelectedCustomer.getCompany());
+            tv_admin_customer_name.setText(mSelectedCustomer.getCompany());
+            tv_admin_customer_address.setText(mSelectedCustomer.getContact_name());
 
-            btn_select_customer.setVisibility(View.GONE);
         } else {
-            tv_cust_name.setVisibility(View.GONE);
-            btn_select_location_pickup.setEnabled(false);
-            btn_select_location_pickup.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
+            iv_select_location_pickup.setEnabled(false);
+            iv_select_location_pickup.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_place_disabled_24dp));
 
-            btn_select_location_delivery.setEnabled(false);
-            btn_select_location_delivery.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
+            iv_select_location_delivery.setEnabled(false);
+            iv_select_location_delivery.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_place_disabled_24dp));
 
-            btn_select_customer.setVisibility(View.VISIBLE);
+            tv_admin_customer_name.setText("");
+            tv_admin_customer_address.setText("");
         }
 
         if (mLocationPickup != null) {
-            btn_select_location_pickup.setVisibility(View.GONE);
-            layout_location_pickup.setVisibility(View.VISIBLE);
             tv_cust_location_pickup_name.setText(mLocationPickupName);
             tv_cust_location_pickup_address.setText(mLocationPickupAddress);
-        } else {
-            btn_select_location_pickup.setVisibility(View.VISIBLE);
-            layout_location_pickup.setVisibility(View.GONE);
-
-
+        }else{
+            tv_cust_location_pickup_name.setText("");
+            tv_cust_location_pickup_address.setText("");
         }
 
         if (mLocationDelivery != null) {
-            btn_select_location_delivery.setVisibility(View.GONE);
-            layout_location_delivery.setVisibility(View.VISIBLE);
             tv_cust_location_delivery_name.setText(mLocationDeliveryName);
             tv_cust_location_delivery_address.setText(mLocationDeliveryAddress);
-        } else {
-            btn_select_location_delivery.setVisibility(View.VISIBLE);
-            layout_location_delivery.setVisibility(View.GONE);
-        }
-
-        if (mSelectedCustomer == null || mLocationDelivery == null || mLocationPickup == null) {
-            btn_submit_order.setEnabled(false);
-            btn_submit_order.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
-        } else {
-            btn_submit_order.setEnabled(true);
-            btn_submit_order.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
-        }
-
-        if(mDate == 0){
-            tv_pickup_date.setVisibility(View.GONE);
-            btn_get_date.setVisibility(View.VISIBLE);
         }else{
-            tv_pickup_date.setVisibility(View.VISIBLE);
-            SimpleDateFormat format =  new SimpleDateFormat(Constants.DATE_FORMAT);
+            tv_cust_location_delivery_name.setText("");
+            tv_cust_location_delivery_address.setText("");
 
+        }
+
+        if(mDate != 0){
+
+            SimpleDateFormat format =  new SimpleDateFormat(Constants.DATE_FORMAT, Locale.getDefault());
             String dateString;
 
             dateString = format.format(mDate);
             tv_pickup_date.setText(dateString);
+        }else{
+            tv_pickup_date.setText("");
+        }
 
-            btn_get_date.setVisibility(View.GONE);
+        if (mDate == 0 || mSelectedCustomer == null || mLocationDelivery == null || mLocationPickup == null) {
+            btn_phone_order_add.setEnabled(false);
+            btn_phone_order_add.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
+        } else {
+            btn_phone_order_add.setEnabled(true);
+            btn_phone_order_add.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
         }
 
     }
+
+    // Get the distance between the pickup and delivery location
+    private void getOrderDistance() {
+
+        if (mLocationDelivery != null && mLocationPickup != null) {
+
+            String origin = "place_id:" + mLocationPickup.getPlaceId();
+
+            String dest = "place_id:" + mLocationDelivery.getPlaceId();
+
+            Call<Results> call = apiService.getDistance(origin, dest);
+
+            call.enqueue(new Callback<Results>() {
+                @Override
+                public void onResponse(@NonNull Call<Results> call, @NonNull Response<Results> response) {
+
+                    Log.i(Constants.LOG_TAG, "Response:" + response);
+
+                    if (response.isSuccessful()) {
+                        // Code 200, 201
+                        Results results = response.body();
+
+                        List<Route> routes;
+                        if (results != null) {
+                            routes = results.getRoutes();
+                            Route route = routes.get(0);
+
+                            List<Leg> legs = route.getLegs();
+
+                            Leg trip = legs.get(0);
+
+                            mDistance = trip.getDistance();
+
+                            Log.i(Constants.LOG_TAG, "Response Distance:" + mDistance.getText());
+                        }
+
+
+
+                                                // Notify the activity movie fetch was successfull
+                        //distance_ok(fetchResults);
+                    } else {
+                        //distance_failed(response.message());
+
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<Results> call, @NonNull Throwable t) {
+                    // Log error here since request failed
+                    Log.e(Constants.LOG_TAG, t.toString());
+                    //distance_failed(response.message());
+                }
+            });
+
+
+        }
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -350,6 +386,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
                 mLocationPickupName = data.getStringExtra(Constants.EXTRA_LOCATION_NAME);
                 mLocationPickupAddress = data.getStringExtra(Constants.EXTRA_LOCATION_ADDRESS);
                 setupForm();
+                getOrderDistance();
 
             } else if (resultCode == RESULT_CANCELED) {
                 Utils_General.showToast(getContext(), "Pickup Location Not Selected");
@@ -365,6 +402,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
                 mLocationDeliveryName = data.getStringExtra(Constants.EXTRA_LOCATION_NAME);
                 mLocationDeliveryAddress = data.getStringExtra(Constants.EXTRA_LOCATION_ADDRESS);
                 setupForm();
+                getOrderDistance();
 
             } else if (resultCode == RESULT_CANCELED) {
                 Utils_General.showToast(getContext(), "Delivery Location Not Selected");
@@ -410,10 +448,24 @@ public class Fragment_NewPhoneOrder extends Fragment {
                         final Order order = new Order();
                         order.setCustomerId(mSelectedCustomer.getId());
                         order.setCustomerName(mSelectedCustomer.getCompany());
+                        order.setCustomerContact(mSelectedCustomer.getContact_name());
+                        order.setCustomerPhone(mSelectedCustomer.getContact_number());
+
                         order.setDeliveryLocationId(mLocationDelivery.getPlaceId());
                         order.setPickupLocationId(mLocationPickup.getPlaceId());
                         order.setType(Constants.ORDER_TYPE_PHONE);
                         order.setStatus(Constants.ORDER_STATUS_BOOKED);
+                        order.setDistance(mDistance.getValue());
+                        order.setDistance_text(mDistance.getText());
+
+                        DecimalFormat df = new DecimalFormat("#.##");
+                        Double distance = Double.valueOf(df.format(mDistance.getValue()/1000));
+
+                        // TODO: store in a db so it can be changed
+                        double dblAmount = distance * 2.13;
+                        int intAmount = (int) (dblAmount * 100);
+
+                        order.setAmount(intAmount);
 
                         long newDate = Utils_General.getStartTimeForDate(mDate);
 

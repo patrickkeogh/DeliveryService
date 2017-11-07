@@ -29,13 +29,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.AppUser;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Location;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.AppUser;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Location;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.views.ui.ViewHolder_Locations;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 /**
@@ -54,10 +54,10 @@ public class Activity_SelectLocation extends AppCompatActivity  implements Googl
     // Firebase variables
     private DatabaseReference mLocationsRef;
 
-    @InjectView(R.id.rv_locations_list)
+    @BindView(R.id.rv_locations_list)
     RecyclerView mRecyclerView;
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
     /**
@@ -70,7 +70,7 @@ public class Activity_SelectLocation extends AppCompatActivity  implements Googl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_location);
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         if (savedInstanceState != null) {
 

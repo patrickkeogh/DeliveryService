@@ -17,19 +17,14 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 
 public class Activity_Main extends AppCompatActivity {
 
-    public static final String ANONYMOUS = "anonymous";
-    public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
-    public static final String FRIENDLY_MSG_LENGTH_KEY = "friendly_msg_length";
-
-    private String mUsername;
     private ActionBar mActionBar;
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
     // Member variables for the Firebase database
@@ -47,7 +42,7 @@ public class Activity_Main extends AppCompatActivity {
 
         Log.i(Constants.LOG_TAG, "onCreate() in Activity_Main");
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         // Set the support action bar
         setSupportActionBar(mToolbar);

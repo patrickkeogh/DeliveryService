@@ -1,6 +1,6 @@
 package com.programming.kantech.deliveryservice.app.data.retrofit;
 
-import com.programming.kantech.deliveryservice.app.data.model.pogo.directions.Example;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.directions.Results;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -22,7 +22,7 @@ public interface ApiInterface {
     String ROOT_PATH = "json";
 
     @GET(ROOT_PATH)
-    Call<Example> getDistance(@Query(PARAM_ORIGIN) String origin_place,
+    Call<Results> getDistance(@Query(PARAM_ORIGIN) String origin_place,
                               @Query(PARAM_DESTINATION) String destination_place);
 
 

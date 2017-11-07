@@ -28,7 +28,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
@@ -56,12 +55,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -73,12 +73,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pogo.directions.Distance;
-import com.programming.kantech.deliveryservice.app.data.model.pogo.directions.Example;
-import com.programming.kantech.deliveryservice.app.data.model.pogo.directions.Leg;
-import com.programming.kantech.deliveryservice.app.data.model.pogo.directions.Route;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Driver;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Order;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.directions.Distance;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.directions.Leg;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.directions.Results;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.directions.Route;
 import com.programming.kantech.deliveryservice.app.data.retrofit.ApiClient;
 import com.programming.kantech.deliveryservice.app.data.retrofit.ApiInterface;
 import com.programming.kantech.deliveryservice.app.driver.views.ui.ViewHolder_Order;
@@ -93,8 +93,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import retrofit2.Call;
@@ -119,8 +119,12 @@ public class Activity_Main extends AppCompatActivity implements
     private FirebaseRecyclerAdapter<Order, ViewHolder_Order> mFireAdapter;
     private Order mSelectedOrder;
     private boolean mShowFilter = true;
-    private boolean mShowPickupOrders = true;
-    private boolean mShowDeliveryOrders = true;
+
+
+    private boolean mShowOpen = true;
+    private boolean mShowComplete = true;
+    private boolean mShowDeliveryLocations = true;
+    private boolean mShowPickupLocations = true;
 
     // The displayed Date in millisecs
     private long mDisplayDateStartTimeInMillis;
@@ -148,43 +152,39 @@ public class Activity_Main extends AppCompatActivity implements
     // The orders for the selected day
     private ArrayList<Order> mOrdersList = new ArrayList<>();
 
-    // Member variables for the Firebase Authorization
-    private FirebaseAuth mFirebaseAuth;
-    private FirebaseAuth.AuthStateListener mFirebaseAuthListener;
-
     private ApiInterface apiService;
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-    @InjectView(R.id.mapView)
+    @BindView(R.id.mapView)
     MapView mMapView;
 
-    @InjectView(R.id.drawer_layout)
+    @BindView(R.id.drawer_layout)
     DrawerLayout mDrawer;
 
-    @InjectView(R.id.rv_driver_orders)
+    @BindView(R.id.rv_driver_orders)
     RecyclerView mRecyclerView;
 
-    @InjectView(R.id.tv_order_filter_date)
+    @BindView(R.id.tv_order_filter_date)
     TextView tv_order_filter_date;
 
-    @InjectView(R.id.nav_view)
+    @BindView(R.id.nav_view)
     NavigationView mNavView;
 
-    @InjectView(R.id.btn_driver_order_previous_day)
+    @BindView(R.id.btn_driver_order_previous_day)
     AppCompatButton btn_driver_order_previous_day;
 
-    @InjectView(R.id.btn_driver_order_next_day)
+    @BindView(R.id.btn_driver_order_next_day)
     AppCompatButton btn_driver_order_next_day;
 
-    @InjectView(R.id.btn_driver_pickup_complete)
+    @BindView(R.id.btn_driver_pickup_complete)
     AppCompatButton btn_driver_pickup_complete;
 
-    @InjectView(R.id.btn_driver_delivery_complete)
+    @BindView(R.id.btn_driver_delivery_complete)
     AppCompatButton btn_driver_delivery_complete;
 
-    @InjectView(R.id.layout_map_filter)
+    @BindView(R.id.layout_map_filter)
     LinearLayout layout_map_filter;
 
     @Override
@@ -207,7 +207,7 @@ public class Activity_Main extends AppCompatActivity implements
         }
 
         // use ButterKnife to inject the layout views
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         // Set the support action bar
         setSupportActionBar(mToolbar);
@@ -251,13 +251,6 @@ public class Activity_Main extends AppCompatActivity implements
         // this will call onMapReady() when finished
         mMapView.getMapAsync(this);
 
-        initializeApp();
-
-        // create an instance of the Firebase Authentication object
-        mFirebaseAuth = FirebaseAuth.getInstance();
-
-        setupAuthentication();
-
         // Get a root reference to the Drivers Node
         mDriverRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_DRIVERS);
 
@@ -298,7 +291,7 @@ public class Activity_Main extends AppCompatActivity implements
 
                 Animation fadeInAnimation;
 
-                if(mShowFilter){
+                if (mShowFilter) {
                     fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.view_fade_in);
                     fadeInAnimation.setFillAfter(true);
                     // Now Set your animation
@@ -306,7 +299,7 @@ public class Activity_Main extends AppCompatActivity implements
 
                     layout_map_filter.setVisibility(View.VISIBLE);
 
-                }else{
+                } else {
                     fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.view_fade_out);
                     fadeInAnimation.setFillAfter(false);
                     // Now Set your animation
@@ -316,10 +309,6 @@ public class Activity_Main extends AppCompatActivity implements
                 }
 
                 return true;
-
-
-
-
             case R.id.action_driver_orders:
                 Intent intent_orders = new Intent(this, Activity_ShowOrders.class);
                 intent_orders.putExtra(Constants.EXTRA_DRIVER, mDriver);
@@ -335,8 +324,19 @@ public class Activity_Main extends AppCompatActivity implements
 
                 return true;
             case R.id.action_sign_out:
+                Utils_General.showToast(this, "Signout called");
                 removeDriverFromActive();
-                AuthUI.getInstance().signOut(this);
+                //FirebaseAuth.getInstance().signOut();
+                AuthUI.getInstance()
+                        .signOut(this)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            public void onComplete(@NonNull Task<Void> task) {
+                                // user is now signed out
+                                startActivity(new Intent(Activity_Main.this, Activity_Splash.class));
+                                finish();
+                            }
+                        });
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -373,100 +373,7 @@ public class Activity_Main extends AppCompatActivity implements
 
     }
 
-    // Things in this mehod will only be done on new app installs
-    private void initializeApp() {
 
-        // TODO Add if this device has not subscribed to a topic yet
-        FirebaseMessaging.getInstance().subscribeToTopic(Constants.FIREBASE_NOTIFICATION_TOPIC_DRIVER);
-    }
-
-    private void setupAuthentication() {
-        //Log.i(Constants.LOG_TAG, "setupAuthentication called");
-
-        mFirebaseAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-
-                if (user != null) {
-
-                    // Signed In
-                    Utils_General.showToast(Activity_Main.this, "You are now signed in");
-
-                    onSignedInInitialize(user);
-
-
-                } else {
-
-                    // Not signed in
-                    onSignedOutCleanup();
-
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setIsSmartLockEnabled(!BuildConfig.DEBUG)
-                                    .setTheme(R.style.LoginTheme)
-                                    .setAvailableProviders(
-                                            Arrays.asList(
-                                                    new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()))
-                                    .build(),
-                            Constants.REQUEST_CODE_SIGN_IN);
-                }
-
-
-            }
-        };
-    }
-
-    private void onSignedInInitialize(final FirebaseUser user) {
-        //Log.i(Constants.LOG_TAG, "onSignedInInitialize()");
-
-        mUsername = user.getDisplayName();
-
-        // Do a one time fetch to Firebase to get the Driver Info
-        DatabaseReference driverRef = mDriverRef.child(user.getUid());
-
-        driverRef.addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i(Constants.LOG_TAG, "onDataChange()called for driver");
-
-                // Check if a driver document was found for the use signed in (by userId)
-                if (dataSnapshot.exists()) {
-                    // run some code
-
-                    mDriver = dataSnapshot.getValue(Driver.class);
-                    Log.i(Constants.LOG_TAG, "The driver is in the db:" + mDriver.toString());
-
-                    if (!mDriver.getDriverApproved()) {
-                        checkIfAuthorized(user);
-                    } else {
-                        buildGoogleApiClients();
-                    }
-
-                } else {
-                    Log.i(Constants.LOG_TAG, "The driver is not in the database");
-                    // User is not in the driver db. add them
-                    mDriver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(), "", false, false, "", "");
-
-                    mDriverRef.child(user.getUid()).setValue(mDriver);
-                    //mDriverDBReference.push().setValue(driver);
-
-                    //checkIfAuthorized(user);
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
-    }
 
     private void onSignedOutCleanup() {
 
@@ -545,7 +452,7 @@ public class Activity_Main extends AppCompatActivity implements
 
         mFireAdapter = new FirebaseRecyclerAdapter<Order, ViewHolder_Order>(
                 Order.class,
-                R.layout.item_order,
+                R.layout.item_driver_order,
                 ViewHolder_Order.class,
                 getDatabaseQuery()) {
             @Override
@@ -563,43 +470,55 @@ public class Activity_Main extends AppCompatActivity implements
                     String origin = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude();
                     String dest = "place_id:" + order.getPickupLocationId();
 
-                    Call<Example> call = apiService.getDistance(origin, dest);
+                    Call<Results> call = apiService.getDistance(origin, dest);
 
-                    call.enqueue(new Callback<Example>() {
+                    call.enqueue(new Callback<Results>() {
                         @Override
-                        public void onResponse(@NonNull Call<Example> call, @NonNull Response<Example> response) {
+                        public void onResponse(@NonNull Call<Results> call, @NonNull Response<Results> response) {
 
                             //Log.i(Constants.LOG_TAG, "Response:" + response);
 
                             if (response.isSuccessful()) {
                                 // Code 200, 201
-                                Example example = response.body();
+                                Results result = response.body();
 
-                                List<Route> routes = example.getRoutes();
+                                List<Route> routes;
 
-                                Route route = routes.get(0);
+                                if (result != null) {
+                                    routes = result.getRoutes();
 
-                                List<Leg> legs = route.getLegs();
+                                    if (routes != null && routes.size() != 0) {
+                                        Log.i(Constants.LOG_TAG, "Routes:" + routes.toString());
+                                        Route route = routes.get(0);
 
-                                Leg trip = legs.get(0);
+                                        List<Leg> legs = route.getLegs();
 
-                                Distance distance = trip.getDistance();
+                                        Leg trip = legs.get(0);
 
-                                //Log.i(Constants.LOG_TAG, "Response Distance:" + distance.getText());
+                                        Distance distance = trip.getDistance();
 
-                                if (distance.getValue() < 500) {
-                                    holder.setDistance("You have arrived!");
+                                        //Log.i(Constants.LOG_TAG, "Response Distance:" + distance.getText());
 
-                                } else {
-                                    holder.setDistance(distance.getText());
+                                        if (distance.getValue() < 500) {
+                                            holder.setDistance("You have arrived!");
+
+                                        } else {
+                                            holder.setDistance(distance.getText());
+                                        }
+
+                                    }
+
+
                                 }
+
+
                             } else {
                                 //movies_failed(response.message());
                             }
                         }
 
                         @Override
-                        public void onFailure(@NonNull Call<Example> call, @NonNull Throwable t) {
+                        public void onFailure(@NonNull Call<Results> call, @NonNull Throwable t) {
                             // Log error here since request failed
                             Log.e(Constants.LOG_TAG, t.toString());
                             //movies_failed(t.toString());
@@ -687,38 +606,8 @@ public class Activity_Main extends AppCompatActivity implements
     }
 
     private Query getDatabaseQuery() {
-        //Log.i(Constants.LOG_TAG, "CustId:" + mAppUser.getId());
-
-        //Log.i(Constants.LOG_TAG, "QueryStartTime:" + mDisplayDateStartTimeInMillis);
-
         String strQuery = "true_" + mDisplayDateStartTimeInMillis + "_" + mDriver.getUid();
-
-        //Log.i(Constants.LOG_TAG, "strQuery:  " + strQuery);
-
         return mOrdersRef.orderByChild("inProgressDateDriverId").equalTo(strQuery);
-
-    }
-
-    private void checkIfAuthorized(FirebaseUser user) {
-        //if (!Utils_Preferences.getHasTokenBeenSent(getApplicationContext()))
-        sendTokenToServer(user);
-
-        Log.i(Constants.LOG_TAG, "checkIfAuthorized() in Driver has been called");
-
-        Intent intent = new Intent(Activity_Main.this, Activity_NewDriverRequest.class);
-        startActivity(intent);
-        finish();
-
-    }
-
-    private void sendTokenToServer(FirebaseUser user) {
-
-        String token = FirebaseInstanceId.getInstance().getToken();
-
-        mDriverRef.child(user.getUid()).child("device").setValue(token);
-
-        Utils_Preferences.saveHasTokenBeenSent(getApplicationContext(), true);
-
     }
 
     @Override
@@ -743,17 +632,12 @@ public class Activity_Main extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         mMapView.onPause();
-
-        if (mFirebaseAuthListener != null) {
-            mFirebaseAuth.removeAuthStateListener(mFirebaseAuthListener);
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mMapView.onResume();
-        mFirebaseAuth.addAuthStateListener(mFirebaseAuthListener);
     }
 
     @Override
@@ -832,78 +716,125 @@ public class Activity_Main extends AppCompatActivity implements
     @OnClick(R.id.btn_driver_pickup_complete)
     public void completePickup() {
 
-        showAlertMessage("Order picked up for:", "that");
+        final Place[] thisPlace = new Place[1];
+
+        PendingResult<PlaceBuffer> result_pickup = Places.GeoDataApi.getPlaceById(mClient, mSelectedOrder.getPickupLocationId());
+
+        result_pickup.setResultCallback(new ResultCallback<PlaceBuffer>() {
+            @Override
+            public void onResult(@NonNull PlaceBuffer places) {
+                thisPlace[0] = places.get(0);
 
 
+                showAlertMessage("Confirm pickup has been completed for:",
+                        mSelectedOrder.getCustomerName(),
+                        thisPlace[0].getAddress().toString(),
+                        "Pickup completion has been canceled",
+                        Constants.ORDER_STATUS_PICKUP_COMPLETE);
 
+            }
+        });
 
     }
 
     @OnClick(R.id.btn_driver_delivery_complete)
     public void completeDelivery() {
 
+        final Place[] thisPlace = new Place[1];
+
+        PendingResult<PlaceBuffer> result_delivery = Places.GeoDataApi.getPlaceById(mClient, mSelectedOrder.getDeliveryLocationId());
+
+        result_delivery.setResultCallback(new ResultCallback<PlaceBuffer>() {
+            @Override
+            public void onResult(@NonNull PlaceBuffer places) {
+                thisPlace[0] = places.get(0);
+
+
+                showAlertMessage("Confirm delivery has been completed for:",
+                        mSelectedOrder.getCustomerName(),
+                        thisPlace[0].getAddress().toString(),
+                        "Delivery completion has been canceled",
+                        Constants.ORDER_STATUS_COMPLETE);
+
+            }
+        });
+
 
     }
 
-    @OnCheckedChanged({R.id.rb_driver_all, R.id.rb_driver_pickups, R.id.rb_driver_delivery})
+    @OnCheckedChanged(R.id.cb_driver_pickup_locations)
+    public void onPickupLocationsSelected(CompoundButton button, boolean checked){
+        mShowPickupLocations = checked;
+        paintMarkersToMap();
+    }
+
+    @OnCheckedChanged(R.id.cb_driver_delivery_locations)
+    public void onDeliveryLocationsSelected(CompoundButton button, boolean checked){
+        mShowDeliveryLocations = checked;
+        paintMarkersToMap();
+    }
+
+    @OnCheckedChanged({R.id.rb_driver_all, R.id.rb_driver_open, R.id.rb_driver_complete})
     public void onRadioButtonCheckChanged(CompoundButton button, boolean checked) {
         if (checked) {
             switch (button.getId()) {
                 case R.id.rb_driver_all:
-                    mShowDeliveryOrders = true;
-                    mShowPickupOrders = true;
+                    mShowOpen = true;
+                    mShowComplete = true;
                     break;
-                case R.id.rb_driver_pickups:
-                    mShowDeliveryOrders = false;
-                    mShowPickupOrders = true;
+                case R.id.rb_driver_open:
+                    mShowOpen = true;
+                    mShowComplete = false;
                     break;
-                case R.id.rb_driver_delivery:
-                    mShowDeliveryOrders = true;
-                    mShowPickupOrders = false;
+                case R.id.rb_driver_complete:
+                    mShowOpen = true;
+                    mShowComplete = false;
                     break;
             }
-
             paintMarkersToMap();
         }
     }
 
 
-    private void showAlertMessage(String title, String message) {
+    private void showAlertMessage(String title, String company, String address, final String cancelText, final String status) {
         Log.i(Constants.LOG_TAG, "Alert Message called");
 
         LayoutInflater inflater = this.getLayoutInflater();
-        View dialog_confirm = inflater.inflate(R.layout.alert_confirm, null);
+        View dialog_confirm = inflater.inflate(R.layout.alert_confirm_location_complete, null);
 
-        TextView tv_message = dialog_confirm.findViewById(R.id.tv_alert_message);
-        tv_message.setText(message);
+        TextView tv_location_pickup_name = dialog_confirm.findViewById(R.id.tv_location_pickup_name);
+        tv_location_pickup_name.setText(company);
 
-            Log.i(Constants.LOG_TAG, "Alert Message called");
-            new AlertDialog.Builder(this)
-                    .setTitle(title)
-                    .setView(dialog_confirm)
-                    .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            //cancelOrder();
+        TextView tv_location_pickup_address = dialog_confirm.findViewById(R.id.tv_location_pickup_address);
+        tv_location_pickup_address.setText(address);
 
-                            //detachDatabaseReadListeners();
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setView(dialog_confirm)
+                .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
-                            mOrdersRef.child(mSelectedOrder.getId())
-                                    .child("status").setValue(Constants.ORDER_STATUS_PICKUP_COMPLETE);
+                        mOrdersRef.child(mSelectedOrder.getId())
+                                .child(Constants.FIREBASE_CHILD_ORDER_STATUS)
+                                .setValue(status);
 
-                            // TODO: let the user know the order has been picked up
+                        mSelectedOrder.setStatus(status);
 
-                        }
-                    })
-                    .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            //cancelOrder();
+                        paintMarkersToMap();
+                        setDrawerButtons();
 
-                            //detachDatabaseReadListeners();
-                        }
-                    })
-                    .show();
+                        // TODO: let the user know the order has been picked up
+
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Utils_General.showToast(Activity_Main.this, cancelText);
+                    }
+                })
+                .show();
 
     }
 
@@ -965,6 +896,7 @@ public class Activity_Main extends AppCompatActivity implements
     }
 
     private void setDrawerButtons() {
+        Log.i(Constants.LOG_TAG, "setDrawerButtons called");
 
         Drawable top;
 
@@ -972,22 +904,21 @@ public class Activity_Main extends AppCompatActivity implements
             top = ContextCompat.getDrawable(this, R.drawable.ic_info_outline_100dp);
             btn_driver_pickup_complete.setEnabled(false);
             btn_driver_pickup_complete.setText("Select Order");
-            btn_driver_pickup_complete.setCompoundDrawablesWithIntrinsicBounds(null, top , null, null);
+            btn_driver_pickup_complete.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
 
             btn_driver_delivery_complete.setEnabled(false);
             btn_driver_delivery_complete.setText("Select Order");
-            btn_driver_delivery_complete.setCompoundDrawablesWithIntrinsicBounds(null, top , null, null);
+            btn_driver_delivery_complete.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
         } else {
+            Log.i(Constants.LOG_TAG, "Order is not null");
 
 
             btn_driver_pickup_complete.setText("Pickup Complete");
-
-
             btn_driver_delivery_complete.setText("Delivery Complete");
 
             Log.i(Constants.LOG_TAG, "Status:" + mSelectedOrder.getStatus());
 
-            switch (mSelectedOrder.getStatus()){
+            switch (mSelectedOrder.getStatus()) {
                 case Constants.ORDER_STATUS_ASSIGNED:
                     Log.i(Constants.LOG_TAG, "Status is assigned");
                     btn_driver_pickup_complete.setEnabled(true);
@@ -995,10 +926,10 @@ public class Activity_Main extends AppCompatActivity implements
 
 
                     top = ContextCompat.getDrawable(this, R.drawable.ic_not_complete_100dp);
-                    btn_driver_pickup_complete.setCompoundDrawablesWithIntrinsicBounds(null, top , null, null);
+                    btn_driver_pickup_complete.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
 
                     top = ContextCompat.getDrawable(this, R.drawable.ic_not_complete_100dp);
-                    btn_driver_delivery_complete.setCompoundDrawablesWithIntrinsicBounds(null, top , null, null);
+                    btn_driver_delivery_complete.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
 
                     break;
 
@@ -1008,10 +939,23 @@ public class Activity_Main extends AppCompatActivity implements
 
 
                     top = ContextCompat.getDrawable(this, R.drawable.ic_complete_100dp);
-                    btn_driver_pickup_complete.setCompoundDrawablesWithIntrinsicBounds(null, top , null, null);
+                    btn_driver_pickup_complete.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
 
                     top = ContextCompat.getDrawable(this, R.drawable.ic_not_complete_100dp);
-                    btn_driver_delivery_complete.setCompoundDrawablesWithIntrinsicBounds(null, top , null, null);
+                    btn_driver_delivery_complete.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+
+                    break;
+
+                case Constants.ORDER_STATUS_COMPLETE:
+                    btn_driver_pickup_complete.setEnabled(false);
+                    btn_driver_delivery_complete.setEnabled(false);
+
+
+                    top = ContextCompat.getDrawable(this, R.drawable.ic_complete_100dp);
+                    btn_driver_pickup_complete.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+
+                    top = ContextCompat.getDrawable(this, R.drawable.ic_complete_100dp);
+                    btn_driver_delivery_complete.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
 
                     break;
                 default:
@@ -1020,10 +964,7 @@ public class Activity_Main extends AppCompatActivity implements
             }
 
 
-
         }
-
-
 
 
     }
@@ -1071,7 +1012,6 @@ public class Activity_Main extends AppCompatActivity implements
         }
 
 
-
     }
 
     private void paintMarkersToMap() {
@@ -1079,7 +1019,7 @@ public class Activity_Main extends AppCompatActivity implements
 
         // Clear any existing markers
         mGoogleMap.clear();
-        mLocationMarkers = new ArrayList<Marker>();
+        mLocationMarkers = new ArrayList<>();
 
         paintDriverLocationToMap();
 
@@ -1090,8 +1030,18 @@ public class Activity_Main extends AppCompatActivity implements
 
                 final Order order = mOrdersList.get(i);
 
-                if (mShowPickupOrders) {
-                    //Log.i(Constants.LOG_TAG, "create pickup marker");
+                if (mShowPickupLocations) {
+
+                    final int pickupIconColor;
+
+                    switch (order.getStatus()) {
+                        case Constants.ORDER_STATUS_ASSIGNED:
+                            pickupIconColor = R.color.colorAccent;
+                            break;
+                        default:
+                            pickupIconColor = R.color.colorGreen;
+                            break;
+                    }
 
                     final PendingResult<PlaceBuffer> pickupResult =
                             Places.GeoDataApi.getPlaceById(mClient, order.getPickupLocationId());
@@ -1107,7 +1057,48 @@ public class Activity_Main extends AppCompatActivity implements
                                     .snippet(places.get(0).getAddress().toString())
                                     .infoWindowAnchor(0.5f, 0.5f)
                                     .icon(Utils_General.vectorToBitmap(Activity_Main.this, R.drawable.ic_place_accent_24dp,
-                                            ContextCompat.getColor(Activity_Main.this, R.color.colorAccent)));
+                                            ContextCompat.getColor(Activity_Main.this, pickupIconColor)));
+
+                            Marker marker = mGoogleMap.addMarker(markerOptions);
+
+                            //Log.i(Constants.LOG_TAG, "add Marker to list");
+                            mLocationMarkers.add(marker);
+                            setMapCamera();
+                        }
+                    });
+                }
+
+                if (mShowDeliveryLocations) {
+
+                    final int deliveryIconColor;
+
+                    switch (order.getStatus()) {
+                        case Constants.ORDER_STATUS_OPEN:
+                        case Constants.ORDER_STATUS_BOOKED:
+                        case Constants.ORDER_STATUS_ASSIGNED:
+                        case Constants.ORDER_STATUS_PICKUP_COMPLETE:
+                            deliveryIconColor = R.color.colorAccent;
+                            break;
+                        default:
+                            deliveryIconColor = R.color.colorGreen;
+                            break;
+                    }
+
+                    final PendingResult<PlaceBuffer> deliveryResult =
+                            Places.GeoDataApi.getPlaceById(mClient, order.getDeliveryLocationId());
+
+                    deliveryResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+                        @Override
+                        public void onResult(@NonNull PlaceBuffer places) {
+
+                            MarkerOptions markerOptions = new MarkerOptions();
+
+                            markerOptions.position(places.get(0).getLatLng())
+                                    .title(order.getCustomerName())
+                                    .snippet(places.get(0).getAddress().toString())
+                                    .infoWindowAnchor(0.5f, 0.5f)
+                                    .icon(Utils_General.vectorToBitmap(Activity_Main.this, R.drawable.ic_place_accent_24dp,
+                                            ContextCompat.getColor(Activity_Main.this, deliveryIconColor)));
 
                             Marker marker = mGoogleMap.addMarker(markerOptions);
 
@@ -1121,7 +1112,6 @@ public class Activity_Main extends AppCompatActivity implements
 
 
         }
-
 
 
     }
@@ -1168,14 +1158,14 @@ public class Activity_Main extends AppCompatActivity implements
             hasPoint = true;
         }
 
-        if(mLocationMarkers != null){
+        if (mLocationMarkers != null) {
             //Log.i(Constants.LOG_TAG, "Markers are NOT null");
 
             for (int i = 0; i < mLocationMarkers.size(); i++) {
 
                 final Marker marker = mLocationMarkers.get(i);
 
-                Log.i(Constants.LOG_TAG, "add marker to build");
+                //Log.i(Constants.LOG_TAG, "add marker to build");
 
                 // add the driver to the lat lng bounds
                 builder.include(marker.getPosition());
@@ -1185,8 +1175,6 @@ public class Activity_Main extends AppCompatActivity implements
         }
 
         if (hasPoint) {
-
-
             //mGoogleMap.setMaxZoomPreference(12);
 
             LatLngBounds bounds = builder.build();

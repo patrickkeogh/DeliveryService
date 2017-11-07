@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Driver;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
 /**

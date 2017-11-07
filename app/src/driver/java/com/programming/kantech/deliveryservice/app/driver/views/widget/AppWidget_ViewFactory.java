@@ -14,7 +14,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Order;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class AppWidget_ViewFactory implements RemoteViewsService.RemoteViewsFact
 
     private void populateOrdersListView() {
 
-        Log.i(Constants.LOG_TAG, "populateOrdersListView called");
+        //Log.i(Constants.LOG_TAG, "populateOrdersListView called");
         mOrdersRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_ORDERS);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -54,7 +54,7 @@ public class AppWidget_ViewFactory implements RemoteViewsService.RemoteViewsFact
             mOrdersRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Log.i(Constants.LOG_TAG, "onDataChange called in populateOrdersListView()");
+                    //Log.i(Constants.LOG_TAG, "onDataChange called in populateOrdersListView()");
 
                     mOrderList = new ArrayList<Order>();
 
@@ -63,7 +63,7 @@ public class AppWidget_ViewFactory implements RemoteViewsService.RemoteViewsFact
                     if (dataSnapshot != null) {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             Order order = snapshot.getValue(Order.class);
-                            Log.i(Constants.LOG_TAG, "Add order to list:" + order.toString());
+                            //Log.i(Constants.LOG_TAG, "Add order to list:" + order.toString());
                             mOrderList.add(order);
                         }
 
@@ -126,14 +126,14 @@ public class AppWidget_ViewFactory implements RemoteViewsService.RemoteViewsFact
 
     @Override
     public int getCount() {
-        Log.i(Constants.LOG_TAG, "Count:" + mOrderList.size());
+        //Log.i(Constants.LOG_TAG, "Count:" + mOrderList.size());
         if (mOrderList == null) return 0;
         return mOrderList.size();
     }
 
     @Override
     public RemoteViews getViewAt(int position) {
-        Log.i(Constants.LOG_TAG, "getViewAt() called in WidgetRemoteViewsFactory");
+        //og.i(Constants.LOG_TAG, "getViewAt() called in WidgetRemoteViewsFactory");
 
         if (mOrderList == null || mOrderList.size() == 0) return null;
 

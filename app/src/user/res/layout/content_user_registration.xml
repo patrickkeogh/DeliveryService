@@ -28,7 +28,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:text="@string/label_customer_info"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textColor="@color/colorPrimaryDark" />
 
                 <View
@@ -87,34 +87,50 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:text="Billing Address"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textColor="@color/colorPrimaryDark" />
 
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="@dimen/divider_view_accent"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="@dimen/margin_8dp"
+                    android:layout_marginTop="@dimen/margin_8dp"
                     android:background="@color/colorAccent" />
 
                 <LinearLayout
+                    android:id="@+id/layout_registration_address"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-                    <include layout="@layout/item_location_pickup" />
+                    <ImageView
+                        android:layout_width="@dimen/icon_width_height"
+                        android:layout_height="@dimen/icon_width_height"
+                        android:layout_gravity="fill"
+                        android:layout_marginEnd="@dimen/margin_16dp"
+                        android:src="@drawable/ic_place_accent_24dp" />
 
-
-                    <Button
-                        android:id="@+id/btn_user_get_address"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_8dp"
-                        android:background="@color/colorAccent"
-                        android:text="Select Billing Address"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@color/colorWhite"
-                        android:textStyle="bold" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_registration_address_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:textColor="@color/colorBlack"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+                        <TextView
+                            android:id="@+id/tv_registration_address"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+                    </LinearLayout>
+
                 </LinearLayout>
 
                 <View
@@ -134,6 +150,16 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:textColor="@color/colorWhite"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:maxLines="1"
+                    android:textColor="@color/colorAccent"
+                    android:text="All fields are required."
+                    android:gravity="center_horizontal"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
 
             </LinearLayout>

@@ -25,9 +25,13 @@ import com.google.android.gms.location.places.Places;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
+import com.programming.kantech.deliveryservice.app.admin.views.ui.HPLinearLayoutManager;
 import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Customers;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Customer;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
+
+import java.util.Objects;
 
 /**
  * Created by patrick keogh on 2017-08-29.
@@ -41,6 +45,8 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
     private FirebaseRecyclerAdapter<Customer, ViewHolder_Customers> mFireAdapter;
     private RecyclerView mCustomerRecyclerView;
     private GoogleApiClient mClient;
+
+    private Customer mSelectedCustomer;
 
     // Firebase references
     private DatabaseReference mCustomersRef;
@@ -65,8 +71,15 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
      * initializes the fragment's arguments, and returns the
      * new fragment to the client.
      */
-    public static Fragment_CustomerList newInstance() {
-        return new Fragment_CustomerList();
+    public static Fragment_CustomerList newInstance(Customer selectedCustomer) {
+
+        Fragment_CustomerList f = new Fragment_CustomerList();
+        Bundle args = new Bundle();
+        args.putParcelable(Constants.EXTRA_CUSTOMER, selectedCustomer);
+
+        f.setArguments(args);
+
+        return f;
     }
 
     @Nullable
@@ -74,10 +87,25 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        // Get the fragment layout for the driving list
+        // Get the fragment layout for the customer list
         final View rootView = inflater.inflate(R.layout.fragment_customer_list, container, false);
 
-        // Get a reference to the orders table
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(Constants.STATE_INFO_CUSTOMER)) {
+                Log.i(Constants.LOG_TAG, "we found the recipe key in savedInstanceState");
+                mSelectedCustomer = savedInstanceState.getParcelable(Constants.STATE_INFO_CUSTOMER);
+            }
+
+        } else {
+            Log.i(Constants.LOG_TAG, "Activity_Photo savedInstanceState is null, get data from intent: ");
+            mSelectedCustomer = getArguments().getParcelable(Constants.EXTRA_CUSTOMER);
+        }
+
+        if(mSelectedCustomer != null){
+            mCallback.onCustomerSelected(mSelectedCustomer);
+        }
+
+        // Get a reference to the customers table
         mCustomersRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_CUSTOMERS);
 
         // Get a reference to the Fab Button in the fragment_customer_list xml layout file
@@ -104,7 +132,10 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
                 new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
 
         /* setLayoutManager associates the LayoutManager we created above with our RecyclerView */
-        mCustomerRecyclerView.setLayoutManager(layoutManager);
+        //mCustomerRecyclerView.setLayoutManager(layoutManager);
+
+        HPLinearLayoutManager hpLinearLayoutManager = new HPLinearLayoutManager(getContext());
+        mCustomerRecyclerView.setLayoutManager(hpLinearLayoutManager);
 
         /*
          * Use this setting to improve performance if you know that changes in content do not
@@ -203,10 +234,11 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
         }
     }
     private void loadFirebaseAdapter() {
+        Log.i(Constants.LOG_TAG, "loadFirebaseAdapter() called:");
 
         mFireAdapter = new FirebaseRecyclerAdapter<Customer, ViewHolder_Customers>(
                 Customer.class,
-                R.layout.item_customer,
+                R.layout.item_admin_customer,
                 ViewHolder_Customers.class,
                 mCustomersRef) {
 
@@ -216,8 +248,15 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
 
                 //holder.itemView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
 
-                holder.setName(customer.getCompany());
+                if (mSelectedCustomer != null) {
+                    if (Objects.equals(customer.getId(), mSelectedCustomer.getId())) {
+                        holder.setSelectedColor(getContext(), R.color.colorPrimaryLight);
+                    } else {
+                        holder.setSelectedColor(getContext(), R.color.colorWhite);
+                    }
+                }
 
+                holder.setName(customer.getCompany());
 
                 PendingResult<PlaceBuffer> placeResult;
 
@@ -240,6 +279,7 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
                     public void onClick(View v) {
                         // Notify the activity a customer has been selected
                         mCallback.onCustomerSelected(customer);
+                        customerSelected(customer);
                     }
                 });
             }
@@ -247,6 +287,15 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
         };
 
         mCustomerRecyclerView.setAdapter(mFireAdapter);
+
+    }
+
+    private void customerSelected(Customer customer) {
+        Log.i(Constants.LOG_TAG, "customerSelected()");
+
+        mSelectedCustomer = customer;
+
+        mFireAdapter.notifyDataSetChanged();
 
     }
 }

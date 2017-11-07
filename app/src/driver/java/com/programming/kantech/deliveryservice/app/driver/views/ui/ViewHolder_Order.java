@@ -1,5 +1,6 @@
 package com.programming.kantech.deliveryservice.app.driver.views.ui;
 
+import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -81,8 +82,9 @@ public class ViewHolder_Order extends RecyclerView.ViewHolder {
     public void setBackgroundColor(Activity_Main activity, int colorId){
         layout_user_order.setBackgroundColor(ContextCompat.getColor(activity, colorId));
     }
-    public void setSelectedColor(Activity_Main activity, int colorId){
-        layout_driver_order_inside.setBackgroundColor(ContextCompat.getColor(activity, colorId));
+
+    public void setSelectedColor(Context context, int colorId){
+        layout_driver_order_inside.setBackgroundColor(ContextCompat.getColor(context, colorId));
     }
 
 

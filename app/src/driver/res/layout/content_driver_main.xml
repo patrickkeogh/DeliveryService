@@ -6,8 +6,8 @@
 
     <View
         android:layout_width="fill_parent"
-        android:layout_height="2dip"
-        android:background="@color/colorPrimaryDark" />
+        android:layout_height="2dp"
+        android:background="@color/colorBlack" />
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
@@ -21,12 +21,13 @@
         android:layout_marginStart="50dp"
         android:layout_marginTop="50dp"
         android:layout_width="250dp"
-        android:layout_height="200dp">
+        android:layout_height="280dp">
 
         <TextView
             android:textColor="@color/colorWhite"
+            android:background="@color/colorMapTitleFilter"
             android:gravity="center"
-            android:text="Map Filters"
+            android:text="Location Filters"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:layout_width="match_parent"
             android:layout_height="40dp" />
@@ -35,6 +36,42 @@
             android:background="@color/colorPrimaryLight"
             android:layout_width="match_parent"
             android:layout_height="2dp" />
+
+        <CheckBox android:id="@+id/cb_driver_pickup_locations"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/colorWhite"
+            android:checked="true"
+            android:buttonTint="@color/colorWhite"
+            android:text="Show Pickup Locations"/>
+        <View
+            android:background="@color/colorPrimaryLight"
+            android:layout_width="match_parent"
+            android:layout_height="2dp" />
+
+        <CheckBox android:id="@+id/cb_driver_delivery_locations"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/colorWhite"
+            android:checked="true"
+            android:buttonTint="@color/colorWhite"
+            android:text="Show Delivery Locations"/>
+
+        <View
+            android:background="@color/colorPrimaryLight"
+            android:layout_width="match_parent"
+            android:layout_height="2dp" />
+
+        <TextView
+            android:textColor="@color/colorWhite"
+            android:background="@color/colorMapTitleFilter"
+            android:gravity="center"
+            android:text="Order Filters"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:layout_width="match_parent"
+            android:layout_height="40dp" />
 
 
 
@@ -52,7 +89,7 @@
                 android:checked="true"
                 android:textColor="@color/colorWhite"
                 android:buttonTint="@color/colorWhite"
-                android:text="All Destinations" />
+                android:text="All Orders" />
 
             <View
                 android:background="@color/colorPrimaryLight"
@@ -60,13 +97,13 @@
                 android:layout_height="2dp" />
 
             <RadioButton
-                android:id="@+id/rb_driver_pickups"
+                android:id="@+id/rb_driver_open"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:textColor="@color/colorWhite"
                 android:buttonTint="@color/colorWhite"
-                android:text="Pickup Destinations" />
+                android:text="Open Orders" />
 
             <View
                 android:background="@color/colorPrimaryLight"
@@ -74,18 +111,13 @@
                 android:layout_height="2dp" />
 
             <RadioButton
-                android:id="@+id/rb_driver_delivery"
+                android:id="@+id/rb_driver_complete"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:textColor="@color/colorWhite"
                 android:buttonTint="@color/colorWhite"
-                android:text="Delivery Destinations" />
-
-            <View
-                android:background="@color/colorPrimaryLight"
-                android:layout_width="match_parent"
-                android:layout_height="2dp" />
+                android:text="Complete Orders" />
 
 
 

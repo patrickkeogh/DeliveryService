@@ -3,21 +3,17 @@ package com.programming.kantech.deliveryservice.app.driver.views.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -26,18 +22,13 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Driver;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
-import com.programming.kantech.deliveryservice.app.utils.Utils_General;
-import com.squareup.picasso.Picasso;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Objects;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 /**
@@ -54,19 +45,19 @@ public class Activity_Photo extends AppCompatActivity {
     private StorageReference mDriverPhotoStorageRef;
     private DatabaseReference mDriverRef;
 
-    @InjectView(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-    @InjectView(R.id.iv_driver_photo)
+    @BindView(R.id.iv_driver_photo)
     ImageView mImageView;
 
-    @InjectView(R.id.pb_loading_indicator)
+    @BindView(R.id.pb_loading_indicator)
     ProgressBar mProgressBar;
 
-    @InjectView(R.id.layout_photo_uploading)
+    @BindView(R.id.layout_photo_uploading)
     LinearLayout mLayoutLoading;
 
-    @InjectView(R.id.layout_photo_showing)
+    @BindView(R.id.layout_photo_showing)
     LinearLayout mLayoutShowing;
 
     @Override
@@ -87,7 +78,7 @@ public class Activity_Photo extends AppCompatActivity {
             mDriver = getIntent().getParcelableExtra(Constants.EXTRA_DRIVER);
         }
 
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         if (mDriver == null) {
             throw new IllegalArgumentException("Must pass EXTRA_DRIVER");

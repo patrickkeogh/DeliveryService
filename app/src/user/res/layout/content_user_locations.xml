@@ -2,35 +2,35 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="@dimen/padding_8dp"
     android:layout_marginTop="?attr/actionBarSize"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <Button
         android:id="@+id/btn_user_add_location"
-        style="?android:textAppearanceSmall"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:background="@color/colorAccent"
         android:textColor="@color/colorWhite"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_8dp"
-        android:text="Add Location"
-        android:textStyle="bold" />
+        android:text="@string/btn_add_location" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_8dp"
-        android:layout_marginTop="12dp"
-        android:text="User Location List"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:layout_marginTop="@dimen/margin_16dp"
+        android:text="@string/title_user_location_list"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@color/colorPrimaryDark" />
 
     <View
         android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:layout_marginTop="4dp"
-        android:background="@color/colorPrimary" />
+        android:layout_height="@dimen/divider_view_accent"
+        android:layout_marginBottom="@dimen/margin_8dp"
+        android:layout_marginTop="@dimen/margin_8dp"
+        android:background="@color/colorAccent" />
 
     <android.support.v7.widget.RecyclerView
         android:padding="@dimen/padding_8dp"

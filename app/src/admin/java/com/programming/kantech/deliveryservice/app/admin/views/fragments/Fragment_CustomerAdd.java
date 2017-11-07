@@ -1,11 +1,14 @@
 package com.programming.kantech.deliveryservice.app.admin.views.fragments;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,31 +17,48 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Customer;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.Location;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Location;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
+import com.programming.kantech.deliveryservice.app.utils.Utils_General;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by patrick keogh on 2017-08-18.
- *
  */
 
-public class Fragment_CustomerAdd extends Fragment{
+public class Fragment_CustomerAdd extends Fragment {
 
-    private EditText et_fullname;
-    private EditText et_email;
-    private EditText et_company;
-    private TextView tv_address;
+    @BindView(R.id.et_customer_add_company)
+    EditText et_customer_add_company;
+
+    @BindView(R.id.et_customer_add_contact)
+    EditText et_customer_add_contact;
+
+    @BindView(R.id.et_customer_add_email)
+    EditText et_customer_add_email;
+
+    @BindView(R.id.et_customer_add_phone)
+    EditText et_customer_add_phone;
+
+
+    @BindView(R.id.tv_location_name)
+    TextView tv_location_name;
+
+    @BindView(R.id.tv_location_address)
+    TextView tv_location_address;
 
     private DatabaseReference mCustomerRef;
     private DatabaseReference mLocationsRef;
@@ -46,6 +66,15 @@ public class Fragment_CustomerAdd extends Fragment{
     private Customer mCustomer;
     private Location mLocation;
     private Place mPlace;
+
+    // Define a new interface SaveCustomerListener that triggers a callback in the host activity
+    SaveCustomerListener mCallback;
+
+    // SaveCustomerListener interface, calls a method in the host activity
+    // after a new customer has been saved
+    public interface SaveCustomerListener {
+        void onCustomerSaved(Customer customer);
+    }
 
     /**
      * Static factory method that takes a driver object parameter,
@@ -64,23 +93,12 @@ public class Fragment_CustomerAdd extends Fragment{
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_customer_add, container, false);
 
-        et_fullname = rootView.findViewById(R.id.et_customer_add_fullname);
-        et_email = rootView.findViewById(R.id.et_customer_add_email);
-        et_company = rootView.findViewById(R.id.et_customer_add_company);
+        ButterKnife.bind(this, rootView);
 
-        tv_address = rootView.findViewById(R.id.et_customer_add_address);
+        et_customer_add_phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 
         mCustomer = new Customer();
         mLocation = new Location();
-
-        Button btn_select_location = rootView.findViewById(R.id.btn_select_location);
-
-        btn_select_location.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onGetLocationButtonClicked();
-            }
-        });
 
         Button btn_add_customer = rootView.findViewById(R.id.btn_customer_add);
 
@@ -98,6 +116,35 @@ public class Fragment_CustomerAdd extends Fragment{
 
     }
 
+    @OnClick(R.id.iv_select_location)
+    public void onSelectLocationClicked() {
+
+        onGetLocationButtonClicked();
+    }
+
+    @OnClick(R.id.layout_location_select)
+    public void onSelectLocationAreaClicked() {
+
+        onGetLocationButtonClicked();
+    }
+
+
+
+    // Override onAttach to make sure that the container activity has implemented the callback
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // This makes sure that the host activity has implemented the callback interface
+        // If not, it throws an exception
+        try {
+            mCallback = (Fragment_CustomerAdd.SaveCustomerListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement SaveCustomerListener");
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.i(Constants.LOG_TAG, "onActivityResult in Frag,ment");
@@ -108,24 +155,15 @@ public class Fragment_CustomerAdd extends Fragment{
                 return;
             }
 
-            // Extract the place information from the API
-//            String placeName = place.getName().toString();
-//            String placeAddress = place.getAddress().toString();
-//            String placeID = place.getId();
-//
-//            LatLng latlng = place.getLatLng();
-//
-//            Double lat = latlng.latitude;
-//            Double lng = latlng.longitude;
-
             mPlace = place;
 
-            tv_address.setText(place.getAddress().toString());
+            tv_location_address.setText(mPlace.getAddress().toString());
+            tv_location_name.setText(mPlace.getName().toString());
         }
     }
 
     /***
-     * Button Click event handler to handle clicking the "select Location" Button
+     * Button Click event handler to handle clicking the "select Address" Button
      *
      */
     public void onGetLocationButtonClicked() {
@@ -152,56 +190,82 @@ public class Fragment_CustomerAdd extends Fragment{
     public void onAddCustomerClicked() {
         Log.i(Constants.LOG_TAG, "onGetLocationButtonClicked() called");
 
-        // Validate the custer info
+        boolean hasErrors = false;
 
-        // Add the customer and display message
-        mCustomer.setCompany(et_company.getText().toString());
-        mCustomer.setEmail(et_email.getText().toString());
-        mCustomer.setContact_name(et_fullname.getText().toString());
-        mCustomer.setPlaceId(mPlace.getId());
+        // Validate the customer info
 
-        mLocation.setPlaceId(mPlace.getId());
-        mLocation.setMainAddress(true);
+        if (et_customer_add_company.getText().length() == 0) {
+            et_customer_add_company.setError("Company is required");
+            hasErrors = true;
+        }
 
-//        LatLng latlng = mPlace.getLatLng();
-//
-//        Double lat = latlng.latitude;
-//        Double lng = latlng.longitude;
-//
-//        mCustomer.setLat(lat);
-//        mCustomer.setLng(lng);
+        if (et_customer_add_contact.getText().length() == 0) {
+            et_customer_add_contact.setError("Contact name is required");
+            hasErrors = true;
+        }
 
-        //mCustomer.setPlaceId(mPlace.getId());
+        if (et_customer_add_phone.getText().length() != 14) {
+            et_customer_add_phone.setError("Contact phone number is not valid");
+            hasErrors = true;
+        }
 
-        //mCustomerRef.push().setValue(mCustomer);
-        //m/Customer.setUid(mCustomerRef.getKey());
-        //Log.i(Constants.LOG_TAG, "key:" + mCustomerRef.child());
-        //mCustomerRef.child(mGroupId).setValue(mCustomer);
-        Log.i(Constants.LOG_TAG, "Customer:" + mCustomer.toString());
+        if (mPlace == null) {
 
-        mCustomerRef
-                .push()
-                .setValue(mCustomer, new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(DatabaseError databaseError,
-                                           DatabaseReference databaseReference) {
-                        String uniqueKey = databaseReference.getKey();
+        }
 
-                        mCustomer.setId(uniqueKey);
+        if (hasErrors) {
+            Utils_General.showToast(getContext(), "The new customer form has errors.");
+            return;
+        } else {
 
-                        mCustomerRef.child(uniqueKey).setValue(mCustomer);
+            LayoutInflater inflater = this.getLayoutInflater();
+            View dialog_confirm = inflater.inflate(R.layout.alert_confirm_customer, null);
 
-                        mLocation.setCustId(uniqueKey);
+            TextView tv_confirm_company_name = dialog_confirm.findViewById(R.id.tv_confirm_company_name);
+            tv_confirm_company_name.setText(et_customer_add_company.getText().toString());
 
+            TextView tv_confirm_company_address = dialog_confirm.findViewById(R.id.tv_confirm_company_address);
+            tv_confirm_company_address.setText(mPlace.getAddress());
 
+            new AlertDialog.Builder(getContext())
+            .setTitle("Add the following new customer?")
+            .setView(dialog_confirm)
+            .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
 
-                        addLocation();
+                    // Add the customer and display message
+                    mCustomer.setCompany(et_customer_add_company.getText().toString());
+                    mCustomer.setEmail(et_customer_add_email.getText().toString());
+                    mCustomer.setContact_name(et_customer_add_contact.getText().toString());
+                    mCustomer.setContact_number(et_customer_add_phone.getText().toString());
+                    mCustomer.setPlaceId(mPlace.getId());
 
-                        Log.i(Constants.LOG_TAG, "key:" + uniqueKey);
-                    }
-                });
+                    mLocation.setPlaceId(mPlace.getId());
+                    mLocation.setMainAddress(true);
 
+                    Log.i(Constants.LOG_TAG, "Customer:" + mCustomer.toString());
 
+                    mCustomerRef.push()
+                    .setValue(mCustomer, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError,
+                                               DatabaseReference databaseReference) {
+                            String uniqueKey = databaseReference.getKey();
+
+                            mCustomer.setId(uniqueKey);
+
+                            mCustomerRef.child(uniqueKey).setValue(mCustomer);
+
+                            mLocation.setCustId(uniqueKey);
+
+                            addLocation();
+                        }
+                    });
+                }
+            })
+            .show();
+        }
     }
 
     private void addLocation() {
@@ -219,7 +283,12 @@ public class Fragment_CustomerAdd extends Fragment{
 
                         mLocationsRef.child(mCustomer.getId()).child(uniqueKey).setValue(mLocation);
 
-                        Log.i(Constants.LOG_TAG, "key:" + uniqueKey);
+                        // Inform user the new customer has been added and
+                        // send them back to the management screen with the new customer highlighted
+                        Utils_General.showToast(getContext(), "The new customer has been successfully saved");
+                        mCallback.onCustomerSaved(mCustomer);
+
+
                     }
                 });
 

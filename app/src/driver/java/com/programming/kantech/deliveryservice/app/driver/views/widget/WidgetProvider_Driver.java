@@ -1,6 +1,7 @@
 package com.programming.kantech.deliveryservice.app.driver.views.widget;
 
 import android.annotation.TargetApi;
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
@@ -47,7 +48,7 @@ public class WidgetProvider_Driver extends AppWidgetProvider {
      * @return The RemoteViews for the widget
      */
     private static RemoteViews getRemoteView(Context context) {
-        Log.i(Constants.LOG_TAG, "getRemoteView() called in WidgetProvider_Driver");
+        //Log.i(Constants.LOG_TAG, "getRemoteView() called in WidgetProvider_Driver");
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget_driver);
 
@@ -66,6 +67,13 @@ public class WidgetProvider_Driver extends AppWidgetProvider {
 
         // Handle empty favs list
         views.setEmptyView(R.id.widget_list_view_orders, R.id.empty_view);
+
+        Intent intent = new Intent(context, Activity_Main.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        views.setOnClickPendingIntent(R.id.iv_widget_logo, pendingIntent);
+
+
 
         return views;
 
@@ -105,14 +113,18 @@ public class WidgetProvider_Driver extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-        Log.i(Constants.LOG_TAG, "onReceive");
+        //Log.i(Constants.LOG_TAG, "onReceive");
 
         if (intent.getAction().equals(ACTION_DATA_UPDATED)) {
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             int[] appWidgetIds = appWidgetManager.getAppWidgetIds(
                     new ComponentName(context, getClass()));
 
-            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds,R.id.widget_list_view_orders);
+            synchronized (this) {
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds,R.id.widget_list_view_orders);
+            }
+
+            //appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds,R.id.widget_list_view_orders);
         }
     }
 
