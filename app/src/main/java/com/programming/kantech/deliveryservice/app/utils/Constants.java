@@ -19,12 +19,14 @@ public class Constants {
 
 
     public final static String KEY_GOOGLE = "AIzaSyAY4VENShVhvMRUJkj7C_XnHjfKPNOamMU";
-    public final static String STRIPE_PUBLIC_KEY = "pk_test_f2kTNX5k5qSiF2bF5osb4htj";
+    public final static String STRIPE_PUBLIC_KEY = "pk_test_fSmlFVwnfbJVU78S4fIFOgac";
 
     // Format used for storing dates in the database.  ALso used for converting those strings
     // back into date objects for comparison/processing.
     public static final String DATE_FORMAT = "EEEE, MMMM dd, yyyy";
     public static final String DATE_TIME_FORMAT = "MMM-dd-yyyy HH:mm:ss";
+
+    public static final String NUMBER_FORMAT = "#.##";
 
     /**
      * Constants used for adding/removing time in milliseconds
@@ -80,6 +82,9 @@ public class Constants {
     public static final String STATE_INFO_LOCATION_SELECT_MESSAGE = "com.programming.kantech.deliveryservice.app.state.location.message";
     public static final String STATE_INFO_ORDERS_LIST = "com.programming.kantech.deliveryservice.app.state.orders.list";
 
+    public static final String STATE_INFO_FRAGMENT_DETAILS = "com.programming.kantech.deliveryservice.app.state.admin.fragment.details";
+    public static final String STATE_INFO_FRAGMENT_MASTER = "com.programming.kantech.deliveryservice.app.state.admin.fragment.master";
+    public static final String STATE_INFO_FRAGMENT_FULLSCREEN = "com.programming.kantech.deliveryservice.app.state.admin.fragment.fullscreen";
     /**
      * The Constants used for data added as extras to intents
      */
@@ -163,6 +168,8 @@ public class Constants {
     public static final String FIREBASE_NOTIFICATION_TOPIC_DRIVER = "topic_driver";
     public static final String FIREBASE_NOTIFICATION_TOPIC_USER = "topic_customer";
 
+    public final static String FIREBASE_DEFAULT_NO_DRIVER = "No Driver Assigned";
+
 
 
     /*
@@ -193,7 +200,7 @@ public class Constants {
 
     public static final String ORDER_STATUS_OPEN = "OPEN";
     public static final String ORDER_STATUS_BOOKED = "BOOKED";
-    public static final String ORDER_STATUS_ASSIGNED = "ASSIGNED";
+    public static final String ORDER_STATUS_ASSIGNED = "DRIVER ASSIGNED";
     public static final String ORDER_STATUS_PICKUP_COMPLETE = "PICKUP COMPLETE";
     public static final String ORDER_STATUS_COMPLETE = "COMPLETE";
 

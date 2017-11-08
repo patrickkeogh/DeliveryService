@@ -193,6 +193,8 @@ public class Activity_PlaceOrder extends AppCompatActivity {
         final Order order = new Order();
         order.setCustomerId(mAppUser.getId());
         order.setCustomerName(mAppUser.getCompany());
+        order.setCustomerContact(mAppUser.getContact_name());
+        order.setCustomerPhone(mAppUser.getContact_number());
         order.setDeliveryLocationId(mLocationDelivery.getPlaceId());
         order.setPickupLocationId(mLocationPickup.getPlaceId());
         order.setType(Constants.ORDER_TYPE_USER);

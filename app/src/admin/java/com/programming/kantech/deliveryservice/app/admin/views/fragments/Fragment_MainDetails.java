@@ -1,5 +1,6 @@
 package com.programming.kantech.deliveryservice.app.admin.views.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -75,6 +76,15 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     private Query mOrdersQuery;
     private ValueEventListener mOrdersEventListener;
 
+    // Define a new interface StepNavClickListener that triggers a callback in the host activity
+    MainDetailsFragmentListener mCallback;
+
+    // MainDetailsFragmentListener interface, calls a method in the host activity
+    // depending on the order selected in the master list
+    public interface MainDetailsFragmentListener {
+        void onFragmentLoaded(String tag);
+    }
+
     /**
      * Static factory method that,
      * initializes the fragment's arguments, and returns the
@@ -114,6 +124,21 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
         return rootView;
 
+    }
+
+    // Override onAttach to make sure that the container activity has implemented the callback
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // This makes sure that the host activity has implemented the callback interface
+        // If not, it throws an exception
+        try {
+            mCallback = (Fragment_MainDetails.MainDetailsFragmentListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OrderClickListener");
+        }
     }
 
 
@@ -166,7 +191,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
         if (mDriversList != null) {
             if (mDriversList.size() != 0) {
 
-                Log.i(Constants.LOG_TAG, "Paint Markers: Driver list is not null or zero");
+                //Log.i(Constants.LOG_TAG, "Paint Markers: Driver list is not null or zero");
 
                 // Add markers for active drivers
                 for (int i = 0; i < mDriversList.size(); i++) {
@@ -226,6 +251,14 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                 .addApi(Places.GEO_DATA_API)
                 .build();
         mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // Notify the activity that this fragment was loaded
+        mCallback.onFragmentLoaded(Constants.TAG_FRAGMENT_MAIN_DETAILS);
     }
 
     @Override
@@ -289,7 +322,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     private LatLngBounds.Builder builder;
 
     private void drawMarker(LatLng point, String title, String snip, BitmapDescriptor bitmapDescriptor) {
-        Log.i(Constants.LOG_TAG, "drawMarker()");
+        //Log.i(Constants.LOG_TAG, "drawMarker()");
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(point)
@@ -302,9 +335,14 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
         builder.include(markerOptions.getPosition());
 
-        LatLngBounds bounds = builder.build();
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 10);
-        mGoogleMap.animateCamera(cu);
+        mGoogleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                LatLngBounds bounds = builder.build();
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 10);
+                mGoogleMap.animateCamera(cu);
+            }
+        });
     }
 
 
@@ -316,17 +354,17 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Log.i(Constants.LOG_TAG, "onDataChange in attachOrderListener");
+                    //Log.i(Constants.LOG_TAG, "onDataChange in attachOrderListener on Fragment_MainDetails");
                     mOrdersList = new ArrayList<>();
 
                     if (dataSnapshot != null) {
-                        Log.i(Constants.LOG_TAG, "wqe have a snapshot");
+                        //Log.i(Constants.LOG_TAG, "we have a snapshot");
 
                         // Get each order that is in progress
                         for (DataSnapshot orders : dataSnapshot.getChildren()) {
 
                             Order order = orders.getValue(Order.class);
-                            Log.e(Constants.LOG_TAG, "ORDERS:" + order.getCustomerName());
+                            //Log.i(Constants.LOG_TAG, "ORDERS:" + order.getCustomerName());
 
                             mOrdersList.add(order);
                         }
@@ -354,7 +392,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                    Log.i(Constants.LOG_TAG, "onChildAdded");
+                    //Log.i(Constants.LOG_TAG, "onChildAdded");
 
                     String driverKey = dataSnapshot.getKey();
 
@@ -394,7 +432,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     if (dataSnapshot.exists()) {
 
-                        Log.i(Constants.LOG_TAG, "dataSnapshot:" + dataSnapshot.toString());
+                        //Log.i(Constants.LOG_TAG, "dataSnapshot:" + dataSnapshot.toString());
 
                         String driverKey = dataSnapshot.getKey();
 
@@ -422,7 +460,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
                     if (dataSnapshot.exists()) {
 
-                        Log.i(Constants.LOG_TAG, "dataSnapshot:" + dataSnapshot.toString());
+                        //Log.i(Constants.LOG_TAG, "dataSnapshot:" + dataSnapshot.toString());
 
                         String driverKey = dataSnapshot.getKey();
 
@@ -469,7 +507,6 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
         }
 
     }
-
 
     public void showOrders(boolean b) {
 

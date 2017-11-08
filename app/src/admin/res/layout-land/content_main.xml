@@ -14,7 +14,7 @@
 
     <!-- A small divider -->
     <View
-        android:layout_width="10dp"
+        android:layout_width="@dimen/divider_view_accent"
         android:layout_height="match_parent"
         android:background="@color/colorGreyBackground" />
 

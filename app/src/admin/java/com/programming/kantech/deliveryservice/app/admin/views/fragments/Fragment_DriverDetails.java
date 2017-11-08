@@ -56,6 +56,7 @@ public class Fragment_DriverDetails extends Fragment {
     // onDriverSelected interface, calls a method in the host activity named onDriverSelected
     public interface VerifyDriverClickListener {
         void onVerifyDriverClicked(Driver driver);
+        void onFragmentLoaded(String tag);
     }
 
     /**
@@ -124,6 +125,14 @@ public class Fragment_DriverDetails extends Fragment {
         // Update driver record
         mCallback.onVerifyDriverClicked(mDriver);
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // Notify the activity this fragment was loaded
+        mCallback.onFragmentLoaded(Constants.TAG_FRAGMENT_DRIVER_DETAILS);
     }
 
     @Override

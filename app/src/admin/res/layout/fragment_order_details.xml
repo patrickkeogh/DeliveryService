@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginTop="?attr/actionBarSize"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="24dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/margin_8dp"
+            tools:ignore="UselessParent">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -25,25 +28,17 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Customer"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:text="@string/title_customer"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textColor="@color/colorPrimaryDark" />
 
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
+                <include layout="@layout/view_accent_line" />
 
                 <TextView
                     android:id="@+id/tv_order_details_company"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     tools:text="Harvey's" />
 
@@ -51,9 +46,7 @@
                     android:id="@+id/tv_order_details_contact"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/margin_8dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     tools:text="John Snow" />
 
@@ -61,145 +54,125 @@
                     android:id="@+id/tv_order_details_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
+
+                    android:layout_marginTop="@dimen/margin_8dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     tools:text="(909) 555-5655" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Order No."
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:text="@string/title_order_number"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textColor="@color/colorPrimaryDark" />
 
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dip"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
+                <include layout="@layout/view_accent_line" />
+
+
 
                 <TextView
                     android:id="@+id/tv_order_number"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="@dimen/margin_8dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     tools:text="-KsuiOLz1Nxq78tvDUyE" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Delivery Date"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:text="@string/title_order_driver_assigned"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textColor="@color/colorPrimaryDark" />
 
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
+                <include layout="@layout/view_accent_line" />
+
+                <TextView
+                    android:id="@+id/tv_order_driver"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/margin_8dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    tools:text="King Kong" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:text="@string/title_delivery_date"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    android:textColor="@color/colorPrimaryDark" />
+
+                <include layout="@layout/view_accent_line" />
 
                 <TextView
                     android:id="@+id/tv_order_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     tools:text="Thursday July 19th, 2017" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Pickup Location"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:text="@string/title_pickup_location"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textColor="@color/colorPrimaryDark" />
 
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
+                <include layout="@layout/view_accent_line" />
 
                 <TextView
                     android:id="@+id/tv_order_location_pickup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="@dimen/margin_8dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     tools:text="27 Geddes Crescent, Barrie On, Canada" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Delivery Location"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:text="@string/title_delivery_location"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textColor="@color/colorPrimaryDark" />
 
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dip"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
-
+                <include layout="@layout/view_accent_line" />
 
                 <TextView
                     android:id="@+id/tv_order_location_delivery"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="@dimen/margin_8dp"
+
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     tools:text="27 Geddes Crescent, Barrie On" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:orientation="horizontal">
-
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="2">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginTop="12dp"
-                        android:layout_weight=".92"
-                        android:text="Distance"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@color/colorPrimaryDark" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="@dimen/margin_8dp"
                         android:layout_weight="1"
-                        android:text="Cost"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:text="@string/title_distance"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                        android:textColor="@color/colorPrimaryDark" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_8dp"
+                        android:layout_weight="1"
+                        android:text="@string/title_cost"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
                         android:textColor="@color/colorPrimaryDark" />
 
                 </LinearLayout>
@@ -207,23 +180,23 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="2">
 
                     <View
                         android:layout_width="0dp"
                         android:layout_height="2dp"
-                        android:layout_marginBottom="4dp"
+                        android:layout_marginBottom="@dimen/margin_8dp"
                         android:layout_marginEnd="5dp"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="@dimen/margin_8dp"
                         android:layout_weight="1"
                         android:background="@color/colorAccent" />
 
                     <View
                         android:layout_width="0dp"
                         android:layout_height="2dp"
-                        android:layout_marginBottom="4dp"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="@dimen/margin_8dp"
+                        android:layout_marginTop="@dimen/margin_8dp"
                         android:layout_weight="1"
                         android:background="@color/colorAccent" />
 
@@ -233,16 +206,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="2">
 
                     <TextView
                         android:id="@+id/tv_order_distance"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:layout_marginLeft="4dp"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="@dimen/margin_8dp"
                         android:layout_weight="1"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         tools:text="37km" />
@@ -251,9 +222,7 @@
                         android:id="@+id/tv_order_amount"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:layout_marginLeft="4dp"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="@dimen/margin_8dp"
                         android:layout_weight="1"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         tools:text="$43.85" />
@@ -264,25 +233,25 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="2">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="@dimen/margin_8dp"
                         android:layout_weight="1"
-                        android:text="Order Status"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:text="@string/title_order_status"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
                         android:textColor="@color/colorPrimaryDark" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="@dimen/margin_8dp"
                         android:layout_weight="1"
-                        android:text="Order Type"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:text="@string/title_order_type"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
                         android:textColor="@color/colorPrimaryDark" />
 
                 </LinearLayout>
@@ -290,23 +259,23 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="2">
 
                     <View
                         android:layout_width="0dp"
-                        android:layout_height="2dp"
-                        android:layout_marginBottom="4dp"
+                        android:layout_height="@dimen/divider_view_accent"
+                        android:layout_marginBottom="@dimen/margin_8dp"
                         android:layout_marginEnd="5dp"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="@dimen/margin_8dp"
                         android:layout_weight="1"
                         android:background="@color/colorAccent" />
 
                     <View
                         android:layout_width="0dp"
-                        android:layout_height="2dp"
-                        android:layout_marginBottom="4dp"
-                        android:layout_marginTop="4dp"
+                        android:layout_height="@dimen/divider_view_accent"
+                        android:layout_marginBottom="@dimen/margin_8dp"
+                        android:layout_marginTop="@dimen/margin_8dp"
                         android:layout_weight="1"
                         android:background="@color/colorAccent" />
 
@@ -316,16 +285,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="2"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="2">
 
                     <TextView
                         android:id="@+id/tv_order_status"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:layout_marginLeft="4dp"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="@dimen/margin_8dp"
                         android:layout_weight="1"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         tools:text="BOOKED" />
@@ -334,44 +301,33 @@
                         android:id="@+id/tv_order_type"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:layout_marginLeft="4dp"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="@dimen/margin_8dp"
                         android:layout_weight="1"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         tools:text="APP USER" />
 
 
                 </LinearLayout>
-
-
             </LinearLayout>
+
+
         </ScrollView>
 
 
-    </LinearLayout>
+    </FrameLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_assign_driver"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:orientation="vertical">
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/margin_16dp"
+        android:src="@drawable/ic_menu_drive_white"
+        app:fabSize="normal" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:padding="4dp"
-            android:src="@drawable/powered_by_google_light" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autoLink="web"
-            android:paddingBottom="4dp"
-            android:text="@string/privacy"
-            android:textAlignment="center"
-            android:textColor="@color/colorPrimaryDark" />
-    </LinearLayout>
-</RelativeLayout>
+</LinearLayout>
+
+
+
+

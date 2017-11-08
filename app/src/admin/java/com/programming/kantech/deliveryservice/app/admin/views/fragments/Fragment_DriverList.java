@@ -6,22 +6,28 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Driver;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by patrick keogh on 2017-08-14.
- * Uses FirebaseDatabase-UI
+ * Uses FirebaseDatabase-UI, ButterKnife
  *
  */
 
@@ -29,7 +35,14 @@ public class Fragment_DriverList extends Fragment {
 
     // Member variables
     private FirebaseRecyclerAdapter<Driver, ViewHolder_Driver> mFireAdapter;
-    private RecyclerView rv_drivers_list;
+    private RecyclerView.AdapterDataObserver mObserver;
+
+    // Bind the layout views
+    @BindView(R.id.rv_drivers_list)
+    RecyclerView rv_drivers_list;
+
+    @BindView(R.id.tv_empty_view)
+    TextView tv_empty_view;
 
     // Firebase references
     private DatabaseReference mDriverRef;
@@ -40,6 +53,7 @@ public class Fragment_DriverList extends Fragment {
     // onDriverSelected interface, calls a method in the host activity named onDriverSelected
     public interface DriverClickListener {
         void onDriverSelected(Driver driver);
+        void onFragmentLoaded(String tag);
     }
 
     // Mandatory empty constructor
@@ -61,16 +75,14 @@ public class Fragment_DriverList extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        Log.i(Constants.LOG_TAG, "onCreteView() in Fragment_DriverList");
-
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_drivers_master, container, false);
 
+        // Bind to our rootView
+        ButterKnife.bind(this, rootView);
+
         // Get a reference to the drivers table
         mDriverRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_DRIVERS);
-
-        // Get a reference to the RecyclerView in the fragment_master_list xml layout file
-        rv_drivers_list = rootView.findViewById(R.id.rv_drivers_list);
 
         return rootView;
 
@@ -100,15 +112,15 @@ public class Fragment_DriverList extends Fragment {
 
             @Override
             public void populateViewHolder(ViewHolder_Driver holder, final Driver driver, int position) {
-                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + driver.toString());
+                //Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + driver.toString());
 
                 holder.setName(driver.getDisplayName());
-                //holder.setPhoto(driver.getPhotoUrl(), getActivity());
                 holder.setId(driver.getUid());
 
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
                         // Notify the activity a driver was clicked
                         mCallback.onDriverSelected(driver);
                     }
@@ -118,6 +130,62 @@ public class Fragment_DriverList extends Fragment {
         };
 
         rv_drivers_list.setAdapter(mFireAdapter);
+
+        // Hide or show the list depending on if there are records
+        mDriverRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //remove loading indicator
+
+                // Perform initial setup, this will only be called once
+                if(dataSnapshot.hasChildren()){
+                    showList(true);
+                }else{
+                    showList(false);
+                }
+
+                // Create an observer to check if the list changes
+                mObserver = new RecyclerView.AdapterDataObserver() {
+                    @Override
+                    public void onItemRangeInserted(int positionStart, int itemCount) {
+
+                        int count = mFireAdapter.getItemCount();
+                        if(count == 0){
+                            showList(false);
+                        }else{
+                            showList(true);
+                        }
+                    }
+
+                    @Override
+                    public void onItemRangeRemoved(int positionStart, int itemCount) {
+                        int count = mFireAdapter.getItemCount();
+                        if(count == 0){
+                            showList(false);
+                        }else{
+                            showList(true);
+                        }
+                    }
+                };
+                mFireAdapter.registerAdapterDataObserver(mObserver);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void showList(boolean bShowList) {
+
+        if(bShowList){
+            rv_drivers_list.setVisibility(View.VISIBLE);
+            tv_empty_view.setVisibility(View.GONE);
+        }else{
+            rv_drivers_list.setVisibility(View.GONE);
+            tv_empty_view.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -126,6 +194,14 @@ public class Fragment_DriverList extends Fragment {
         if (mFireAdapter != null) {
             mFireAdapter.cleanup();
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // Notify the activity this fragment was loaded
+        mCallback.onFragmentLoaded(Constants.TAG_FRAGMENT_DRIVER_LIST);
     }
 
     // Override onAttach to make sure that the container activity has implemented the callback

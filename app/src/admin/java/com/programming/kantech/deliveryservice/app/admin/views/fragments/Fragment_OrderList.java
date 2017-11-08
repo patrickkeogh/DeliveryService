@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.common.ConnectionResult;
@@ -21,9 +22,11 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Order;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
@@ -32,29 +35,52 @@ import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import java.util.Objects;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * Created by patrick keogh on 2017-08-27.
+ * Uses FirebaseDatabase-UI, ButterKnife
  *
  */
 
 public class Fragment_OrderList extends Fragment implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
+    // Member variables
     private FirebaseRecyclerAdapter<Order, ViewHolder_Order> mFireAdapter;
+    private RecyclerView.AdapterDataObserver mObserver;
     private GoogleApiClient mClient;
-    private RecyclerView mOrdersList;
     private Order mSelectedOrder;
+
 
     // Member variables for Firebase
     private DatabaseReference mOrdersRef;
 
-    // Define a new interface StepNavClickListener that triggers a callback in the host activity
-    OrderClickListener mCallback;
+    // Views
+    @BindView(R.id.rv_orders_list)
+    RecyclerView rv_orders_list;
 
-    // OrderClickListener interface, calls a method in the host activity
-    // depending on the order selected in the master list
-    public interface OrderClickListener {
+    @BindView(R.id.tv_empty_view)
+    TextView tv_empty_view;
+
+    // Define a new interface StepNavClickListener that triggers a callback in the host activity
+    OrderListFragmentListener mCallback;
+
+    // OrderListFragmentListener interface,
+    // calls a methods in the host activity
+    public interface OrderListFragmentListener {
+
+        // Notify activity when an order is selected
         void onOrderClicked(Order order);
+
+        // Notify the activity to load the new order form
+        void onAddOrderClicked();
+
+        // Notify the activity that this fragment has be loaded,
+        // may be from activity, orientation change, or back button
+        void onFragmentLoaded(String tag);
     }
 
     // Mandatory empty constructor
@@ -80,8 +106,7 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_order_list, container, false);
 
-        // Get a reference to the RecyclerView in the fragment_order_list xml layout file
-        mOrdersList = rootView.findViewById(R.id.rv_orders_list);
+        ButterKnife.bind(this, rootView);
 
         // Get a reference to the orders table
         mOrdersRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_ORDERS);
@@ -89,7 +114,6 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
         return rootView;
 
     }
-
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -100,14 +124,15 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
                 new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
 
         /* setLayoutManager associates the LayoutManager we created above with our RecyclerView */
-        mOrdersList.setLayoutManager(layoutManager);
+        rv_orders_list.setLayoutManager(layoutManager);
 
         /*
          * Use this setting to improve performance if you know that changes in content do not
          * change the child layout size in the RecyclerView.  DO NOT CHANGE IF USING
          * FIREBASE ADAPTOR
          */
-        mOrdersList.setHasFixedSize(false);
+        rv_orders_list.setHasFixedSize(false);
+
     }
 
     // Override onAttach to make sure that the container activity has implemented the callback
@@ -118,16 +143,22 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
         // This makes sure that the host activity has implemented the callback interface
         // If not, it throws an exception
         try {
-            mCallback = (Fragment_OrderList.OrderClickListener) context;
+            mCallback = (Fragment_OrderList.OrderListFragmentListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement OrderClickListener");
+                    + " must implement OrderListFragmentListener");
         }
+    }
+
+    @OnClick(R.id.fab_add_order)
+    public void onFabAddOrderClicked() {
+        mCallback.onAddOrderClicked();
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        mCallback.onFragmentLoaded(Constants.TAG_FRAGMENT_ORDER_LIST);
 
         if (mClient == null) {
             buildApiClient();
@@ -159,6 +190,8 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
         }
     }
 
+
+
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         loadFirebaseAdapter();
@@ -187,16 +220,18 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
         }
     }
 
-    private Query getDatabaseRef() {
-        //Log.i(Constants.LOG_TAG, "CustId:" + mAppUser.getId());
-
-        return mOrdersRef;
-
-
-    }
+//    private Query getDatabaseRef() {
+//        //Log.i(Constants.LOG_TAG, "CustId:" + mAppUser.getId());
+//
+//        // Add filtering here
+//
+//        return mOrdersRef;
+//
+//
+//    }
 
     private void loadFirebaseAdapter() {
-        Log.i(Constants.LOG_TAG, "loadFirebaseAdapter");
+        //Log.i(Constants.LOG_TAG, "loadFirebaseAdapter");
 
         mFireAdapter = new FirebaseRecyclerAdapter<Order, ViewHolder_Order>(
                 Order.class,
@@ -206,7 +241,7 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
 
             @Override
             public void populateViewHolder(final ViewHolder_Order holder, final Order order, int position) {
-                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + order.getCustomerName());
+                //Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + order.getCustomerName());
 
                 //mLayout.setBackgroundColor(ContextCompat.getColor(Activity_MyOrders.this, R.color.colorAccent));
 
@@ -267,7 +302,63 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
             }
         };
 
-        mOrdersList.setAdapter(mFireAdapter);
+        rv_orders_list.setAdapter(mFireAdapter);
+
+        // Hide or show the list depending on if there are records
+        mOrdersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //remove loading indicator
+
+                // Perform initial setup, this will only be called once
+                if(dataSnapshot.hasChildren()){
+                    showList(true);
+                }else{
+                    showList(false);
+                }
+
+                // Create an observer to check if the list changes
+                mObserver = new RecyclerView.AdapterDataObserver() {
+                    @Override
+                    public void onItemRangeInserted(int positionStart, int itemCount) {
+
+                        int count = mFireAdapter.getItemCount();
+                        if(count == 0){
+                            showList(false);
+                        }else{
+                            showList(true);
+                        }
+                    }
+
+                    @Override
+                    public void onItemRangeRemoved(int positionStart, int itemCount) {
+                        int count = mFireAdapter.getItemCount();
+                        if(count == 0){
+                            showList(false);
+                        }else{
+                            showList(true);
+                        }
+                    }
+                };
+                mFireAdapter.registerAdapterDataObserver(mObserver);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void showList(boolean bShowList) {
+
+        if(bShowList){
+            rv_orders_list.setVisibility(View.VISIBLE);
+            tv_empty_view.setVisibility(View.GONE);
+        }else{
+            rv_orders_list.setVisibility(View.GONE);
+            tv_empty_view.setVisibility(View.VISIBLE);
+        }
     }
 
     private void orderSelected(Order order) {

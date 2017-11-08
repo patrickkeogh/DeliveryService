@@ -1,33 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="?attr/actionBarSize"
-    android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <FrameLayout
-        android:id="@+id/content"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/padding_8dp"
+        android:orientation="vertical">
 
         <android.support.v7.widget.RecyclerView
-
             android:id="@+id/rv_orders_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-    </FrameLayout>
+        <TextView
+            android:id="@+id/tv_empty_view"
+            android:text="@string/msg_there_are_no_orders_to_show"
+            android:visibility="gone"
+            android:gravity="center_vertical|center_horizontal"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    <android.support.design.widget.BottomNavigationView
-        android:id="@+id/navigation"
-        android:layout_width="match_parent"
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add_order"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="?android:attr/windowBackground"
-        app:menu="@menu/navigation" />
-
-</LinearLayout>
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/margin_16dp"
+        android:src="@drawable/ic_menu_add"
+        app:fabSize="normal" />
+</FrameLayout>

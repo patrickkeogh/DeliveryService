@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_marginTop="?attr/actionBarSize">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:layout_marginBottom="24dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:orientation="vertical">
 
         <ScrollView
             android:id="@+id/login_form"
+            android:layout_margin="@dimen/margin_8dp"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            tools:ignore="UselessParent">
 
             <LinearLayout
                 android:id="@+id/customer_add_form"
@@ -27,44 +22,41 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="@dimen/margin_8dp"
                     android:text="@string/label_customer_info"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textColor="@color/colorPrimaryDark" />
 
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dip"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:background="@color/colorAccent" />
+                <include layout="@layout/view_accent_line" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
-                    android:text="Company"
+                    android:layout_marginBottom="@dimen/margin_8dp"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:text="@string/title_company"
+                    android:labelFor="@+id/et_customer_add_company"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <EditText
                     android:id="@+id/et_customer_add_company"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:inputType="textCapWords"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
-                    android:text="Contact Name"
+                    android:layout_marginBottom="@dimen/margin_8dp"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:text="@string/title_contact_name"
+                    android:labelFor="@+id/et_customer_add_contact"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <EditText
                     android:id="@+id/et_customer_add_contact"
+                    android:inputType="textCapWords"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
@@ -72,33 +64,33 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
-                    android:text="Contact Phone"
+                    android:layout_marginBottom="@dimen/margin_8dp"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:text="@string/title_contact_phone"
+                    android:labelFor="@+id/et_customer_add_phone"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <EditText
                     android:id="@+id/et_customer_add_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLength="14"
                     android:inputType="phone"
+                    android:maxLength="14"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-
 
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
-                    android:text="Email"
+                    android:layout_marginBottom="@dimen/margin_8dp"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:text="@string/title_email"
+                    android:labelFor="@+id/et_customer_add_email"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <EditText
                     android:id="@+id/et_customer_add_email"
+                    android:inputType="textEmailAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
@@ -106,45 +98,32 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Billing Address"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:layout_marginTop="@dimen/margin_8dp"
+                    android:text="@string/title_billing_address"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textColor="@color/colorPrimaryDark" />
 
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:background="@color/colorAccent" />
+                <include layout="@layout/view_accent_line" />
 
                 <include layout="@layout/item_location" />
 
 
-
-
                 <Button
                     android:id="@+id/btn_customer_add"
-                    style="?android:textAppearanceSmall"
-                    android:background="@color/colorPrimaryDark"
-                    android:textColor="@color/colorWhite"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_16dp"
+                    android:background="@color/colorPrimaryDark"
                     android:onClick="onAddCustomerClicked"
-                    android:layout_marginTop="16dp"
-                    android:text="Add Customer"
-                    android:textStyle="bold" />
+                    android:text="@string/title_add_customer"
+                    android:textColor="@color/colorWhite" />
 
-
-
-                
 
             </LinearLayout>
         </ScrollView>
 
 
-
-    </LinearLayout>
 
 
 </RelativeLayout>

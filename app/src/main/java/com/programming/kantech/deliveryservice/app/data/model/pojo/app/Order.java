@@ -22,6 +22,7 @@ public class Order implements Parcelable{
     private String customerPhone;
 
     private String driverId;
+    private String driverName;
     private String type;
     private String status = Constants.ORDER_STATUS_BOOKED;
     private boolean inProgress;
@@ -40,7 +41,7 @@ public class Order implements Parcelable{
                  String customerId, String customerName, String driverId,
                  String type, String status, boolean inProgress,
                  String inProgressDriverId, String inProgressDateDriverId,
-                 long pickupDate, String distance_text, int distance, int amount) {
+                 long pickupDate, String distance_text, int distance, int amount, String driver) {
         this.id = id;
         this.deliveryLocationId = deliveryLocationId;
         this.pickupLocationId = pickupLocationId;
@@ -56,6 +57,7 @@ public class Order implements Parcelable{
         this.distance_text = distance_text;
         this.distance = distance;
         this.amount = amount;
+        this.driverName = driver;
     }
 
     protected Order(Parcel in) {
@@ -67,6 +69,7 @@ public class Order implements Parcelable{
         customerContact = in.readString();
         customerPhone = in.readString();
         driverId = in.readString();
+        driverName = in.readString();
         type = in.readString();
         status = in.readString();
         inProgress = in.readByte() != 0;
@@ -76,6 +79,7 @@ public class Order implements Parcelable{
         distance_text = in.readString();
         distance = in.readInt();
         amount = in.readInt();
+
     }
 
     @Override
@@ -88,6 +92,7 @@ public class Order implements Parcelable{
         dest.writeString(customerContact);
         dest.writeString(customerPhone);
         dest.writeString(driverId);
+        dest.writeString(driverName);
         dest.writeString(type);
         dest.writeString(status);
         dest.writeByte((byte) (inProgress ? 1 : 0));
@@ -252,6 +257,14 @@ public class Order implements Parcelable{
         this.customerPhone = customerPhone;
     }
 
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -263,6 +276,7 @@ public class Order implements Parcelable{
                 ", customerContact='" + customerContact + '\'' +
                 ", customerPhone='" + customerPhone + '\'' +
                 ", driverId='" + driverId + '\'' +
+                ", driverName='" + driverName + '\'' +
                 ", type='" + type + '\'' +
                 ", status='" + status + '\'' +
                 ", inProgress=" + inProgress +

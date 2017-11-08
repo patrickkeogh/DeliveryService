@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseError;
@@ -41,7 +40,6 @@ import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -63,21 +61,23 @@ import static android.app.Activity.RESULT_OK;
 
 public class Fragment_NewPhoneOrder extends Fragment {
 
-    private DatabaseReference mOrderRef;
-
+    // Reference to our rest service
     private ApiInterface apiService;
 
+    // Firebase member variables
+    private DatabaseReference mOrderRef;
+
+    // Member variables
     private Customer mSelectedCustomer;
     private Distance mDistance;
-
     private Location mLocationPickup;
     private String mLocationPickupName;
     private String mLocationPickupAddress;
-
     private Location mLocationDelivery;
     private String mLocationDeliveryName;
     private String mLocationDeliveryAddress;
 
+    // Views to bind too
     @BindView(R.id.tv_admin_customer_name)
     TextView tv_admin_customer_name;
 
@@ -113,16 +113,16 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
     private long mDate;
 
-    // Define a new interface onCustomerSelected that triggers a callback in the host activity
-    Fragment_NewPhoneOrder.GetCustomerClickListener mCallback;
+    // Reference to the GetCustomerClickListener interface
+    NewOrderListener mCallback;
 
-    // onCustomerSelected interface, calls a method in the host activity named onCustomerSelected
-    public interface GetCustomerClickListener {
-        void onGetCustomerSelected();
+    // NewOrderListener interface,
+    // calls a methods in the host activity
+    public interface NewOrderListener {
 
-        void onGetLocationPickup(Customer mSelectedCustomer);
-
-        void onGetLocationDelivery();
+        // Notify the activity that this fragment has be loaded,
+        // may be from activity, orientation change, or back button
+        void onFragmentLoaded(String tag);
     }
 
     /**
@@ -177,7 +177,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
         return rootView;
     }
 
-    @OnClick(R.id.iv_select_date)
+    @OnClick(R.id.layout_order_date)
     public void onSelectDateClicked() {
 
         Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date
@@ -193,13 +193,13 @@ public class Fragment_NewPhoneOrder extends Fragment {
         datePicker.show();
     }
 
-    @OnClick(R.id.iv_select_customer)
+    @OnClick(R.id.layout_order_customer)
     public void onSelectCustomerClicked() {
         Intent intent = new Intent(getActivity(), Activity_SelectCustomer.class);
         startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CUSTOMER);
     }
 
-    @OnClick(R.id.iv_select_location_pickup)
+    @OnClick(R.id.layout_order_location_pickup)
     public void onSelectPickupLocationClicked() {
         Intent intent = new Intent(getActivity(), Activity_SelectLocation.class);
 
@@ -207,7 +207,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
         startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_PICKUP_LOCATION);
     }
 
-    @OnClick(R.id.iv_select_location_delivery)
+    @OnClick(R.id.layout_order_location_delivery)
     public void onSelectDeliveryLocationClicked() {
         Intent intent = new Intent(getActivity(), Activity_SelectLocation.class);
 
@@ -225,6 +225,14 @@ public class Fragment_NewPhoneOrder extends Fragment {
         cancelNewOrder();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // Notify the activity this fragment was loaded
+        mCallback.onFragmentLoaded(Constants.TAG_FRAGMENT_ORDER_ADD);
+    }
+
     // Override onAttach to make sure that the container activity has implemented the callback
     @Override
     public void onAttach(Context context) {
@@ -233,7 +241,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
         // This makes sure that the host activity has implemented the callback interface
         // If not, it throws an exception
         try {
-            mCallback = (Fragment_NewPhoneOrder.GetCustomerClickListener) context;
+            mCallback = (Fragment_NewPhoneOrder.NewOrderListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement GetCustomerClickListener");
@@ -266,7 +274,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
         if (mLocationPickup != null) {
             tv_cust_location_pickup_name.setText(mLocationPickupName);
             tv_cust_location_pickup_address.setText(mLocationPickupAddress);
-        }else{
+        } else {
             tv_cust_location_pickup_name.setText("");
             tv_cust_location_pickup_address.setText("");
         }
@@ -274,20 +282,20 @@ public class Fragment_NewPhoneOrder extends Fragment {
         if (mLocationDelivery != null) {
             tv_cust_location_delivery_name.setText(mLocationDeliveryName);
             tv_cust_location_delivery_address.setText(mLocationDeliveryAddress);
-        }else{
+        } else {
             tv_cust_location_delivery_name.setText("");
             tv_cust_location_delivery_address.setText("");
 
         }
 
-        if(mDate != 0){
+        if (mDate != 0) {
 
-            SimpleDateFormat format =  new SimpleDateFormat(Constants.DATE_FORMAT, Locale.getDefault());
+            SimpleDateFormat format = new SimpleDateFormat(Constants.DATE_FORMAT, Locale.getDefault());
             String dateString;
 
             dateString = format.format(mDate);
             tv_pickup_date.setText(dateString);
-        }else{
+        } else {
             tv_pickup_date.setText("");
         }
 
@@ -306,8 +314,8 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
         if (mLocationDelivery != null && mLocationPickup != null) {
 
+            // Create origin and destination strings for google
             String origin = "place_id:" + mLocationPickup.getPlaceId();
-
             String dest = "place_id:" + mLocationDelivery.getPlaceId();
 
             Call<Results> call = apiService.getDistance(origin, dest);
@@ -316,7 +324,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
                 @Override
                 public void onResponse(@NonNull Call<Results> call, @NonNull Response<Results> response) {
 
-                    Log.i(Constants.LOG_TAG, "Response:" + response);
+                    //Log.i(Constants.LOG_TAG, "Response:" + response);
 
                     if (response.isSuccessful()) {
                         // Code 200, 201
@@ -333,16 +341,10 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
                             mDistance = trip.getDistance();
 
-                            Log.i(Constants.LOG_TAG, "Response Distance:" + mDistance.getText());
+                            //Log.i(Constants.LOG_TAG, "Response Distance:" + mDistance.getText());
                         }
 
-
-
-                                                // Notify the activity movie fetch was successfull
                         //distance_ok(fetchResults);
-                    } else {
-                        //distance_failed(response.message());
-
                     }
                 }
 
@@ -357,7 +359,6 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
         }
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -425,25 +426,25 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
     private void createNewOrder() {
 
+        // Avoid passing null as parent to dialogs
+        final ViewGroup nullParent = null;
+
         LayoutInflater inflater = this.getLayoutInflater();
-        View dialog_confirm = inflater.inflate(R.layout.alert_confirm_order, null);
+        View dialog_confirm = inflater.inflate(R.layout.alert_confirm_order, nullParent);
 
         TextView tv_name = dialog_confirm.findViewById(R.id.tv_confirm_order_company);
         tv_name.setText(mSelectedCustomer.getCompany());
 
         new AlertDialog.Builder(getContext())
-                .setTitle("Please confirm a new order for:")
+                .setTitle(R.string.alert_confirm_new_order)
                 .setView(dialog_confirm)
                 .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
                         // get today at 00:00 hrs
-                        Calendar date = new GregorianCalendar();
-                        long mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
-
-                        //long startDateMillis = mDisplayDateStartTime.getTimeInMillis();
-                        Log.i(Constants.LOG_TAG, "StartTime for 12th:" + mDisplayDateStartTimeInMillis);
+                        //Calendar date = new GregorianCalendar();
+                        //long mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
 
                         final Order order = new Order();
                         order.setCustomerId(mSelectedCustomer.getId());
@@ -458,10 +459,12 @@ public class Fragment_NewPhoneOrder extends Fragment {
                         order.setDistance(mDistance.getValue());
                         order.setDistance_text(mDistance.getText());
 
-                        DecimalFormat df = new DecimalFormat("#.##");
-                        Double distance = Double.valueOf(df.format(mDistance.getValue()/1000));
+                        order.setDriverName(Constants.FIREBASE_DEFAULT_NO_DRIVER);
 
-                        // TODO: store in a db so it can be changed
+                        DecimalFormat df = new DecimalFormat(Constants.NUMBER_FORMAT);
+                        Double distance = Double.valueOf(df.format(mDistance.getValue() / 1000));
+
+                        // TODO: store in a db so it can be changed from Firebase
                         double dblAmount = distance * 2.13;
                         int intAmount = (int) (dblAmount * 100);
 
@@ -469,7 +472,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
                         long newDate = Utils_General.getStartTimeForDate(mDate);
 
-                        Log.i(Constants.LOG_TAG, "THIS:" + newDate);
+                        //Log.i(Constants.LOG_TAG, "THIS:" + newDate);
                         order.setPickupDate(newDate);
 
                         mOrderRef

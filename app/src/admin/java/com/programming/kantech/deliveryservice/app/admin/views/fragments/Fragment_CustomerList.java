@@ -4,14 +4,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.common.ConnectionResult;
@@ -22,20 +21,25 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.admin.views.ui.HPLinearLayoutManager;
 import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Customers;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
 import java.util.Objects;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * Created by patrick keogh on 2017-08-29.
- *
  */
 
 public class Fragment_CustomerList extends Fragment implements GoogleApiClient.ConnectionCallbacks,
@@ -43,10 +47,18 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
 
     // Member variables
     private FirebaseRecyclerAdapter<Customer, ViewHolder_Customers> mFireAdapter;
-    private RecyclerView mCustomerRecyclerView;
+
     private GoogleApiClient mClient;
 
     private Customer mSelectedCustomer;
+    private RecyclerView.AdapterDataObserver mObserver;
+
+    // Bind the layout views
+    @BindView(R.id.rv_customer_list)
+    RecyclerView rv_customer_list;
+
+    @BindView(R.id.tv_empty_view)
+    TextView tv_empty_view;
 
     // Firebase references
     private DatabaseReference mCustomersRef;
@@ -58,7 +70,10 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
     // onAddCustomerClicked interface, calls a method in the host activity named onAddCustomerClicked
     public interface CustomerClickListener {
         void onCustomerSelected(Customer customer);
+
         void onAddCustomerClicked();
+
+        void onFragmentLoaded(String tag);
     }
 
     // Mandatory empty constructor
@@ -90,6 +105,8 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
         // Get the fragment layout for the customer list
         final View rootView = inflater.inflate(R.layout.fragment_customer_list, container, false);
 
+        ButterKnife.bind(this, rootView);
+
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(Constants.STATE_INFO_CUSTOMER)) {
                 Log.i(Constants.LOG_TAG, "we found the recipe key in savedInstanceState");
@@ -101,48 +118,40 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
             mSelectedCustomer = getArguments().getParcelable(Constants.EXTRA_CUSTOMER);
         }
 
-        if(mSelectedCustomer != null){
+        if (mSelectedCustomer != null) {
             mCallback.onCustomerSelected(mSelectedCustomer);
         }
 
         // Get a reference to the customers table
         mCustomersRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_CUSTOMERS);
 
-        // Get a reference to the Fab Button in the fragment_customer_list xml layout file
-        FloatingActionButton mFab_add_customer = rootView.findViewById(R.id.fab_add_customer);
-        mFab_add_customer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mCallback.onAddCustomerClicked();
-            }
-        });
-
-        // Get a reference to the RecyclerView in the fragment_customer_list xml layout file
-        mCustomerRecyclerView = rootView.findViewById(R.id.rv_customer_list);
-
         return rootView;
 
+    }
+
+    @OnClick(R.id.fab_add_customer)
+    public void onFabAddCustomerClicked() {
+        mCallback.onAddCustomerClicked();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        LinearLayoutManager layoutManager =
-                new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+//        LinearLayoutManager layoutManager =
+//                new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
 
         /* setLayoutManager associates the LayoutManager we created above with our RecyclerView */
         //mCustomerRecyclerView.setLayoutManager(layoutManager);
 
         HPLinearLayoutManager hpLinearLayoutManager = new HPLinearLayoutManager(getContext());
-        mCustomerRecyclerView.setLayoutManager(hpLinearLayoutManager);
+        rv_customer_list.setLayoutManager(hpLinearLayoutManager);
 
         /*
          * Use this setting to improve performance if you know that changes in content do not
          * change the child layout size in the RecyclerView
          */
-        mCustomerRecyclerView.setHasFixedSize(false);
-
+        rv_customer_list.setHasFixedSize(false);
 
     }
 
@@ -172,10 +181,9 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.i(Constants.LOG_TAG, "onConnected called");
+        //Log.i(Constants.LOG_TAG, "onConnected called");
         loadFirebaseAdapter();
     }
-
 
 
     @Override
@@ -191,11 +199,15 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
     @Override
     public void onStart() {
         super.onStart();
-        if(mClient == null){
+
+        // Notify the activity this fragment was loaded
+        mCallback.onFragmentLoaded(Constants.TAG_FRAGMENT_CUSTOMER_LIST);
+
+        if (mClient == null) {
             buildApiClient();
             mClient.connect();
-        }else{
-            if(!mClient.isConnected() ){
+        } else {
+            if (!mClient.isConnected()) {
                 mClient.connect();
             }
         }
@@ -205,7 +217,7 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
     public void onPause() {
         super.onPause();
 
-        if(mClient != null){
+        if (mClient != null) {
             mClient.disconnect();
         }
     }
@@ -217,10 +229,10 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
     }
 
     private void buildApiClient() {
-        Log.i(Constants.LOG_TAG, "buildApiClient() called");
+        //Log.i(Constants.LOG_TAG, "buildApiClient() called");
 
-        if(mClient == null){
-            Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
+        if (mClient == null) {
+            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
 
             // Build up the LocationServices API client
             // Uses the addApi method to request the LocationServices API
@@ -233,9 +245,10 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
                     .build();
         }
     }
-    private void loadFirebaseAdapter() {
-        Log.i(Constants.LOG_TAG, "loadFirebaseAdapter() called:");
 
+    private void loadFirebaseAdapter() {
+
+        // Create FireBaseAdapter
         mFireAdapter = new FirebaseRecyclerAdapter<Customer, ViewHolder_Customers>(
                 Customer.class,
                 R.layout.item_admin_customer,
@@ -244,10 +257,8 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
 
             @Override
             public void populateViewHolder(final ViewHolder_Customers holder, final Customer customer, int position) {
-                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + customer.toString());
 
-                //holder.itemView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
-
+                // Highlight the selected record in the list
                 if (mSelectedCustomer != null) {
                     if (Objects.equals(customer.getId(), mSelectedCustomer.getId())) {
                         holder.setSelectedColor(getContext(), R.color.colorPrimaryLight);
@@ -256,10 +267,11 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
                     }
                 }
 
+                // Set the name field
                 holder.setName(customer.getCompany());
 
+                // Get the Place based on the stored placeId
                 PendingResult<PlaceBuffer> placeResult;
-
                 placeResult = Places.GeoDataApi.getPlaceById(mClient, customer.getPlaceId());
 
                 placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
@@ -268,8 +280,7 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
 
                         Place myPlace = places.get(0);
 
-                        Log.i(Constants.LOG_TAG, "PLACE:" + myPlace.getAddress());
-
+                        // Set the address field
                         holder.setAddress(myPlace.getAddress().toString());
                     }
                 });
@@ -286,8 +297,64 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
 
         };
 
-        mCustomerRecyclerView.setAdapter(mFireAdapter);
+        rv_customer_list.setAdapter(mFireAdapter);
 
+        // Hide or show the list depending on if there are records
+        mCustomersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //remove loading indicator
+
+                // Perform initial setup, this will only be called once
+                if (dataSnapshot.hasChildren()) {
+                    showList(true);
+                } else {
+                    showList(false);
+                }
+
+                // Create an observer to check if the list changes
+                mObserver = new RecyclerView.AdapterDataObserver() {
+                    @Override
+                    public void onItemRangeInserted(int positionStart, int itemCount) {
+
+                        int count = mFireAdapter.getItemCount();
+                        if (count == 0) {
+                            showList(false);
+                        } else {
+                            showList(true);
+                        }
+                    }
+
+                    @Override
+                    public void onItemRangeRemoved(int positionStart, int itemCount) {
+                        int count = mFireAdapter.getItemCount();
+                        if (count == 0) {
+                            showList(false);
+                        } else {
+                            showList(true);
+                        }
+                    }
+                };
+                mFireAdapter.registerAdapterDataObserver(mObserver);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void showList(boolean bShowList) {
+
+        if (bShowList) {
+            rv_customer_list.setVisibility(View.VISIBLE);
+            tv_empty_view.setVisibility(View.GONE);
+        } else {
+            rv_customer_list.setVisibility(View.GONE);
+            tv_empty_view.setVisibility(View.VISIBLE);
+        }
     }
 
     private void customerSelected(Customer customer) {
@@ -295,6 +362,7 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
 
         mSelectedCustomer = customer;
 
+        // redraw the list to show the selected customer
         mFireAdapter.notifyDataSetChanged();
 
     }

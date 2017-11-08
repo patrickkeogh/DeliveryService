@@ -3,8 +3,8 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_user_checkout"
-        android:title="Checkout"
+        android:id="@+id/action_user_orders"
+        android:title="@string/menu_my_orders"
         android:orderInCategory="100"
         app:showAsAction="never"/>
 

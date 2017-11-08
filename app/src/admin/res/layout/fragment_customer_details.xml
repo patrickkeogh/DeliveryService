@@ -2,151 +2,135 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginTop="?attr/actionBarSize">
 
-    <LinearLayout
+
+    <ScrollView
+        android:id="@+id/customer_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="24dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:orientation="vertical">
+        android:layout_margin="@dimen/margin_8dp">
 
-        <ScrollView
-            android:id="@+id/customer_form"
+        <LinearLayout
+            android:id="@+id/customer_details_form"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/customer_details_form"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:text="@string/label_customer_info"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <include layout="@layout/view_accent_line" />
+
+            <TextView
+                android:id="@+id/tv_customer_company"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                tools:text="Harvey's" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="@string/label_customer_info"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textColor="@color/colorPrimaryDark" />
+            <TextView
+                android:id="@+id/tv_customer_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="1234 Somewhere Ave. Barrie, ON" />
 
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
-
-                <TextView
-                    android:id="@+id/tv_customer_company"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    tools:text="Harvey's" />
-
-                <TextView
-                    android:id="@+id/tv_customer_address"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="1234 Somewhere Ave. Barrie, ON" />
-
-                <TextView
+            <TextView
                 android:id="@+id/tv_customer_contact_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:layout_marginTop="@dimen/margin_8dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 tools:text="John Snow" />
 
+            <TextView
+                android:id="@+id/tv_customer_contact_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                tools:text="777-777-8989" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:weightSum="10">
+
                 <TextView
-                    android:id="@+id/tv_customer_contact_phone"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="777-777-8989" />
+                    android:layout_marginTop="@dimen/margin_16dp"
+                    android:layout_weight="9"
+                    android:text="@string/title_pickup_and_delivery_locations"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    android:textColor="@color/colorPrimaryDark" />
 
-                <LinearLayout
-                    android:weightSum="10"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_weight="9"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Pickup and Delivery Locations"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                        android:textColor="@color/colorPrimaryDark" />
-
-                    <ImageButton
-                        android:id="@+id/ib_customer_add_location"
-                        android:background="@color/colorWhite"
-                        android:layout_gravity="end"
-                        android:src="@drawable/ic_add_accent"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="match_parent" />
-
-                </LinearLayout>
-
-
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/rv_customer_locations_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
+                <ImageButton
+                    android:id="@+id/ib_customer_add_location"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:layout_weight="1"
+                    android:background="@color/colorWhite"
+                    android:src="@drawable/ic_add_accent"
+                    android:contentDescription="@string/content_description_add_location_button" />
 
             </LinearLayout>
-        </ScrollView>
 
 
-    </LinearLayout>
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/divider_view_accent"
+                android:layout_marginBottom="@dimen/margin_8dp"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:background="@color/colorAccent" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_customer_locations_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+
+        </LinearLayout>
+    </ScrollView>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="UseCompoundDrawables">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:padding="4dp"
-            android:src="@drawable/powered_by_google_light" />
+            android:padding="@dimen/padding_8dp"
+            android:src="@drawable/powered_by_google_light"
+            android:contentDescription="@string/content_description_google_icon" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autoLink="web"
-            android:paddingBottom="4dp"
+            android:paddingBottom="@dimen/padding_8dp"
             android:text="@string/privacy"
             android:textAlignment="center"
             android:textColor="@color/colorPrimaryDark" />

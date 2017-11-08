@@ -144,7 +144,7 @@ public class Activity_Main extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.i(Constants.LOG_TAG, "onOptionsItemSelected:" + item.getItemId());
         switch (item.getItemId()) {
-            case R.id.action_user_checkout:
+            case R.id.action_user_orders:
                 Intent intent = new Intent(Activity_Main.this, Activity_MyOrders.class);
                 intent.putExtra(Constants.EXTRA_USER, mAppUser);
                 startActivity(intent);

@@ -1,290 +1,244 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginTop="?attr/actionBarSize">
 
-    <LinearLayout
+
+    <ScrollView
+        android:id="@+id/login_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="24dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:orientation="vertical">
+        android:layout_margin="@dimen/margin_8dp"
+        tools:ignore="UselessParent">
 
-        <ScrollView
-            android:id="@+id/login_form"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:text="@string/title_select_customer"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <include layout="@layout/view_accent_line" />
 
             <LinearLayout
+                android:id="@+id/layout_order_customer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:padding="@dimen/padding_8dp"
+                android:weightSum="10">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Select Customer"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@color/colorPrimaryDark" />
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dip"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
+                <ImageView
+                    android:id="@+id/iv_select_customer"
+                    android:layout_width="@dimen/icon_width_height"
+                    android:layout_height="@dimen/icon_width_height"
+                    android:layout_marginEnd="@dimen/margin_8dp"
+                    android:contentDescription="@string/content_description_customer_select_icon"
+                    android:src="@drawable/ic_account_circle_24dp" />
 
                 <LinearLayout
-                    android:id="@+id/layout_order_customer"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:orientation="horizontal"
-                    android:padding="8dp"
-                    android:weightSum="10">
+                    android:layout_weight="9"
+                    android:orientation="vertical"
+                    android:paddingEnd="@dimen/padding_8dp"
+                    android:paddingStart="@dimen/padding_8dp">
 
-                    <ImageView
-                        android:id="@+id/iv_select_customer"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="fill"
-                        android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_account_circle_24dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="9"
-                        android:orientation="vertical"
-                        android:paddingEnd="@dimen/padding_8dp"
-                        android:paddingStart="8dp">
-
-
-                        <TextView
-                            android:id="@+id/tv_admin_customer_name"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                            android:textColor="@android:color/black"
-                            tools:text="Harvey's" />
-
-                        <TextView
-                            android:id="@+id/tv_admin_customer_address"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                            tools:text="Monday September 11th, 2014" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_8dp"
-                    android:text="Select Pickup date"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/colorPrimaryDark" />
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dip"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
-
-                <LinearLayout
-                    android:id="@+id/layout_order_date"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:orientation="horizontal"
-                    android:padding="8dp"
-                    android:weightSum="10">
-
-                    <ImageView
-                        android:id="@+id/iv_select_date"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="fill"
-                        android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_date_range_24dp" />
 
                     <TextView
-                        android:id="@+id/tv_pickup_date"
+                        android:id="@+id/tv_admin_customer_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginBottom="4dp"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginTop="4dp"
-                        android:text="Monday March 17th, 2018"
                         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                        android:textColor="@android:color/black" />
+                        android:textColor="@color/colorBlack" />
 
-
-                </LinearLayout>
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Select Pickup Location"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@color/colorPrimaryDark" />
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dip"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
-
-                <LinearLayout
-                    android:id="@+id/layout_order_location_pickup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:orientation="horizontal"
-                    android:padding="8dp"
-                    android:weightSum="10">
-
-                    <ImageView
-                        android:id="@+id/iv_select_location_pickup"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="fill"
-                        android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_place_accent_24dp" />
-
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/tv_admin_customer_address"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="9"
-                        android:orientation="vertical"
-                        android:paddingEnd="@dimen/padding_8dp"
-                        android:paddingStart="8dp">
-
-                        <TextView
-                            android:id="@+id/tv_cust_location_pickup_name"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                            android:textColor="@android:color/black"
-                            tools:text="Harvey's" />
-
-                        <TextView
-                            android:id="@+id/tv_cust_location_pickup_address"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                            tools:text="Monday September 11th, 2014" />
-
-                    </LinearLayout>
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 </LinearLayout>
+
+            </LinearLayout>
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:text="@string/title_select_pickup_date"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <include layout="@layout/view_accent_line" />
+
+            <LinearLayout
+                android:id="@+id/layout_order_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/padding_8dp"
+                android:weightSum="10"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:id="@+id/iv_select_date"
+                    android:layout_width="@dimen/icon_width_height"
+                    android:layout_height="@dimen/icon_width_height"
+                    android:layout_marginEnd="@dimen/margin_8dp"
+                    android:src="@drawable/ic_date_range_24dp"
+                    android:contentDescription="@string/content_description_date_select_icon" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Select Delivery Location"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@color/colorPrimaryDark" />
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dip"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
-
-                <LinearLayout
-                    android:id="@+id/layout_order_location_delivery"
+                    android:id="@+id/tv_pickup_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:orientation="horizontal"
-                    android:padding="8dp"
-                    android:weightSum="10">
-
-                    <ImageView
-                        android:id="@+id/iv_select_location_delivery"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="fill"
-                        android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_place_accent_24dp" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="9"
-                        android:orientation="vertical"
-                        android:paddingEnd="@dimen/padding_8dp"
-                        android:paddingStart="8dp">
-
-                        <TextView
-                            android:id="@+id/tv_cust_location_delivery_name"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                            android:textColor="@android:color/black"
-                            tools:text="Harvey's" />
-
-                        <TextView
-                            android:id="@+id/tv_cust_location_delivery_address"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="start"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                            tools:text="Monday September 11th, 2014" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-
-                <Button
-                    android:id="@+id/btn_phone_order_add"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:background="@color/colorPrimaryDark"
-                    android:text="Book Phone Order"
-                    android:textColor="@color/colorWhite"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/btn_phone_order_cancel"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:background="@color/colorAccent"
-                    android:text="Cancel/Reset Form"
-                    android:textColor="@color/colorWhite"
-                    android:textStyle="bold" />
+                    android:layout_gravity="center_vertical"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textColor="@color/colorBlack" />
 
 
             </LinearLayout>
-        </ScrollView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:text="@string/title_select_pickup_location"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <include layout="@layout/view_accent_line" />
+
+            <LinearLayout
+                android:id="@+id/layout_order_location_pickup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/padding_8dp"
+                android:weightSum="10">
+
+                <ImageView
+                    android:id="@+id/iv_select_location_pickup"
+                    android:layout_width="@dimen/icon_width_height"
+                    android:layout_height="@dimen/icon_width_height"
+                    android:layout_marginEnd="@dimen/margin_8dp"
+                    android:src="@drawable/ic_place_accent_24dp"
+                    android:contentDescription="@string/content_description_select_pickup_location_icon" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="9"
+                    android:orientation="vertical"
+                    android:paddingEnd="@dimen/padding_8dp"
+                    android:paddingStart="@dimen/padding_8dp">
+
+                    <TextView
+                        android:id="@+id/tv_cust_location_pickup_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textColor="@color/colorBlack"
+                        tools:text="Harvey's" />
+
+                    <TextView
+                        android:id="@+id/tv_cust_location_pickup_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        tools:text="Monday September 11th, 2014" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:text="@string/title_select_delivery_location"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <include layout="@layout/view_accent_line" />
+
+            <LinearLayout
+                android:id="@+id/layout_order_location_delivery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="@dimen/padding_8dp"
+                android:weightSum="10">
+
+                <ImageView
+                    android:id="@+id/iv_select_location_delivery"
+                    android:layout_width="@dimen/icon_width_height"
+                    android:layout_height="@dimen/icon_width_height"
+                    android:layout_marginEnd="@dimen/margin_8dp"
+                    android:src="@drawable/ic_place_accent_24dp"
+                    android:contentDescription="@string/content_description_select_delivery_location_icon" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="9"
+                    android:orientation="vertical"
+                    android:paddingEnd="@dimen/padding_8dp"
+                    android:paddingStart="@dimen/margin_8dp">
+
+                    <TextView
+                        android:id="@+id/tv_cust_location_delivery_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textColor="@color/colorBlack"
+                        tools:text="Harvey's" />
+
+                    <TextView
+                        android:id="@+id/tv_cust_location_delivery_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        tools:text="Monday September 11th, 2014" />
+
+                </LinearLayout>
+
+            </LinearLayout>
 
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/btn_phone_order_add"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:background="@color/colorPrimaryDark"
+                android:text="@string/btn_book_phone_order"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorWhite" />
+
+            <Button
+                android:id="@+id/btn_phone_order_cancel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:background="@color/colorAccent"
+                android:text="@string/btn_cancel"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorWhite" />
+
+
+        </LinearLayout>
+    </ScrollView>
+
 
 </RelativeLayout>

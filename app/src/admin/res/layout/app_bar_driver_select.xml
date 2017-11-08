@@ -18,6 +18,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_driver_list" />
+    <include layout="@layout/content_select_driver" />
 
 </android.support.design.widget.CoordinatorLayout>

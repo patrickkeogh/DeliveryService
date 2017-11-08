@@ -6,4 +6,5 @@
     <string name="or">or</string>
     <string name="enter_details">Enter card details</string>
     <string name="activity_title_checkout_success">Payment Received</string>
+    <string name="menu_my_orders">My Orders</string>
 </resources>

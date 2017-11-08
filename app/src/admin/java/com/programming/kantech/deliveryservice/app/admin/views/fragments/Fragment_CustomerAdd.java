@@ -27,7 +27,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Location;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
@@ -37,10 +36,12 @@ import butterknife.OnClick;
 
 /**
  * Created by patrick keogh on 2017-08-18.
+ *
  */
 
 public class Fragment_CustomerAdd extends Fragment {
 
+    // View to bind to
     @BindView(R.id.et_customer_add_company)
     EditText et_customer_add_company;
 
@@ -60,9 +61,11 @@ public class Fragment_CustomerAdd extends Fragment {
     @BindView(R.id.tv_location_address)
     TextView tv_location_address;
 
+    // Firebase member variables
     private DatabaseReference mCustomerRef;
     private DatabaseReference mLocationsRef;
 
+    // Local member variables
     private Customer mCustomer;
     private Location mLocation;
     private Place mPlace;
@@ -74,6 +77,7 @@ public class Fragment_CustomerAdd extends Fragment {
     // after a new customer has been saved
     public interface SaveCustomerListener {
         void onCustomerSaved(Customer customer);
+        void onFragmentLoaded(String tag);
     }
 
     /**
@@ -128,7 +132,13 @@ public class Fragment_CustomerAdd extends Fragment {
         onGetLocationButtonClicked();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
 
+        // Notify the activity this fragment was loaded
+        mCallback.onFragmentLoaded(Constants.TAG_FRAGMENT_CUSTOMER_ADD);
+    }
 
     // Override onAttach to make sure that the container activity has implemented the callback
     @Override
@@ -209,17 +219,15 @@ public class Fragment_CustomerAdd extends Fragment {
             hasErrors = true;
         }
 
-        if (mPlace == null) {
-
-        }
-
         if (hasErrors) {
             Utils_General.showToast(getContext(), "The new customer form has errors.");
-            return;
         } else {
 
+            // Avoid passing null as parent to dialogs
+            final ViewGroup nullParent = null;
+
             LayoutInflater inflater = this.getLayoutInflater();
-            View dialog_confirm = inflater.inflate(R.layout.alert_confirm_customer, null);
+            View dialog_confirm = inflater.inflate(R.layout.alert_confirm_customer, nullParent);
 
             TextView tv_confirm_company_name = dialog_confirm.findViewById(R.id.tv_confirm_company_name);
             tv_confirm_company_name.setText(et_customer_add_company.getText().toString());

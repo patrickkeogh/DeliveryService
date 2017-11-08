@@ -38,6 +38,10 @@ import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Location;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * Created by patrick keogh on 2017-08-14.
  *
@@ -49,22 +53,30 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     // Member variables
     private Customer mCustomer;
     private FirebaseRecyclerAdapter<Location, ViewHolder_Locations> mFireAdapter;
-    private RecyclerView mLocationRecyclerView;
     private GoogleApiClient mClient;
     private DatabaseReference mLocationsRef;
 
-    private TextView tv_customer_address;
-    private TextView tv_customer_company;
-    private TextView tv_customer_contact_name;
-    private TextView tv_customer_contact_phone;
+    @BindView(R.id.tv_customer_address)
+    TextView tv_customer_address;
 
-    private ImageButton ib_customer_add_location;
+    @BindView(R.id.tv_customer_company)
+    TextView tv_customer_company;
+
+    @BindView(R.id.tv_customer_contact_name)
+    TextView tv_customer_contact_name;
+
+    @BindView(R.id.tv_customer_contact_phone)
+    TextView tv_customer_contact_phone;
+
+    @BindView(R.id.rv_customer_locations_list)
+    RecyclerView rv_customer_locations_list;
 
     // Define a new interface onCustomerSelected that triggers a callback in the host activity
     LocationAddedListener mCallback;
 
     public interface LocationAddedListener {
         void onLocationAdded(Customer customer);
+        void onFragmentLoaded(String tag);
     }
 
     /**
@@ -105,12 +117,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_customer_details, container, false);
 
-        tv_customer_company = rootView.findViewById(R.id.tv_customer_company);
-        tv_customer_address = rootView.findViewById(R.id.tv_customer_address);
-        tv_customer_contact_name = rootView.findViewById(R.id.tv_customer_contact_name);
-        tv_customer_contact_phone = rootView.findViewById(R.id.tv_customer_contact_phone);
-
-        ib_customer_add_location = rootView.findViewById(R.id.ib_customer_add_location);
+        ButterKnife.bind(this, rootView);
 
         if (mCustomer == null) {
             throw new IllegalArgumentException("Must pass EXTRA_CUSTOMER");
@@ -120,22 +127,9 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
             tv_customer_contact_phone.setText(mCustomer.getContact_number());
         }
 
-        ib_customer_add_location.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Get a new location using google places
-                onGetLocationButtonClicked();
-            }
-        });
-
-        // Get a reference to the RecyclerView in the fragment_order_list xml layout file
-        mLocationRecyclerView = rootView.findViewById(R.id.rv_customer_locations_list);
-
         // Get a reference to the drivers table
         mLocationsRef = FirebaseDatabase.getInstance()
                 .getReference().child(Constants.FIREBASE_NODE_LOCATIONS).child(mCustomer.getId());
-
-        //buildApiClient();
 
         return rootView;
 
@@ -164,15 +158,14 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
                 new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
 
         /* setLayoutManager associates the LayoutManager we created above with our RecyclerView */
-        mLocationRecyclerView.setLayoutManager(layoutManager);
+        rv_customer_locations_list.setLayoutManager(layoutManager);
 
         /*
          * Use this setting to improve performance if you know that changes in content do not
          * change the child layout size in the RecyclerView
          */
-        mLocationRecyclerView.setHasFixedSize(false);
+        rv_customer_locations_list.setHasFixedSize(false);
 
-        loadFirebaseAdapter();
     }
 
 
@@ -195,7 +188,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
             @Override
             public void onResult(@NonNull PlaceBuffer places) {
 
-                Log.i(Constants.LOG_TAG, "PLACE:" + places.get(0).getAddress().toString());
+                //Log.i(Constants.LOG_TAG, "PLACE:" + places.get(0).getAddress().toString());
 
                 tv_customer_address.setText(places.get(0).getAddress().toString());
 
@@ -228,6 +221,10 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     @Override
     public void onStart() {
         super.onStart();
+
+        // Notify the activity this fragment was loaded
+        mCallback.onFragmentLoaded(Constants.TAG_FRAGMENT_CUSTOMER_DETAILS);
+
         if(mClient == null){
             buildApiClient();
             mClient.connect();
@@ -254,10 +251,10 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     }
 
     private void buildApiClient() {
-        Log.i(Constants.LOG_TAG, "buildApiClient() called");
+        //Log.i(Constants.LOG_TAG, "buildApiClient() called");
 
         if(mClient == null){
-            Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
+            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
 
             // Build up the LocationServices API client
             // Uses the addApi method to request the LocationServices API
@@ -276,6 +273,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
             mFireAdapter.cleanup();
         }
 
+        // Create the customer locations list
         mFireAdapter = new FirebaseRecyclerAdapter<Location, ViewHolder_Locations>(
                 Location.class,
                 R.layout.item_location,
@@ -285,8 +283,6 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
             @Override
             public void populateViewHolder(final ViewHolder_Locations holder, Location location, int position) {
                 Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + location.toString());
-
-                //holder.itemView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
 
                 PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mClient, location.getPlaceId());
 
@@ -312,12 +308,12 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
 
         };
 
-        mLocationRecyclerView.setAdapter(mFireAdapter);
+        rv_customer_locations_list.setAdapter(mFireAdapter);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i(Constants.LOG_TAG, "onActivityResult in Frag,ment");
+        //Log.i(Constants.LOG_TAG, "onActivityResult in Fragment");
         if (requestCode == Constants.REQUEST_CODE_LOCATION_PICKER && resultCode == Activity.RESULT_OK) {
             Place place = PlacePicker.getPlace(getContext(), data);
 
@@ -332,7 +328,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     }
 
     public void onGetLocationButtonClicked() {
-        Log.i(Constants.LOG_TAG, "onGetLocationButtonClicked() called");
+        //Log.i(Constants.LOG_TAG, "onGetLocationButtonClicked() called");
         try {
 
             // Start a new Activity for the Place Picker API, this will trigger {@code #onActivityResult}
@@ -350,8 +346,15 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
         }
     }
 
+    @OnClick(R.id.ib_customer_add_location)
+    public void onAddCustLocationClicked() {
+        // Get a new location using google places
+        onGetLocationButtonClicked();
+    }
+
+
     private void addLocation(Place place) {
-        Log.i(Constants.LOG_TAG, "addLocation() calledplaceid:" + place.getId());
+        //Log.i(Constants.LOG_TAG, "addLocation() calledplaceid:" + place.getId());
 
         final Location location = new Location();
         location.setCustId(mCustomer.getId());
@@ -377,7 +380,6 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
                             }
                         });
 
-                        Log.i(Constants.LOG_TAG, "key:" + uniqueKey);
                     }
                 });
 

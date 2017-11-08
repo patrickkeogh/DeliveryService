@@ -362,6 +362,9 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
                                         mOrder.setId(uniqueKey);
 
                                         orderRef.child(uniqueKey).setValue(mOrder);
+
+                                        // On server we will check for an update to the "token" field
+                                        // which will trigger a call to Strips
                                         orderRef.child(uniqueKey).child("token").setValue(mToken);
 
                                         Utils_General.showToast(Activity_Checkout.this, getString(R.string.order_booked));
@@ -402,34 +405,33 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
 
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
+
                     Log.i(Constants.LOG_TAG, dataSnapshot.toString());
                     Utils_General.showToast(Activity_Checkout.this, "charge added:");
 
                     pb_checkout_progress_bar.setVisibility(View.GONE);
 
-                    if (dataSnapshot != null) {
-                        Charge charge = dataSnapshot.getValue(Charge.class);
-                        if (charge != null) {
-                            Log.i(Constants.LOG_TAG, "Wed have a charge");
+                    Charge charge = dataSnapshot.getValue(Charge.class);
+                    if (charge != null) {
+                        Log.i(Constants.LOG_TAG, "Wed have a charge");
 
-                            Outcome outcome = charge.getOutcome();
+                        Outcome outcome = charge.getOutcome();
 
-                            mStatus = charge.getStatus();
-                            String title = "Payment " + mStatus.substring(0, 1).toUpperCase() + mStatus.substring(1);
+                        mStatus = charge.getStatus();
+                        String title = "Payment " + mStatus.substring(0, 1).toUpperCase() + mStatus.substring(1);
 
-                            // Delete the order if the charge was rejected
-                            if (Objects.equals(mStatus, "failed")) {
-                                mOrderRef.child(mOrder.getId()).setValue(null);
-                                mOrder.setId(null);
-                            }
-
-                            showAlertMessage(title, outcome.getSeller_message());
-
-
-                            Utils_General.showToast(Activity_Checkout.this, "charge status:" + charge.getStatus());
-                        } else {
-                            Log.i(Constants.LOG_TAG, "No Charge object");
+                        // Delete the order if the charge was rejected
+                        if (Objects.equals(mStatus, "failed")) {
+                            mOrderRef.child(mOrder.getId()).setValue(null);
+                            mOrder.setId(null);
                         }
+
+                        showAlertMessage(title, outcome.getSeller_message());
+
+
+                        Utils_General.showToast(Activity_Checkout.this, "charge status:" + charge.getStatus());
+                    } else {
+                        Log.i(Constants.LOG_TAG, "No Charge object");
                     }
                 }
 
@@ -440,6 +442,7 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
             };
 
             mOrderRef.child(mOrder.getId()).child("charge").addValueEventListener(mChargeEventListener);
+            Log.i(Constants.LOG_TAG, "Path For Charge:" + mOrderRef.toString());
         }
 
 
