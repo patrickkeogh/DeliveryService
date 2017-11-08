@@ -120,7 +120,7 @@ public class Activity_Splash extends AppCompatActivity {
 
         // User is signed in, send them to the main page
 
-        Intent intent = new Intent(Activity_Splash.this, Activity_Main.class);
+        Intent intent = new Intent(Activity_Splash.this, Activity_FragTest.class);
 
         startActivity(intent);
         finish();

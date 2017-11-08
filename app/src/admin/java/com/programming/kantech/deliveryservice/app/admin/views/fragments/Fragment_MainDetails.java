@@ -137,7 +137,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
             mCallback = (Fragment_MainDetails.MainDetailsFragmentListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement OrderClickListener");
+                    + " must implement MainDetailsFragmentListener");
         }
     }
 
