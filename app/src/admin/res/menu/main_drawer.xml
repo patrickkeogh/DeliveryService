@@ -27,6 +27,11 @@
     <item android:title="@string/menu_item_filters">
         <menu>
 
+            <item
+                android:id="@+id/nav_admin_call_in_order"
+                android:icon="@drawable/ic_menu_add"
+                android:title="Show All" />
+
 
         </menu>
     </item>

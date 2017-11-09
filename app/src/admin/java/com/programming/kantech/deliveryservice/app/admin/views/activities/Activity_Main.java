@@ -1,5 +1,6 @@
 package com.programming.kantech.deliveryservice.app.admin.views.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,6 +23,8 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -100,8 +103,8 @@ public class Activity_Main extends AppCompatActivity implements
     private DatabaseReference mDriverRef;
     private ChildEventListener mDriversTableEventListener;
 
-    private MenuItem mMenuItem_Driver;
-    private MenuItem mMenuItem_Order;
+    //private MenuItem mMenuItem_Driver;
+    //private MenuItem mMenuItem_Order;
 
 
     @Override
@@ -259,16 +262,6 @@ public class Activity_Main extends AppCompatActivity implements
             Fragment_MainDetails fragment = Fragment_MainDetails.newInstance();
             replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
 
-
-//            // add main fragment to master container on first start
-//            Fragment_MainDetails fragment = Fragment_MainDetails.newInstance();
-//
-//            if (!mLandscapeView) {
-//                replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, false, false);
-//            } else {
-//                replaceFragment(R.id.container_full, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true, false);
-//            }
-
         } else if (id == R.id.nav_admin_manage_drivers) {
 
             Fragment_DriverList frag_driver = Fragment_DriverList.newInstance();
@@ -304,8 +297,8 @@ public class Activity_Main extends AppCompatActivity implements
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
 
-        mMenuItem_Driver = menu.findItem(R.id.action_show_drivers);
-        mMenuItem_Order = menu.findItem(R.id.action_show_orders);
+//        mMenuItem_Driver = menu.findItem(R.id.action_show_drivers);
+//        mMenuItem_Order = menu.findItem(R.id.action_show_orders);
 
         return true;
     }
@@ -314,19 +307,19 @@ public class Activity_Main extends AppCompatActivity implements
     public boolean onPrepareOptionsMenu(Menu menu) {
         Log.i(Constants.LOG_TAG, "onPrepareOptionsMenu called");
 
-        mMenuItem_Driver.setVisible(mShowDriverIcon);
-        if (!mShowDrivers) {
-            mMenuItem_Driver.setIcon(R.drawable.ic_menu_drive);
-        } else {
-            mMenuItem_Driver.setIcon(R.drawable.ic_menu_drive_white);
-        }
-
-        mMenuItem_Order.setVisible(mShowOrderIcon);
-        if (!mShowOrders) {
-            mMenuItem_Order.setIcon(R.drawable.ic_shopping_cart);
-        } else {
-            mMenuItem_Order.setIcon(R.drawable.ic_shopping_cart_white);
-        }
+//        mMenuItem_Driver.setVisible(mShowDriverIcon);
+//        if (!mShowDrivers) {
+//            mMenuItem_Driver.setIcon(R.drawable.ic_menu_drive);
+//        } else {
+//            mMenuItem_Driver.setIcon(R.drawable.ic_menu_drive_white);
+//        }
+//
+//        mMenuItem_Order.setVisible(mShowOrderIcon);
+//        if (!mShowOrders) {
+//            mMenuItem_Order.setIcon(R.drawable.ic_shopping_cart);
+//        } else {
+//            mMenuItem_Order.setIcon(R.drawable.ic_shopping_cart_white);
+//        }
 
 
         super.onPrepareOptionsMenu(menu);
@@ -336,32 +329,22 @@ public class Activity_Main extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_show_orders:
-                mShowOrders = !mShowOrders;
-                invalidateOptionsMenu();
 
-                Fragment_MainDetails frag_order = (Fragment_MainDetails)
-                        getSupportFragmentManager().findFragmentByTag(Constants.TAG_FRAGMENT_MAIN_DETAILS);
-
-                if (frag_order != null) {
-                    frag_order.showOrders(mShowOrders);
-                }
-
-                return true;
-            case R.id.action_show_drivers:
-                mShowDrivers = !mShowDrivers;
-                invalidateOptionsMenu();
-
-                Fragment_MainDetails frag_driver = (Fragment_MainDetails)
-                        getSupportFragmentManager().findFragmentByTag(Constants.TAG_FRAGMENT_MAIN_DETAILS);
-
-                if (frag_driver != null) {
-                    frag_driver.showDrivers(mShowDrivers);
-                }
-
-                return true;
             case R.id.action_sign_out:
-                AuthUI.getInstance().signOut(this);
+                Log.i(Constants.LOG_TAG, "Sign out clicked:");
+                AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful()) {
+                            Intent intent = new Intent(Activity_Main.this, Activity_Splash.class);
+                            startActivity(intent);
+                            finish();
+                        }
+
+                    }
+                });
+
                 return true;
             case android.R.id.home:
                 Log.i(Constants.LOG_TAG, "Home clicked");
@@ -375,13 +358,11 @@ public class Activity_Main extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        detachDatabaseReadListeners();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        attachDatabaseReadListeners();
     }
 
     private void replaceFragment(int container, String fragment_tag,
@@ -436,43 +417,43 @@ public class Activity_Main extends AppCompatActivity implements
 
     }
 
-    private void detachDatabaseReadListeners() {
-        if (mDriversTableEventListener != null) {
-            mDriverRef.removeEventListener(mDriversTableEventListener);
-            mDriversTableEventListener = null;
-        }
-    }
+//    private void detachDatabaseReadListeners() {
+//        if (mDriversTableEventListener != null) {
+//            mDriverRef.removeEventListener(mDriversTableEventListener);
+//            mDriversTableEventListener = null;
+//        }
+//    }
 
-    private void attachDatabaseReadListeners() {
-
-        if (mDriversTableEventListener == null) {
-            mDriversTableEventListener = new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                    FriendlyMessage friendlyMessage = dataSnapshot.getValue(FriendlyMessage.class);
-//                    mMessageAdapter.add(friendlyMessage);
-
-                    //Utils_General.showToast(getApplicationContext(), "Child Changed");
-
-                }
-
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                }
-
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-                }
-
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                }
-
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            };
-            mDriverRef.addChildEventListener(mDriversTableEventListener);
-        }
-
-
-    }
+//    private void attachDatabaseReadListeners() {
+//
+//        if (mDriversTableEventListener == null) {
+//            mDriversTableEventListener = new ChildEventListener() {
+//                @Override
+//                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+////                    FriendlyMessage friendlyMessage = dataSnapshot.getValue(FriendlyMessage.class);
+////                    mMessageAdapter.add(friendlyMessage);
+//
+//                    //Utils_General.showToast(getApplicationContext(), "Child Changed");
+//
+//                }
+//
+//                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//                }
+//
+//                public void onChildRemoved(DataSnapshot dataSnapshot) {
+//                }
+//
+//                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//                }
+//
+//                public void onCancelled(DatabaseError databaseError) {
+//                }
+//            };
+//            mDriverRef.addChildEventListener(mDriversTableEventListener);
+//        }
+//
+//
+//    }
 
 //    @Override
 //    public void onGetCustomerSelected() {
@@ -540,7 +521,6 @@ public class Activity_Main extends AppCompatActivity implements
             replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_DETAILS, fragment, true);
         }
     }
-
 
     @Override
     public void onAddOrderClicked() {
@@ -656,7 +636,6 @@ public class Activity_Main extends AppCompatActivity implements
             replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true);
         }
     }
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
