@@ -16,7 +16,7 @@
         -->
         <FrameLayout
             android:id="@+id/container_master"
-            android:layout_width="@dimen/container_master_width"
+            android:layout_width="400dp"
             android:layout_height="match_parent"
             android:scaleType="centerInside" />
 

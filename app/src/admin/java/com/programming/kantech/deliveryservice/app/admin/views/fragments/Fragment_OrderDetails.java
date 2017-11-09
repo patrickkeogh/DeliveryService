@@ -125,9 +125,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
 
         // Load the saved state if there is one
         if (savedInstanceState != null) {
-            Log.i(Constants.LOG_TAG, "Fragment_Step savedInstanceState is not null");
             if (savedInstanceState.containsKey(Constants.STATE_INFO_ORDER)) {
-                Log.i(Constants.LOG_TAG, "we found the step key in savedInstanceState");
                 mOrder = savedInstanceState.getParcelable(Constants.STATE_INFO_ORDER);
             }
         } else {
@@ -143,11 +141,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
         if (mOrder == null) {
             throw new IllegalArgumentException("Must pass a Order Object");
         } else {
-
             parseDriverFields();
-
-
-
         }
 
         // Get a reference to the orders table
@@ -155,6 +149,17 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
 
         return rootView;
 
+    }
+
+    /**
+     * Save the current state of this fragment
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Store the driver in the instance state
+        outState.putParcelable(Constants.STATE_INFO_ORDER, mOrder);
     }
 
     private void parseDriverFields() {
@@ -175,14 +180,6 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
 
         tv_order_driver.setText(mOrder.getDriverName());
 
-    }
-
-    /**
-     * Save the current state of this fragment
-     */
-    @Override
-    public void onSaveInstanceState(Bundle currentState) {
-        currentState.putParcelable(Constants.STATE_INFO_ORDER, mOrder);
     }
 
     @Override

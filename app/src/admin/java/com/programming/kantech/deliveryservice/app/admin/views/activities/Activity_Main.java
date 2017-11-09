@@ -66,10 +66,6 @@ public class Activity_Main extends AppCompatActivity implements
         Fragment_CustomerDetails.LocationAddedListener,
         NavigationView.OnNavigationItemSelectedListener {
 
-    // Local member variables
-    private String mContainerMasterTag;
-    private String mContainerDetailsTag;
-    private String mContainerFullScreenTag;
 
     private FragmentManager mFragmentManager;
 
@@ -96,6 +92,10 @@ public class Activity_Main extends AppCompatActivity implements
     @BindView(R.id.nav_view)
     NavigationView mNavView;
 
+    private FrameLayout container_details;
+    private FrameLayout container_master;
+
+
     // Member variables for the Firebase database
     //private DatabaseReference mUserRef;
     private DatabaseReference mDriverRef;
@@ -110,7 +110,8 @@ public class Activity_Main extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Log.i(Constants.LOG_TAG, "onCreate() in Admin Activity_Main");
+        container_details = (FrameLayout) findViewById(R.id.container_details);
+        container_master = (FrameLayout) findViewById(R.id.container_master);
 
         ButterKnife.bind(this);
 
@@ -149,31 +150,23 @@ public class Activity_Main extends AppCompatActivity implements
         mLandscapeView = (findViewById(R.id.layout_for_two_cols) != null);
         Log.i(Constants.LOG_TAG, "Update Landscape variable to:" + mLandscapeView);
 
-        if (savedInstanceState != null) {
-            Log.i(Constants.LOG_TAG, "We have a state");
-            if (savedInstanceState.containsKey(Constants.STATE_INFO_FRAGMENT_DETAILS)) {
-                mContainerDetailsTag = savedInstanceState.getString(Constants.STATE_INFO_FRAGMENT_DETAILS);
-                //showOrHideContainers(mContainerDetailsTag);
-            }
-
-            if (savedInstanceState.containsKey(Constants.STATE_INFO_FRAGMENT_MASTER)) {
-                mContainerMasterTag = savedInstanceState.getString(Constants.STATE_INFO_FRAGMENT_MASTER);
-                //showOrHideContainers(mContainerMasterTag);
-            }
-
-            if (savedInstanceState.containsKey(Constants.STATE_INFO_FRAGMENT_FULLSCREEN)) {
-                mContainerFullScreenTag = savedInstanceState.getString(Constants.STATE_INFO_FRAGMENT_FULLSCREEN);
-                //showOrHideContainers(mContainerFullScreenTag);
-            }
-
-            if(mLandscapeView){
-
-            }
-
-
-
-
-        }
+//        if (savedInstanceState != null) {
+//            Log.i(Constants.LOG_TAG, "We have a state");
+//            if (savedInstanceState.containsKey(Constants.STATE_INFO_FRAGMENT_DETAILS)) {
+//                mContainerDetailsTag = savedInstanceState.getString(Constants.STATE_INFO_FRAGMENT_DETAILS);
+//                //showOrHideContainers(mContainerDetailsTag);
+//            }
+//
+//            if (savedInstanceState.containsKey(Constants.STATE_INFO_FRAGMENT_MASTER)) {
+//                mContainerMasterTag = savedInstanceState.getString(Constants.STATE_INFO_FRAGMENT_MASTER);
+//                //showOrHideContainers(mContainerMasterTag);
+//            }
+//
+//            if (savedInstanceState.containsKey(Constants.STATE_INFO_FRAGMENT_FULLSCREEN)) {
+//                mContainerFullScreenTag = savedInstanceState.getString(Constants.STATE_INFO_FRAGMENT_FULLSCREEN);
+//                //showOrHideContainers(mContainerFullScreenTag);
+//            }
+//        }
 
         if (savedInstanceState == null && mIsFirstTimeLoaded) {
             // add main fragment to master container on first start
@@ -182,57 +175,8 @@ public class Activity_Main extends AppCompatActivity implements
             replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true, true);
 
         }
-
-//        if (savedInstanceState == null) {
-//
-//            // add main fragment to master container on first start
-//            Fragment_MainDetails fragment = Fragment_MainDetails.newInstance();
-//
-//            if (!mLandscapeView) {
-//                replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, false);
-//            } else {
-//                replaceFragment(R.id.container_full, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, false);
-//            }
-//
-//
-//        }
     }
 
-    private void showOrHideContainersm(String fragment_tag) {
-//        Log.i(Constants.LOG_TAG, "showOrHideContainers():" + fragment_tag);
-//
-//
-//        if (!mLandscapeView) {
-//            Log.i(Constants.LOG_TAG, "Hide the details and full screen containers");
-//            container_details.setVisibility(View.GONE);
-//            container_full.setVisibility(View.GONE);
-//            container_master.setVisibility(View.VISIBLE);
-//        } else {
-//
-//            switch (fragment_tag) {
-//                case Constants.TAG_FRAGMENT_MAIN_DETAILS:
-//                case Constants.TAG_FRAGMENT_MAIN_LIST_START:
-//
-//                    Log.i(Constants.LOG_TAG, "Hide the details and master screen containers");
-//
-//                    container_details.setVisibility(View.GONE);
-//                    container_master.setVisibility(View.GONE);
-//                    container_full.setVisibility(View.VISIBLE);
-//
-//                    break;
-//
-//            }
-//        }
-
-    }
-
-    /**
-     * To be semantically or contextually correct, maybe change the name
-     * and signature of this function to something like:
-     * <p>
-     * private void showBackButton(boolean show)
-     * Just a suggestion.
-     */
     private void enableViews(boolean enable, String title) {
 
         Log.i(Constants.LOG_TAG, "EnableViews called()" + enable);
@@ -282,13 +226,6 @@ public class Activity_Main extends AppCompatActivity implements
             mDrawerToggle.setToolbarNavigationClickListener(null);
             mToolBarNavigationListenerIsRegistered = false;
         }
-
-        // So, one may think "Hmm why not simplify to:
-        // .....
-        // getSupportActionBar().setDisplayHomeAsUpEnabled(enable);
-        // mDrawer.setDrawerIndicatorEnabled(!enable);
-        // ......
-        // To re-iterate, the order in which you enable and disable views IS important #dontSimplify.
     }
 
     @Override
@@ -305,10 +242,17 @@ public class Activity_Main extends AppCompatActivity implements
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        // What ever is here we should remove the details container of there is one,
+        // and remove anything on the back stack as these are all root items
+
         // if we are in 2 pane mode, remove what ever is in the details container
         // when loading the lookup lists
         if (mLandscapeView) {
             clearDetailsContainer();
+        }
+
+        for (int i = 0; i < mFragmentManager.getBackStackEntryCount(); ++i) {
+            mFragmentManager.popBackStack();
         }
 
         if (id == R.id.nav_admin_home) {
@@ -329,17 +273,17 @@ public class Activity_Main extends AppCompatActivity implements
         } else if (id == R.id.nav_admin_manage_drivers) {
 
             Fragment_DriverList frag_driver = Fragment_DriverList.newInstance();
-            //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_DRIVER_LIST, frag_driver, false, false);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_DRIVER_LIST, frag_driver, false, false);
 
         } else if (id == R.id.nav_admin_manage_customers) {
 
             Fragment_CustomerList frag_customer = Fragment_CustomerList.newInstance(null);
-            //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_LIST, frag_customer, false, false);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_LIST, frag_customer, false, false);
 
         } else if (id == R.id.nav_admin_manage_orders) {
 
             Fragment_OrderList frag_order_list = Fragment_OrderList.newInstance();
-            //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_LIST, frag_order_list, false, false);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_LIST, frag_order_list, false, false);
 
         }
 
@@ -349,14 +293,11 @@ public class Activity_Main extends AppCompatActivity implements
 
     private void clearDetailsContainer() {
 
-        if (getSupportFragmentManager().findFragmentById(R.id.container_details) != null) {
+        if (mFragmentManager.findFragmentById(R.id.container_details) != null) {
 
-            getSupportFragmentManager().beginTransaction()
-                    .remove(getSupportFragmentManager()
-                            .findFragmentById(R.id.container_details)).commit();
+            mFragmentManager.beginTransaction()
+                    .remove(mFragmentManager.findFragmentById(R.id.container_details)).commit();
         }
-
-
     }
 
 
@@ -486,65 +427,11 @@ public class Activity_Main extends AppCompatActivity implements
         attachDatabaseReadListeners();
     }
 
-//    private void onSignedOutCleanup() {
-//        //mUsername = ANONYMOUS;
-//
-//        //mMessageAdapter.clear();
-//        detachDatabaseReadListeners();
-//
-//
-//    }
-
     private void replaceFragment(int container, String fragment_tag,
                                  Fragment fragment_in, boolean showFullScreen, boolean addToBackStack) {
 
         // Get a fragment transaction to replace fragments
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        //showOrHideContainers(fragment_tag);
-
-        // Get references to the containers used to host the fragments
-        FrameLayout container_details = (FrameLayout) findViewById(R.id.container_details);
-        FrameLayout container_master = (FrameLayout) findViewById(R.id.container_master);
-
-        // Change the width of the master container if full screen required for landscape mode
-
-        if (mLandscapeView) {
-            if (!showFullScreen) {
-
-                container_details.setVisibility(View.VISIBLE);
-                final float scale = getResources().getDisplayMetrics().density;
-                int requiredWidth = 0;
-                switch (fragment_tag) {
-                    case Constants.TAG_FRAGMENT_ORDER_LIST:
-                    case Constants.TAG_FRAGMENT_ORDER_DETAILS:
-                        requiredWidth = getResources().getInteger(R.integer.container_width_order_list);
-                        break;
-                    case Constants.TAG_FRAGMENT_CUSTOMER_LIST:
-                    case Constants.TAG_FRAGMENT_CUSTOMER_DETAILS:
-                        requiredWidth = getResources().getInteger(R.integer.container_width_customer_list);
-                        break;
-                    case Constants.TAG_FRAGMENT_DRIVER_LIST:
-                    case Constants.TAG_FRAGMENT_DRIVER_DETAILS:
-                        requiredWidth = getResources().getInteger(R.integer.container_width_driver_list);
-                        break;
-                    default:
-                        requiredWidth = getResources().getInteger(R.integer.container_width);
-
-                }
-
-                int pixels = (int) (requiredWidth * scale + 0.5f);
-
-                container_master.setLayoutParams(new LinearLayout.LayoutParams(
-                        pixels, FrameLayout.LayoutParams.MATCH_PARENT));
-            } else {
-                container_details.setVisibility(View.GONE);
-                container_master.setLayoutParams(new LinearLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-            }
-
-        }
-
 
         if (!Objects.equals(fragment_tag, Constants.TAG_FRAGMENT_MAIN_DETAILS)) {
             mShowDriverIcon = false;
@@ -576,9 +463,9 @@ public class Activity_Main extends AppCompatActivity implements
         Fragment_DriverDetails fragment = Fragment_DriverDetails.newInstance(selectedDriver);
 
         if (mLandscapeView) {
-            //replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_DRIVER_DETAILS, fragment, false, false);
+            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_DRIVER_DETAILS, fragment, false, false);
         } else {
-            //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_DRIVER_DETAILS, fragment, true, true);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_DRIVER_DETAILS, fragment, true, true);
         }
 
     }
@@ -667,9 +554,9 @@ public class Activity_Main extends AppCompatActivity implements
         Fragment_CustomerDetails fragment = Fragment_CustomerDetails.newInstance(customer);
 
         if (mLandscapeView) {
-            //replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, false, false);
+            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, false, false);
         } else {
-            //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true, true);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true, true);
         }
     }
 
@@ -679,7 +566,7 @@ public class Activity_Main extends AppCompatActivity implements
         Log.i(Constants.LOG_TAG, "onAddCustomerClicked() called");
 
         Fragment_CustomerAdd fragment = Fragment_CustomerAdd.newInstance();
-        //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_ADD, fragment, true, true);
+        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_ADD, fragment, true, true);
 
     }
 
@@ -690,10 +577,10 @@ public class Activity_Main extends AppCompatActivity implements
         Fragment_OrderDetails fragment = Fragment_OrderDetails.newInstance(order);
 
         if (mLandscapeView) {
-            //replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_ORDER_DETAILS, fragment, false, false);
+            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_ORDER_DETAILS, fragment, false, false);
 
         } else {
-            //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_DETAILS, fragment, true, true);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_DETAILS, fragment, true, true);
         }
     }
 
@@ -705,13 +592,40 @@ public class Activity_Main extends AppCompatActivity implements
         // Replace master container with the new order form.
         // This will be full screen in all views
         Fragment_NewPhoneOrder frag_order = Fragment_NewPhoneOrder.newInstance(null);
-        //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_ADD, frag_order, true, true);
+        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_ADD, frag_order, true, true);
 
     }
 
     @Override
     public void onFragmentLoaded(String tag) {
         Log.i(Constants.LOG_TAG, "onFragmentLoaded Calleed():" + tag);
+
+        if (mLandscapeView) {
+
+            switch (tag) {
+                // first the frags we want to show in full screen
+                case Constants.TAG_FRAGMENT_MAIN_DETAILS:
+                case Constants.TAG_FRAGMENT_CUSTOMER_ADD:
+                case Constants.TAG_FRAGMENT_ORDER_ADD:
+
+                    container_details.setVisibility(View.GONE);
+                    container_master.setLayoutParams(new LinearLayout.LayoutParams(
+                            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+                    break;
+                default:
+                    container_details.setVisibility(View.VISIBLE);
+
+                    final float scale = getResources().getDisplayMetrics().density;
+                    int requiredWidth = getResources().getInteger(R.integer.container_width);
+
+                    int pixels = (int) (requiredWidth * scale + 0.5f);
+
+                    container_master.setLayoutParams(new LinearLayout.LayoutParams(
+                            pixels, FrameLayout.LayoutParams.MATCH_PARENT));
+
+            }
+        }
 
         switch (tag) {
             case Constants.TAG_FRAGMENT_MAIN_DETAILS:
@@ -763,9 +677,9 @@ public class Activity_Main extends AppCompatActivity implements
 
 
         if (mLandscapeView) {
-            //replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, false, true);
+            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, false, true);
         } else {
-            //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true, true);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true, true);
         }
 
     }
@@ -779,9 +693,9 @@ public class Activity_Main extends AppCompatActivity implements
         Fragment_CustomerDetails fragment = Fragment_CustomerDetails.newInstance(customer);
 
         if (mLandscapeView) {
-            //replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, false, true);
+            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, false, true);
         } else {
-            //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true, true);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true, true);
         }
     }
 
@@ -808,8 +722,5 @@ public class Activity_Main extends AppCompatActivity implements
             Log.i(Constants.LOG_TAG, "fragment tag stored for details" + tag_details);
             outState.putString(Constants.STATE_INFO_FRAGMENT_DETAILS, tag_details);
         }
-
-        //Save the fragment's instance
-        //getSupportFragmentManager().putFragment(outState, "myFragmentName", mContent);
     }
 }

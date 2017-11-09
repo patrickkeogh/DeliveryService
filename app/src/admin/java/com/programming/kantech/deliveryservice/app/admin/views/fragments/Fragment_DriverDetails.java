@@ -195,4 +195,16 @@ public class Fragment_DriverDetails extends Fragment {
 
         }
     }
+
+
+    /**
+     * Save the current state of this fragment
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Store the driver in the instance state
+        outState.putParcelable(Constants.STATE_INFO_DRIVER, mDriver);
+    }
 }

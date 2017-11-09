@@ -147,21 +147,6 @@ public class Fragment_NewPhoneOrder extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-//        // Load the saved state if there is one
-//        if (savedInstanceState != null) {
-//            Log.i(Constants.LOG_TAG, "Fragment_Ingredients savedInstanceState is not null");
-//            if (savedInstanceState.containsKey(Constants.STATE_INFO_CUSTOMER)) {
-//                mSelectedCustomer = savedInstanceState.getParcelable(Constants.STATE_INFO_CUSTOMER);
-//            }
-//        } else {
-//            Bundle args = getArguments();
-//            mSelectedCustomer = args.getParcelable(Constants.EXTRA_CUSTOMER);
-//        }
-//
-//        if (mSelectedCustomer == null) {
-//            throw new IllegalArgumentException("Must pass EXTRA_CUSTOMER");
-//        }
-
         apiService = ApiClient.getClient().create(ApiInterface.class);
 
         // Get a reference to the locations table

@@ -129,6 +129,17 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
 
     }
 
+    /**
+     * Save the current state of this fragment
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Store the selected driver in the instance state
+        outState.putParcelable(Constants.STATE_INFO_CUSTOMER, mSelectedCustomer);
+    }
+
     @OnClick(R.id.fab_add_customer)
     public void onFabAddCustomerClicked() {
         mCallback.onAddCustomerClicked();

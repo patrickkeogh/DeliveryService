@@ -168,16 +168,6 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
 
     }
 
-
-
-    /**
-     * Save the current state of this fragment
-     */
-    @Override
-    public void onSaveInstanceState(Bundle currentState) {
-        currentState.putParcelable(Constants.STATE_INFO_CUSTOMER, mCustomer);
-    }
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
@@ -352,7 +342,6 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
         onGetLocationButtonClicked();
     }
 
-
     private void addLocation(Place place) {
         //Log.i(Constants.LOG_TAG, "addLocation() calledplaceid:" + place.getId());
 
@@ -383,5 +372,16 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
                     }
                 });
 
+    }
+
+    /**
+     * Save the current state of this fragment
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Store the customer in the instance state object
+        outState.putParcelable(Constants.STATE_INFO_CUSTOMER, mCustomer);
     }
 }
