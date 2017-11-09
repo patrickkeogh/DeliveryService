@@ -3,34 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="?attr/actionBarSize"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <Button
         android:id="@+id/btn_customer_select_pickup_location"
-        style="?android:textAppearanceSmall"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:background="@color/colorAccent"
         android:textColor="@color/colorWhite"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_8dp"
-        android:text="Add Location"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/padding_8dp"
-        android:layout_marginTop="12dp"
-        android:text="Location List"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@color/colorPrimaryDark" />
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dip"
-        android:layout_marginTop="4dp"
-        android:background="@color/colorPrimary" />
+        android:text="@string/btn_add_location" />
 
     <android.support.v7.widget.RecyclerView
         android:padding="@dimen/padding_8dp"

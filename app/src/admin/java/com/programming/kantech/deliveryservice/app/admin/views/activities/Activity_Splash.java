@@ -2,16 +2,16 @@ package com.programming.kantech.deliveryservice.app.admin.views.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.BuildConfig;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
@@ -21,6 +21,8 @@ import java.util.Arrays;
 
 /**
  * Created by patrick on 2017-11-03.
+ * Will apear in the back ground while performing start up
+ * operations.
  */
 
 public class Activity_Splash extends AppCompatActivity {
@@ -30,7 +32,7 @@ public class Activity_Splash extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mFirebaseAuthListener;
 
     // Member variables for the Firebase database Refs
-    private DatabaseReference mAdminRef;
+    //private DatabaseReference mAdminRef;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,12 +41,12 @@ public class Activity_Splash extends AppCompatActivity {
 
         mFirebaseAuth = FirebaseAuth.getInstance();
 
-        // TODO: Where would a better place to call this be?
+        // Where would a better place to call this be?
         FirebaseMessaging.getInstance().subscribeToTopic(Constants.FIREBASE_NOTIFICATION_TOPIC_ADMIN);
 
         createAuthListener();
 
-        mAdminRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_ADMIN);
+        //mAdminRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_ADMIN);
     }
 
     @Override
@@ -115,57 +117,25 @@ public class Activity_Splash extends AppCompatActivity {
     }
 
     private void onSignedInInitialize(final FirebaseUser user) {
+        Log.i(Constants.LOG_TAG, "Log the users name:" + user.getDisplayName());
 
-        //String mUsername = user.getDisplayName();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(Activity_Splash.this, Activity_Main.class);
 
-        // User is signed in, send them to the main page
-
-        Intent intent = new Intent(Activity_Splash.this, Activity_Main.class);
-
-        startActivity(intent);
-        finish();
-
-
-
-
+                startActivity(intent);
+                finish();
+            }
+        }, 5000);
 
 
-        //DatabaseReference adminRef = mAdminRef.child(user.getUid());
 
-//        adminRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                Log.i(Constants.LOG_TAG, "onDataChange()called for driver");
-//
-//                if (dataSnapshot.exists()) {
-//                    // run some code
-//
-//                    Driver driver = dataSnapshot.getValue(Driver.class);
-//                    Log.i(Constants.LOG_TAG, "The driver is in the db:" + driver.toString());
-//
-//                } else {
-//                    Log.i(Constants.LOG_TAG, "The driver is not in the database");
-//                    // User is not in the driver db. add them
-//                    Driver driver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(), "", false, false, "", "");
-//
-//                    // TODO: Not sure which way is better?????
-//                    //mUserRef.child(user.getUid()).setValue(driver);
-//                    //mDriverDBReference.push().setValue(driver);
-//
-//                    //checkIfAuthorized();
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
 
-        //checkIfAuthorized();
-        //attachDatabaseReadListeners();
+
+
+
 
     }
 }

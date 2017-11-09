@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +28,6 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -45,11 +43,11 @@ import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
  * Created by patrick keogh on 2017-09-01.
+ * Main screen for this app.  Will show a map of driver and orders for a given date
  */
 
 public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -58,13 +56,13 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     private MapView mMapView;
     private GoogleMap mGoogleMap;
     private GoogleApiClient mGoogleApiClient;
-    private Marker mDriverMarker;
+    //private Marker mDriverMarker;
     private ArrayList<Driver> mDriversList = new ArrayList<>();
     private ArrayList<Order> mOrdersList = new ArrayList<>();
 
     private ArrayList<LatLng> mCoordsList = new ArrayList<>();
 
-    private List<Marker> mMarkers_Drivers = new ArrayList<>();
+    //private List<Marker> mMarkers_Drivers = new ArrayList<>();
 
 
     private boolean mShowOrders = true;
@@ -103,7 +101,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_main_details, container, false);
 
-        mMapView = (MapView) rootView.findViewById(R.id.mapView);
+        mMapView = rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.onResume(); // needed to get the map to display immediately
@@ -199,7 +197,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                     Driver d = mDriversList.get(i);
                     LatLng coords = mCoordsList.get(i);
                     drawMarker(coords, d.getDisplayName(), "",
-                            Utils_General.vectorToBitmap(getContext(),R.drawable.ic_local_shipping_accent_24dp,
+                            Utils_General.vectorToBitmap(getContext(), R.drawable.ic_local_shipping_accent_24dp,
                                     ContextCompat.getColor(getContext(), R.color.colorPrimary)));
 
                 }
@@ -295,7 +293,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(mMapView != null) mMapView.onDestroy();
+        if (mMapView != null) mMapView.onDestroy();
     }
 
     @Override
@@ -399,34 +397,35 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                     final Double strLat = (Double) dataSnapshot.child("l").child("0").getValue();
                     final Double strLng = (Double) dataSnapshot.child("l").child("1").getValue();
 
-                    // Get the driver just signed in
-                    DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_DRIVERS).child(driverKey);
+                    if (strLat != null && strLng != null) {
 
-                    driverRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                        // Get the driver just signed in
+                        DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_DRIVERS).child(driverKey);
 
-                            if (dataSnapshot.exists()) {
+                        driverRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                Driver driver = dataSnapshot.getValue(Driver.class);
+                                if (dataSnapshot.exists()) {
 
-                                if (driver != null) {
-                                    Log.i(Constants.LOG_TAG, "driver was added:" + driver.toString());
+                                    Driver driver = dataSnapshot.getValue(Driver.class);
 
-                                    mDriversList.add(driver);
-                                    mCoordsList.add(new LatLng(strLat, strLng));
-                                    paintMarkers();
+                                    if (driver != null) {
+                                        //Log.i(Constants.LOG_TAG, "driver was added:" + driver.toString());
+
+                                        mDriversList.add(driver);
+                                        mCoordsList.add(new LatLng(strLat, strLng));
+                                        paintMarkers();
+                                    }
                                 }
                             }
-                        }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                        }
-                    });
-
-
+                            }
+                        });
+                    }
                 }
 
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
@@ -439,19 +438,23 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                         Double strLat = (Double) dataSnapshot.child("l").child("0").getValue();
                         Double strLng = (Double) dataSnapshot.child("l").child("1").getValue();
 
-                        LatLng driverLatLng = new LatLng(strLat, strLng);
+                        if (strLat != null && strLng != null) {
+
+                            LatLng driverLatLng = new LatLng(strLat, strLng);
 
 
-                        for (int i = 0; i < mDriversList.size(); i++) {
+                            for (int i = 0; i < mDriversList.size(); i++) {
 
-                            Driver d = mDriversList.get(i);
+                                Driver d = mDriversList.get(i);
 
-                            if (Objects.equals(d.getUid(), driverKey)) {
-                                mCoordsList.set(i, driverLatLng);
+                                if (Objects.equals(d.getUid(), driverKey)) {
+                                    mCoordsList.set(i, driverLatLng);
+                                }
                             }
+
+                            paintMarkers();
                         }
 
-                        paintMarkers();
 
                     }
                 }

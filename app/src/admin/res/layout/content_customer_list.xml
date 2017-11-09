@@ -7,14 +7,13 @@
 
     <Button
         android:id="@+id/btn_customer_add"
-        style="?android:textAppearanceSmall"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:background="@color/colorAccent"
         android:textColor="@color/colorWhite"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_8dp"
-        android:text="Add Customer"
-        android:textStyle="bold" />
+        android:text="@string/btn_add_customer" />
 
     <android.support.v7.widget.RecyclerView
         android:padding="@dimen/padding_8dp"

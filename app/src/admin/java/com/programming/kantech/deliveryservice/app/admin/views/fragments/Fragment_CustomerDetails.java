@@ -3,7 +3,6 @@ package com.programming.kantech.deliveryservice.app.admin.views.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,7 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -44,7 +42,7 @@ import butterknife.OnClick;
 
 /**
  * Created by patrick keogh on 2017-08-14.
- *
+ * A fragment to show the details of a Customer record
  */
 
 public class Fragment_CustomerDetails extends Fragment implements GoogleApiClient.ConnectionCallbacks,
@@ -76,6 +74,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
 
     public interface LocationAddedListener {
         void onLocationAdded(Customer customer);
+
         void onFragmentLoaded(String tag);
     }
 
@@ -215,11 +214,11 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
         // Notify the activity this fragment was loaded
         mCallback.onFragmentLoaded(Constants.TAG_FRAGMENT_CUSTOMER_DETAILS);
 
-        if(mClient == null){
+        if (mClient == null) {
             buildApiClient();
             mClient.connect();
-        }else{
-            if(!mClient.isConnected() ){
+        } else {
+            if (!mClient.isConnected()) {
                 mClient.connect();
             }
         }
@@ -229,7 +228,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     public void onPause() {
         super.onPause();
 
-        if(mClient != null){
+        if (mClient != null) {
             mClient.disconnect();
         }
     }
@@ -243,7 +242,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     private void buildApiClient() {
         //Log.i(Constants.LOG_TAG, "buildApiClient() called");
 
-        if(mClient == null){
+        if (mClient == null) {
             //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
 
             // Build up the LocationServices API client
@@ -257,9 +256,10 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
                     .build();
         }
     }
+
     private void loadFirebaseAdapter() {
 
-        if(mFireAdapter != null){
+        if (mFireAdapter != null) {
             mFireAdapter.cleanup();
         }
 
@@ -327,9 +327,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
             Intent i = builder.build(getActivity());
             startActivityForResult(i, Constants.REQUEST_CODE_LOCATION_PICKER);
 
-        } catch (GooglePlayServicesRepairableException e) {
-            Log.e(Constants.LOG_TAG, String.format("GooglePlayServices Not Available [%s]", e.getMessage()));
-        } catch (GooglePlayServicesNotAvailableException e) {
+        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
             Log.e(Constants.LOG_TAG, String.format("GooglePlayServices Not Available [%s]", e.getMessage()));
         } catch (Exception e) {
             Log.e(Constants.LOG_TAG, String.format("PlacePicker Exception: %s", e.getMessage()));
@@ -347,7 +345,8 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
 
         final Location location = new Location();
         location.setCustId(mCustomer.getId());
-        location.setPlaceId(place.getId());location.setMainAddress(false);
+        location.setPlaceId(place.getId());
+        location.setMainAddress(false);
 
         mLocationsRef
                 .push()

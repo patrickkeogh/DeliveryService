@@ -89,5 +89,18 @@
     <string name="msg_there_are_no_drivers_to_show">There are no drivers to show.</string>
     <string name="msg_there_are_no_orders_to_show">There are no orders to show.</string>
     <string name="alert_confirm_new_order">Please confirm a new order for:</string>
+    <string name="title_app_admin_application">Admin Application</string>
+    <string name="msg_initializing_app">Initializing App ...</string>
+    <string name="app_name_full">Kan-Tech Delivery Service</string>
+    <string name="btn_add_customer">ADD CUSTOMER</string>
+    <string name="content_description_driver_icon">driver icon</string>
+    <string name="content_description_location_icon">location icon</string>
+    <string name="content_description_logo">logo</string>
+    <string name="msg_support_email">support@kantechprogramming.com</string>
+    <string name="menu_item_filters">Filters</string>
+    <string name="menu_item_manage_customers">Manage Customers</string>
+    <string name="menu_item_manage_drivers">Manage Drivers</string>
+    <string name="menu_item_manage_orders">Manage Orders</string>
+    <string name="menu_item_home">Home</string>
 
 </resources>

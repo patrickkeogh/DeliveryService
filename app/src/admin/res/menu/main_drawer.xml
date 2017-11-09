@@ -1,36 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_admin_home"
             android:icon="@drawable/ic_menu_home"
-            android:title="Home" />
+            android:title="@string/menu_item_home" />
 
         <item
             android:id="@+id/nav_admin_manage_orders"
             android:icon="@drawable/ic_menu_shop"
-            android:title="Manage Orders" />
+            android:title="@string/menu_item_manage_orders" />
 
 
         <item
             android:id="@+id/nav_admin_manage_drivers"
             android:icon="@drawable/ic_menu_drive"
-            android:title="Manage Drivers" />
+            android:title="@string/menu_item_manage_drivers" />
 
         <item
             android:id="@+id/nav_admin_manage_customers"
             android:icon="@drawable/ic_account_circle_24dp"
-            android:title="Manage Customers" />
+            android:title="@string/menu_item_manage_customers" />
     </group>
 
-    <item android:title="New">
+    <item android:title="@string/menu_item_filters">
         <menu>
-            <item
-                android:id="@+id/nav_admin_call_in_order"
-                android:icon="@drawable/ic_menu_add"
-                android:title="New Phone Order" />
+
 
         </menu>
     </item>

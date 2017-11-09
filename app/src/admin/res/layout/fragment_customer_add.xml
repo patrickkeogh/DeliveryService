@@ -115,8 +115,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_16dp"
                     android:background="@color/colorPrimaryDark"
-                    android:onClick="onAddCustomerClicked"
-                    android:text="@string/title_add_customer"
+                    android:text="@string/btn_add_customer"
                     android:textColor="@color/colorWhite" />
 
 

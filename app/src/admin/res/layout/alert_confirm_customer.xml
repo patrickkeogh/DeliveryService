@@ -5,13 +5,15 @@
 
     <TextView
         android:id="@+id/tv_confirm_company_name"
-        android:paddingLeft="24dp"
+        android:paddingStart="@dimen/alert_start_padding"
+        android:paddingEnd="@dimen/padding_8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <TextView
         android:id="@+id/tv_confirm_company_address"
-        android:paddingLeft="24dp"
+        android:paddingStart="@dimen/alert_start_padding"
+        android:paddingEnd="@dimen/padding_8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

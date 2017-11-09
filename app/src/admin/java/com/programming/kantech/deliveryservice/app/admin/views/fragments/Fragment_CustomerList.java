@@ -40,6 +40,7 @@ import butterknife.OnClick;
 
 /**
  * Created by patrick keogh on 2017-08-29.
+ * Displays a list of customers in a FirebaseAdapter
  */
 
 public class Fragment_CustomerList extends Fragment implements GoogleApiClient.ConnectionCallbacks,
@@ -240,11 +241,7 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
     }
 
     private void buildApiClient() {
-        //Log.i(Constants.LOG_TAG, "buildApiClient() called");
-
         if (mClient == null) {
-            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
-
             // Build up the LocationServices API client
             // Uses the addApi method to request the LocationServices API
             // Also uses enableAutoManage to automatically know when to connect/suspend the client

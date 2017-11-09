@@ -55,7 +55,7 @@
                 android:id="@+id/btn_verify_driver"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/margin_8dp"
                 android:text="@string/button_verify_driver"
                 android:textColor="@color/colorWhite"
                 app:backgroundTint="@color/colorPrimaryDark" />

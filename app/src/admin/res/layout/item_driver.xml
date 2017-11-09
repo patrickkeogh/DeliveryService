@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:paddingBottom="4dp"
-    android:layout_height="75dp">
+    android:layout_height="72dp"
+    android:paddingBottom="4dp">
 
     <LinearLayout
         android:id="@+id/layout_admin_driver"
@@ -16,20 +16,21 @@
             android:id="@+id/layout_admin_driver_inside"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:padding="8dp"
+            android:layout_marginEnd="@dimen/margin_end_list_item"
             android:background="@color/colorWhite"
             android:orientation="horizontal"
+            android:padding="@dimen/padding_8dp"
             android:weightSum="10">
 
             <ImageView
                 android:id="@+id/iv_admin_driver_photo"
-                android:layout_width="60dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="16dp"
+                android:layout_width="@dimen/icon_height_width_large"
+                android:layout_height="@dimen/icon_height_width_large"
+                android:layout_marginEnd="@dimen/margin_16dp"
+                android:layout_marginStart="@dimen/margin_8dp"
                 android:scaleType="fitXY"
-                android:src="@drawable/ic_local_shipping_accent_24dp" />
+                android:src="@drawable/ic_menu_drive_accent_24"
+                android:contentDescription="@string/content_description_driver_icon" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -39,33 +40,26 @@
 
                 <TextView
                     android:id="@+id/tv_driver_name"
-                    tools:text="Patrick Keogh"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:textColor="@android:color/black" />
 
                 <TextView
                     android:id="@+id/tv_driver_id"
-                    tools:text="ADZSGGH48HSJSUHSGS37Y76YF4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="start"
                     android:maxLines="1"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small" />
             </LinearLayout>
-
-
-
         </LinearLayout>
 
     </LinearLayout>
 
     <View
         android:layout_width="fill_parent"
-        android:layout_height="1dp"
+        android:layout_height="@dimen/divider_view_accent"
         android:layout_alignParentBottom="true"
-        android:background="@color/colorPrimary" />
+        android:background="@android:color/darker_gray" />
 
 </RelativeLayout>

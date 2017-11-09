@@ -39,25 +39,21 @@
                     android:id="@+id/tv_order_details_company"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    tools:text="Harvey's" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
                 <TextView
                     android:id="@+id/tv_order_details_contact"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_8dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="John Snow" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <TextView
                     android:id="@+id/tv_order_details_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
                     android:layout_marginTop="@dimen/margin_8dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="(909) 555-5655" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -70,14 +66,12 @@
                 <include layout="@layout/view_accent_line" />
 
 
-
                 <TextView
                     android:id="@+id/tv_order_number"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/margin_8dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="-KsuiOLz1Nxq78tvDUyE" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -94,8 +88,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/margin_8dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="King Kong" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -111,8 +104,7 @@
                     android:id="@+id/tv_order_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="Thursday July 19th, 2017" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -129,8 +121,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/margin_8dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="27 Geddes Crescent, Barrie On, Canada" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -147,9 +138,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/margin_8dp"
-
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    tools:text="27 Geddes Crescent, Barrie On" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -215,8 +204,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/margin_8dp"
                         android:layout_weight="1"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        tools:text="37km" />
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                     <TextView
                         android:id="@+id/tv_order_amount"
@@ -224,8 +212,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/margin_8dp"
                         android:layout_weight="1"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        tools:text="$43.85" />
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
 
                 </LinearLayout>
@@ -294,8 +281,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/margin_8dp"
                         android:layout_weight="1"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        tools:text="BOOKED" />
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                     <TextView
                         android:id="@+id/tv_order_type"
@@ -303,8 +289,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/margin_8dp"
                         android:layout_weight="1"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        tools:text="APP USER" />
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
 
                 </LinearLayout>

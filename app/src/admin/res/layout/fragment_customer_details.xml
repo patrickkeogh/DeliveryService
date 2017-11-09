@@ -34,8 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/margin_8dp"
                 android:layout_marginTop="@dimen/margin_8dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                tools:text="Harvey's" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
 
             <TextView
                 android:id="@+id/tv_customer_address"
@@ -43,8 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/margin_8dp"
                 android:layout_marginTop="@dimen/margin_8dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                tools:text="1234 Somewhere Ave. Barrie, ON" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
             <TextView
                 android:id="@+id/tv_customer_contact_name"
@@ -53,8 +51,7 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="@dimen/margin_8dp"
                 android:layout_marginTop="@dimen/margin_8dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                tools:text="John Snow" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
             <TextView
                 android:id="@+id/tv_customer_contact_phone"
@@ -62,8 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/margin_8dp"
                 android:layout_marginTop="@dimen/margin_8dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                tools:text="777-777-8989" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
 
             <LinearLayout
                 android:layout_width="match_parent"

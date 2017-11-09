@@ -11,11 +11,12 @@
 
         <ImageView
             android:id="@+id/iv_select_location"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="@dimen/icon_width_height"
+            android:layout_height="@dimen/icon_width_height"
             android:layout_gravity="fill"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginEnd="@dimen/margin_16dp"
+            android:layout_marginStart="@dimen/margin_8dp"
+            android:contentDescription="@string/content_description_location_icon"
             android:src="@drawable/ic_place_accent_24dp" />
 
         <LinearLayout
@@ -36,7 +37,6 @@
                 android:id="@+id/tv_location_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start"
                 android:maxLines="1"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small" />
         </LinearLayout>
@@ -46,7 +46,7 @@
 
     <View
         android:layout_width="fill_parent"
-        android:layout_height="1dp"
+        android:layout_height="@dimen/divider_view_accent"
         android:layout_alignParentBottom="true"
         android:background="@android:color/darker_gray" />
 

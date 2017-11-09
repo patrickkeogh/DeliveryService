@@ -1,6 +1,5 @@
 package com.programming.kantech.deliveryservice.app.admin.views.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -42,7 +41,6 @@ import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
-import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import java.util.Objects;
 
@@ -52,6 +50,7 @@ import butterknife.ButterKnife;
 /**
  * Created by patrick keogh on 2017-08-18.
  * Main activty for the Admin Flavor.  Manages multiple fragments at one time
+ * All fragments have the OnFragmentLoaded(tag) callback
  */
 
 public class Activity_Main extends AppCompatActivity implements
@@ -172,7 +171,7 @@ public class Activity_Main extends AppCompatActivity implements
             // add main fragment to master container on first start
             mIsFirstTimeLoaded = false;
             Fragment_MainDetails fragment = Fragment_MainDetails.newInstance();
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true, true);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
 
         }
     }
@@ -258,7 +257,7 @@ public class Activity_Main extends AppCompatActivity implements
         if (id == R.id.nav_admin_home) {
 
             Fragment_MainDetails fragment = Fragment_MainDetails.newInstance();
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true, true);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
 
 
 //            // add main fragment to master container on first start
@@ -273,17 +272,17 @@ public class Activity_Main extends AppCompatActivity implements
         } else if (id == R.id.nav_admin_manage_drivers) {
 
             Fragment_DriverList frag_driver = Fragment_DriverList.newInstance();
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_DRIVER_LIST, frag_driver, false, false);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_DRIVER_LIST, frag_driver, false);
 
         } else if (id == R.id.nav_admin_manage_customers) {
 
             Fragment_CustomerList frag_customer = Fragment_CustomerList.newInstance(null);
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_LIST, frag_customer, false, false);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_LIST, frag_customer, false);
 
         } else if (id == R.id.nav_admin_manage_orders) {
 
             Fragment_OrderList frag_order_list = Fragment_OrderList.newInstance();
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_LIST, frag_order_list, false, false);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_LIST, frag_order_list, false);
 
         }
 
@@ -297,48 +296,6 @@ public class Activity_Main extends AppCompatActivity implements
 
             mFragmentManager.beginTransaction()
                     .remove(mFragmentManager.findFragmentById(R.id.container_details)).commit();
-        }
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == Constants.REQUEST_CODE_SELECT_CUSTOMER) {
-            if (resultCode == RESULT_OK) {
-                // Customer was successfully selected
-                Utils_General.showToast(this, "Customer Selected");
-
-                // Get the customer from the intent data
-                Customer customer = data.getParcelableExtra(Constants.EXTRA_CUSTOMER);
-
-                //
-
-                Fragment_NewPhoneOrder fragment = Fragment_NewPhoneOrder.newInstance(customer);
-                //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_ADD, fragment, true, false);
-
-            } else if (resultCode == RESULT_CANCELED) {
-                Utils_General.showToast(this, "Customer Not Selected");
-                //finish();
-            }
-        } else if (requestCode == Constants.REQUEST_CODE_SELECT_PICKUP_LOCATION) {
-            if (resultCode == RESULT_OK) {
-                // Customer was successfully selected
-                Utils_General.showToast(this, "Pickup Location Selected");
-
-                // Get the customer from the intent data
-                Customer customer = data.getParcelableExtra(Constants.EXTRA_LOCATION);
-
-                //
-
-                Fragment_NewPhoneOrder fragment = Fragment_NewPhoneOrder.newInstance(customer);
-                //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_ADD, fragment, true, false);
-
-            } else if (resultCode == RESULT_CANCELED) {
-                Utils_General.showToast(this, "Customer Not Selected");
-                //finish();
-            }
         }
     }
 
@@ -428,7 +385,7 @@ public class Activity_Main extends AppCompatActivity implements
     }
 
     private void replaceFragment(int container, String fragment_tag,
-                                 Fragment fragment_in, boolean showFullScreen, boolean addToBackStack) {
+                                 Fragment fragment_in, boolean addToBackStack) {
 
         // Get a fragment transaction to replace fragments
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -463,9 +420,9 @@ public class Activity_Main extends AppCompatActivity implements
         Fragment_DriverDetails fragment = Fragment_DriverDetails.newInstance(selectedDriver);
 
         if (mLandscapeView) {
-            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_DRIVER_DETAILS, fragment, false, false);
+            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_DRIVER_DETAILS, fragment, false);
         } else {
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_DRIVER_DETAILS, fragment, true, true);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_DRIVER_DETAILS, fragment, true);
         }
 
     }
@@ -554,9 +511,9 @@ public class Activity_Main extends AppCompatActivity implements
         Fragment_CustomerDetails fragment = Fragment_CustomerDetails.newInstance(customer);
 
         if (mLandscapeView) {
-            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, false, false);
+            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, false);
         } else {
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true, true);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true);
         }
     }
 
@@ -566,7 +523,7 @@ public class Activity_Main extends AppCompatActivity implements
         Log.i(Constants.LOG_TAG, "onAddCustomerClicked() called");
 
         Fragment_CustomerAdd fragment = Fragment_CustomerAdd.newInstance();
-        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_ADD, fragment, true, true);
+        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_ADD, fragment, true);
 
     }
 
@@ -577,10 +534,10 @@ public class Activity_Main extends AppCompatActivity implements
         Fragment_OrderDetails fragment = Fragment_OrderDetails.newInstance(order);
 
         if (mLandscapeView) {
-            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_ORDER_DETAILS, fragment, false, false);
+            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_ORDER_DETAILS, fragment, false);
 
         } else {
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_DETAILS, fragment, true, true);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_DETAILS, fragment, true);
         }
     }
 
@@ -592,7 +549,7 @@ public class Activity_Main extends AppCompatActivity implements
         // Replace master container with the new order form.
         // This will be full screen in all views
         Fragment_NewPhoneOrder frag_order = Fragment_NewPhoneOrder.newInstance(null);
-        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_ADD, frag_order, true, true);
+        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_ADD, frag_order, true);
 
     }
 
@@ -614,6 +571,7 @@ public class Activity_Main extends AppCompatActivity implements
 
                     break;
                 default:
+                    // everything else we have a normal master/details setup
                     container_details.setVisibility(View.VISIBLE);
 
                     final float scale = getResources().getDisplayMetrics().density;
@@ -677,9 +635,9 @@ public class Activity_Main extends AppCompatActivity implements
 
 
         if (mLandscapeView) {
-            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, false, true);
+            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true);
         } else {
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true, true);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true);
         }
 
     }
@@ -693,9 +651,9 @@ public class Activity_Main extends AppCompatActivity implements
         Fragment_CustomerDetails fragment = Fragment_CustomerDetails.newInstance(customer);
 
         if (mLandscapeView) {
-            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, false, true);
+            replaceFragment(R.id.container_details, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true);
         } else {
-            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true, true);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_DETAILS, fragment, true);
         }
     }
 
