@@ -40,8 +40,6 @@ import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by patrick keogh on 2017-08-14.
- *
- *
  */
 
 public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.ConnectionCallbacks,
@@ -141,7 +139,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
         if (mOrder == null) {
             throw new IllegalArgumentException("Must pass a Order Object");
         } else {
-            parseDriverFields();
+            parseOrderFields();
         }
 
         // Get a reference to the orders table
@@ -162,7 +160,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
         outState.putParcelable(Constants.STATE_INFO_ORDER, mOrder);
     }
 
-    private void parseDriverFields() {
+    private void parseOrderFields() {
 
         tv_order_details_company.setText(mOrder.getCustomerName());
 
@@ -206,7 +204,6 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
         });
 
 
-
     }
 
     @Override
@@ -227,11 +224,11 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
         // Notify the activity this fragment was loaded
         mCallback.onFragmentLoaded(Constants.TAG_FRAGMENT_ORDER_DETAILS);
 
-        if(mClient == null){
+        if (mClient == null) {
             buildApiClient();
             mClient.connect();
-        }else{
-            if(!mClient.isConnected() ){
+        } else {
+            if (!mClient.isConnected()) {
                 mClient.connect();
             }
         }
@@ -241,7 +238,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
     public void onPause() {
         super.onPause();
 
-        if(mClient != null){
+        if (mClient != null) {
             mClient.disconnect();
         }
     }
@@ -268,10 +265,10 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
     }
 
     private void buildApiClient() {
-        Log.i(Constants.LOG_TAG, "buildApiClient() called");
+        //Log.i(Constants.LOG_TAG, "buildApiClient() called");
 
-        if(mClient == null){
-            Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
+        if (mClient == null) {
+            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
 
             // Build up the LocationServices API client
             // Uses the addApi method to request the LocationServices API
@@ -317,7 +314,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
 
     private void confirmAndSaveDriver() {
 
-        if(mOrder != null && mSelectedDriver !=  null) {
+        if (mOrder != null && mSelectedDriver != null) {
 
             final ViewGroup nullParent = null;
 
@@ -341,6 +338,9 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
                             mOrder.setDriverName(mSelectedDriver.getDisplayName());
                             mOrder.setInProgressDriverId("true_" + mSelectedDriver.getUid());
 
+                            mOrder.setQueryDateDriverId(mOrder.getPickupDate() + "_" +
+                                    mSelectedDriver.getUid() + Constants.FIREBASE_STATUS_SORT_ASSIGNED);
+
                             // Construct query string for inprogress_date_driver
                             String strQuery = "true_" +
                                     mOrder.getPickupDate()
@@ -348,12 +348,24 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
 
                             mOrder.setInProgressDateDriverId(strQuery);
 
+//                            mOrder.setSortDateDriverId("b_" +
+//                                    sortDate + "_" + mSelectedDriver.getUid());
+//
+//                            // Construct query string for inprogress_date_driver
+//                            // sort string (reps a status) + date + driverId + inProgress
+//
+//                            String strQuery = Constants.FIREBASE_STATUS_SORT_ASSIGNED + sortDate + "_" +
+//                                    mSelectedDriver.getUid() + "_true";
+//
+//
+//                            mOrder.setInProgressDateDriverId(strQuery);
+
                             // Save the order to firebase
                             mOrdersRef.child(mOrder.getId()).setValue(mOrder);
 
 
                             fab_assign_driver.setEnabled(false);
-                            parseDriverFields();
+                            parseOrderFields();
 
                         }
                     })

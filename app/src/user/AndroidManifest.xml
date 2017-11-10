@@ -55,12 +55,32 @@
         <activity
             android:name="com.programming.kantech.deliveryservice.app.user.views.activities.Activity_MyOrders"
             android:exported="true"
+            android:launchMode="singleTop"
             android:label="@string/app_name">
 
-            <intent-filter>
-                <action android:name="android.intent.action.ORDERS" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.programming.kantech.deliveryservice.app.user.views.activities.Activity_Main" />
+        </activity>
+
+        <activity
+            android:name="com.programming.kantech.deliveryservice.app.user.views.activities.Activity_OrderDetails"
+            android:exported="true"
+            android:label="@string/app_name">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.programming.kantech.deliveryservice.app.user.views.activities.Activity_MyOrders" />
+        </activity>
+
+        <activity
+            android:name="com.programming.kantech.deliveryservice.app.user.views.activities.Activity_MyMap"
+            android:exported="true"
+            android:label="@string/app_name">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.programming.kantech.deliveryservice.app.user.views.activities.Activity_Main" />
         </activity>
 
     </application>

@@ -221,6 +221,7 @@ public class Activity_Splash extends AppCompatActivity {
                         showDriverNotAuthorized(user);
                     } else {
                         Intent intent = new Intent(Activity_Splash.this, Activity_Main.class);
+                        intent.putExtra(Constants.EXTRA_DRIVER, mDriver);
                         startActivity(intent);
                         finish();
                     }

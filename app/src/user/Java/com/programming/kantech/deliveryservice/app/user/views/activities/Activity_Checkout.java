@@ -166,7 +166,7 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
             BigDecimal num2 = new BigDecimal(1000);
             Log.i(Constants.LOG_TAG, "new method" + num1.divide(num2, scale, RoundingMode.DOWN).toString());
 
-            DecimalFormat df = new DecimalFormat("#.##");
+            DecimalFormat df = new DecimalFormat(Constants.NUMBER_FORMAT);
             Double km = Double.valueOf(df.format(mOrder.getDistance() / 1000));
 
             //Double km = (double) (mOrder.getDistance() / 1000);

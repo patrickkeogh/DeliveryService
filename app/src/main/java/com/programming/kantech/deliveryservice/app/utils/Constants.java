@@ -159,6 +159,7 @@ public class Constants {
     public static final String FIREBASE_CHILD_DRIVER_APPROVED = "driverApproved";
     public static final String FIREBASE_CHILD_DEVICE = "device";
     public static final String FIREBASE_CHILD_LOCATIONS = "locations";
+    public static final String FIREBASE_CHILD_INPROGRESS = "inProgress";
 
     public static final String FIREBASE_CHILD_ORDER_STATUS = "status";
     public static final String FIREBASE_CHILD_ORDER_CUST_ID = "customerId";
@@ -169,6 +170,8 @@ public class Constants {
     public static final String FIREBASE_NOTIFICATION_TOPIC_USER = "topic_customer";
 
     public final static String FIREBASE_DEFAULT_NO_DRIVER = "No Driver Assigned";
+
+
 
 
 
@@ -203,6 +206,11 @@ public class Constants {
     public static final String ORDER_STATUS_ASSIGNED = "DRIVER ASSIGNED";
     public static final String ORDER_STATUS_PICKUP_COMPLETE = "PICKUP COMPLETE";
     public static final String ORDER_STATUS_COMPLETE = "COMPLETE";
+
+    public final static String FIREBASE_STATUS_SORT_PICKUP_COMPLETE = "a_";
+    public final static String FIREBASE_STATUS_SORT_ASSIGNED = "b_";
+    public final static String FIREBASE_STATUS_SORT_BOOKED = "c_";
+    public final static String FIREBASE_STATUS_SORT_COMPLETE = "d_";
 
 
 

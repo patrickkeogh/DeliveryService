@@ -1,7 +1,9 @@
 package com.programming.kantech.deliveryservice.app.application;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.os.Bundle;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -19,7 +21,7 @@ import com.programming.kantech.deliveryservice.app.utils.Constants;
  *
  */
 
-public class Application_DeliveryService extends Application {
+public class Application_DeliveryService extends Application implements Application.ActivityLifecycleCallbacks {
 
     private static Application_DeliveryService instance;
 
@@ -43,6 +45,8 @@ public class Application_DeliveryService extends Application {
 
         mContext = getApplicationContext();
 
+        registerActivityLifecycleCallbacks(this);
+
 
     }
 
@@ -51,4 +55,39 @@ public class Application_DeliveryService extends Application {
         super.onTerminate();
     }
 
+
+    @Override
+    public void onActivityCreated(Activity activity, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onActivityStarted(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityResumed(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityPaused(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityStopped(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onActivityDestroyed(Activity activity) {
+
+    }
 }

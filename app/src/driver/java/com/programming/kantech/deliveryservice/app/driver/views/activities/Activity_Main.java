@@ -106,53 +106,59 @@ import retrofit2.Response;
  */
 
 public class Activity_Main extends AppCompatActivity implements
+        com.google.android.gms.location.LocationListener,
         OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        com.google.android.gms.location.LocationListener {
+        GoogleApiClient.OnConnectionFailedListener {
 
-    private ActionBar mActionBar;
-    private String mUsername;
+    // Local member variables
     private Driver mDriver;
-    private GoogleApiClient mClient;
+    private ActionBar mActionBar;
     private GoogleMap mGoogleMap;
-    private FirebaseRecyclerAdapter<Order, ViewHolder_Order> mFireAdapter;
+    private GoogleApiClient mClient;
     private Order mSelectedOrder;
+    private FirebaseRecyclerAdapter<Order, ViewHolder_Order> mFireAdapter;
+
+    // Get a ref to our api service that will fetch distances between 2 places
+    private ApiInterface apiService;
+
+
+    // Determines if the filter view should be visible on the screen
     private boolean mShowFilter = true;
 
+    // Marker for the driver
+    private Marker mDriverMarker;
 
-    private boolean mShowOpen = true;
-    private boolean mShowComplete = true;
-    private boolean mShowDeliveryLocations = true;
-    private boolean mShowPickupLocations = true;
-
-    // The displayed Date in millisecs
-    private long mDisplayDateStartTimeInMillis;
-
-    private DatabaseReference mDriverRef;
-    private DatabaseReference mOrdersRef;
-    private DatabaseReference mDriverLocationRef;
-
-    private ValueEventListener mOrdersEventListener;
-    private Query mOrdersQuery;
-
+    private LatLngBounds.Builder builder;
 
     // Location member variables
     Location mLastLocation;
     LocationRequest mLocationRequest;
 
-    private LatLngBounds.Builder builder;
-
-    // Marker for the driver
-    private Marker mDriverMarker;
-
-    // List of Markers for all order destinations
-    private ArrayList<Marker> mLocationMarkers = new ArrayList<>();
-
-    // The orders for the selected day
+    // The orders returned by the query
     private ArrayList<Order> mOrdersList = new ArrayList<>();
 
-    private ApiInterface apiService;
+    // List of Markers for all order destinations, pickup and delivery
+    private ArrayList<Marker> mLocationMarkers = new ArrayList<>();
+
+    // booleans used to filter by order status
+    private boolean mShowOpen = true;
+    private boolean mShowComplete = true;
+    private boolean mShowDeliveryLocations = true;
+    private boolean mShowPickupLocations = true;
+
+    // 12:00 AM of the selected day
+    private long mDisplayDateStartTimeInMillis;
+    private long mTodayDateStartTimeInMillis;
+
+    // Firebase member variables
+    private DatabaseReference mDriverRef;
+    private DatabaseReference mOrdersRef;
+    private DatabaseReference mDriverLocationRef;
+    private Query mOrdersQuery;
+
+    // Event listener to list for new or updated orders
+    private ValueEventListener mOrdersEventListener;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -166,17 +172,11 @@ public class Activity_Main extends AppCompatActivity implements
     @BindView(R.id.rv_driver_orders)
     RecyclerView mRecyclerView;
 
+    @BindView(R.id.layout_map_filter)
+    LinearLayout layout_map_filter;
+
     @BindView(R.id.tv_order_filter_date)
     TextView tv_order_filter_date;
-
-    @BindView(R.id.nav_view)
-    NavigationView mNavView;
-
-    @BindView(R.id.btn_driver_order_previous_day)
-    AppCompatButton btn_driver_order_previous_day;
-
-    @BindView(R.id.btn_driver_order_next_day)
-    AppCompatButton btn_driver_order_next_day;
 
     @BindView(R.id.btn_driver_pickup_complete)
     AppCompatButton btn_driver_pickup_complete;
@@ -184,30 +184,31 @@ public class Activity_Main extends AppCompatActivity implements
     @BindView(R.id.btn_driver_delivery_complete)
     AppCompatButton btn_driver_delivery_complete;
 
-    @BindView(R.id.layout_map_filter)
-    LinearLayout layout_map_filter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.i(Constants.LOG_TAG, "onCreate in Driver Main called");
-
-        // load layout
         setContentView(R.layout.activity_main);
 
-        apiService = ApiClient.getClient().create(ApiInterface.class);
-
-        // Load the saved state if there is one
         if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(Constants.STATE_INFO_ORDERS_LIST)) {
-                Log.i(Constants.LOG_TAG, "we found the orders list in savedInstanceState");
-                mOrdersList = savedInstanceState.getParcelableArrayList(Constants.STATE_INFO_ORDERS_LIST);
+            if (savedInstanceState.containsKey(Constants.STATE_INFO_DRIVER)) {
+                mDriver = savedInstanceState.getParcelable(Constants.STATE_INFO_DRIVER);
             }
+        } else {
+
+            mDriver = getIntent().getParcelableExtra(Constants.EXTRA_DRIVER);
+        }
+
+        if (mDriver == null) {
+            throw new IllegalArgumentException("Must pass EXTRA_DRIVER");
         }
 
         // use ButterKnife to inject the layout views
         ButterKnife.bind(this);
+
+        // Set the distance api service
+        apiService = ApiClient.getClient().create(ApiInterface.class);
 
         // Set the support action bar
         setSupportActionBar(mToolbar);
@@ -215,22 +216,12 @@ public class Activity_Main extends AppCompatActivity implements
         // Set the action bar back button to look like an up button
         mActionBar = this.getSupportActionBar();
 
-        // Create the display date, today at 00:00 hrs
-        Calendar date = new GregorianCalendar();
-        mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
-
-        //Log.i(Constants.LOG_TAG, "Start Time for today in Millis:" + mDisplayDateStartTimeInMillis);
-
-        String showDate = Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis);
-
-        tv_order_filter_date.setText(showDate);
-
-
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(false);
-            mActionBar.setTitle(showDate);
+            //mActionBar.setTitle(showDate);
         }
 
+        // Setup the Navigation Drawer
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 
@@ -260,7 +251,6 @@ public class Activity_Main extends AppCompatActivity implements
         // get a root reference to the drivers location node
         mDriverLocationRef = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_NODE_DRIVER_LOCATIONS);
 
-
         // Set up the recycler view
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -269,6 +259,20 @@ public class Activity_Main extends AppCompatActivity implements
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(false);
+
+        showOrHideFilterView();
+
+        // Create the display date, today at 00:00 hrs
+        Calendar date = new GregorianCalendar();
+        mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
+        mTodayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
+
+
+        //Log.i(Constants.LOG_TAG, "Start Time for today in Millis:" + mDisplayDateStartTimeInMillis);
+
+        String showDate = Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis);
+
+        tv_order_filter_date.setText(showDate);
 
 
     }
@@ -283,50 +287,15 @@ public class Activity_Main extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.i(Constants.LOG_TAG, "onOptionsItemSelected:" + item.getItemId());
         switch (item.getItemId()) {
             case R.id.action_driver_filter:
 
-                mShowFilter = !mShowFilter;
-
-                Animation fadeInAnimation;
-
-                if (mShowFilter) {
-                    fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.view_fade_in);
-                    fadeInAnimation.setFillAfter(true);
-                    // Now Set your animation
-                    layout_map_filter.startAnimation(fadeInAnimation);
-
-                    layout_map_filter.setVisibility(View.VISIBLE);
-
-                } else {
-                    fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.view_fade_out);
-                    fadeInAnimation.setFillAfter(false);
-                    // Now Set your animation
-                    layout_map_filter.startAnimation(fadeInAnimation);
-
-                    layout_map_filter.setVisibility(View.INVISIBLE);
-                }
-
-                return true;
-            case R.id.action_driver_orders:
-                Intent intent_orders = new Intent(this, Activity_ShowOrders.class);
-                intent_orders.putExtra(Constants.EXTRA_DRIVER, mDriver);
-                startActivity(intent_orders);
-                return true;
-            case R.id.action_driver_photo:
-                Intent intent_photo = new Intent(this, Activity_Photo.class);
-
-                // Add the driver to the intent
-                Log.i(Constants.LOG_TAG, "Driver in Main:" + mDriver.toString());
-                intent_photo.putExtra(Constants.EXTRA_DRIVER, mDriver);
-                startActivity(intent_photo);
+                showOrHideFilterView();
 
                 return true;
             case R.id.action_sign_out:
-                Utils_General.showToast(this, "Signout called");
+                //Utils_General.showToast(this, "Signout called");
                 removeDriverFromActive();
-                //FirebaseAuth.getInstance().signOut();
                 AuthUI.getInstance()
                         .signOut(this)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -344,12 +313,27 @@ public class Activity_Main extends AppCompatActivity implements
         }
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    private void showOrHideFilterView() {
 
-        // Add the current orders list to the state
-        outState.putParcelableArrayList(Constants.STATE_INFO_ORDERS_LIST, mOrdersList);
+        mShowFilter = !mShowFilter;
+        Animation fadeInAnimation;
+
+        if (mShowFilter) {
+            fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.view_fade_in);
+            fadeInAnimation.setFillAfter(true);
+            // Now Set your animation
+            layout_map_filter.startAnimation(fadeInAnimation);
+
+            layout_map_filter.setVisibility(View.VISIBLE);
+
+        } else {
+            fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.view_fade_out);
+            fadeInAnimation.setFillAfter(false);
+            // Now Set your animation
+            layout_map_filter.startAnimation(fadeInAnimation);
+            layout_map_filter.setVisibility(View.INVISIBLE);
+        }
+
     }
 
     @Override
@@ -373,13 +357,6 @@ public class Activity_Main extends AppCompatActivity implements
 
     }
 
-
-
-    private void onSignedOutCleanup() {
-
-        // Remove the driver from the active driver node
-    }
-
     protected synchronized void buildGoogleApiClients() {
         mClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -392,7 +369,6 @@ public class Activity_Main extends AppCompatActivity implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        //Log.i(Constants.LOG_TAG, "onConnected()");
 
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(5000);
@@ -416,6 +392,7 @@ public class Activity_Main extends AppCompatActivity implements
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
+
                             // Set an initial location
                             onLocationChanged(location);
                         }
@@ -431,30 +408,21 @@ public class Activity_Main extends AppCompatActivity implements
 
         loadFirebaseAdapter();
 
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     private void loadFirebaseAdapter() {
 
+        // Make sure we are starting with an fresh FirebaseAdapter
         if (mFireAdapter != null) {
             mFireAdapter.cleanup();
         }
 
+        // Create the adapter and add it too the recyclerview
         mFireAdapter = new FirebaseRecyclerAdapter<Order, ViewHolder_Order>(
                 Order.class,
                 R.layout.item_driver_order,
                 ViewHolder_Order.class,
-                getDatabaseQuery()) {
+                getDatabaseQueryForList()) {
             @Override
             public ViewHolder_Order onCreateViewHolder(ViewGroup parent, int viewType) {
                 return super.onCreateViewHolder(parent, viewType);
@@ -464,81 +432,103 @@ public class Activity_Main extends AppCompatActivity implements
             public void populateViewHolder(final ViewHolder_Order holder, final Order order, int position) {
                 //Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + order.getCustomerName());
 
-                if (mLastLocation != null) {
+                // only show distances if the order is not complete
+                if (!Objects.equals(order.getStatus(), Constants.ORDER_STATUS_COMPLETE)) {
 
 
-                    String origin = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude();
-                    String dest = "place_id:" + order.getPickupLocationId();
+                    // make sure we have the drivers location
+                    if (mLastLocation != null) {
 
-                    Call<Results> call = apiService.getDistance(origin, dest);
+                        // create origin string for the driver using lat, long coordinates
+                        String origin = mLastLocation.getLatitude() + "," + mLastLocation.getLongitude();
 
-                    call.enqueue(new Callback<Results>() {
-                        @Override
-                        public void onResponse(@NonNull Call<Results> call, @NonNull Response<Results> response) {
+                        // create destination string for a location using a google PlaceId
+                        String dest = "place_id:" + order.getPickupLocationId();
 
-                            //Log.i(Constants.LOG_TAG, "Response:" + response);
+                        Call<Results> call = apiService.getDistance(origin, dest);
 
-                            if (response.isSuccessful()) {
-                                // Code 200, 201
-                                Results result = response.body();
+                        call.enqueue(new Callback<Results>() {
+                            @Override
+                            public void onResponse(@NonNull Call<Results> call, @NonNull Response<Results> response) {
 
-                                List<Route> routes;
+                                //Log.i(Constants.LOG_TAG, "Response:" + response);
 
-                                if (result != null) {
-                                    routes = result.getRoutes();
+                                if (response.isSuccessful()) {
+                                    // Code 200, 201
+                                    Results result = response.body();
 
-                                    if (routes != null && routes.size() != 0) {
-                                        Log.i(Constants.LOG_TAG, "Routes:" + routes.toString());
-                                        Route route = routes.get(0);
+                                    List<Route> routes;
 
-                                        List<Leg> legs = route.getLegs();
+                                    if (result != null) {
+                                        routes = result.getRoutes();
 
-                                        Leg trip = legs.get(0);
+                                        if (routes != null && routes.size() != 0) {
+                                            //Log.i(Constants.LOG_TAG, "Routes:" + routes.toString());
+                                            Route route = routes.get(0);
 
-                                        Distance distance = trip.getDistance();
+                                            List<Leg> legs = route.getLegs();
 
-                                        //Log.i(Constants.LOG_TAG, "Response Distance:" + distance.getText());
+                                            Leg trip = legs.get(0);
 
-                                        if (distance.getValue() < 500) {
-                                            holder.setDistance("You have arrived!");
+                                            Distance distance = trip.getDistance();
 
-                                        } else {
-                                            holder.setDistance(distance.getText());
+                                            //Log.i(Constants.LOG_TAG, "Response Distance:" + distance.getText());
+
+                                            // if we are less than half 500 metres, notify driver we have arrived
+                                            if (distance.getValue() < 500) {
+                                                holder.setDistance("0 km");
+
+                                            } else {
+                                                holder.setDistance(distance.getText());
+                                            }
+
                                         }
+
 
                                     }
 
 
+                                } else {
+                                    Log.i(Constants.LOG_TAG, "A distance could not be fetched");
+                                    holder.setDistance("Unknown");
                                 }
-
-
-                            } else {
-                                //movies_failed(response.message());
                             }
-                        }
 
-                        @Override
-                        public void onFailure(@NonNull Call<Results> call, @NonNull Throwable t) {
-                            // Log error here since request failed
-                            Log.e(Constants.LOG_TAG, t.toString());
-                            //movies_failed(t.toString());
-                        }
-                    });
+                            @Override
+                            public void onFailure(@NonNull Call<Results> call, @NonNull Throwable t) {
+                                // Log error here since request failed
+                                Log.e(Constants.LOG_TAG, t.toString());
+                                holder.setDistance("Unknown");
+                            }
+                        });
+                    }
+
+
+                } else {
+                    // make sure we are not holding a prior distance string
+                    holder.setDistance("");
                 }
+
 
                 holder.setCustomerName(order.getCustomerName());
                 holder.setOrderStatus(order.getStatus());
 
-
+                // change the background color of the list item depending on the status
                 switch (order.getStatus()) {
                     case Constants.ORDER_STATUS_BOOKED:
+                    case Constants.ORDER_STATUS_ASSIGNED:
                         holder.setBackgroundColor(Activity_Main.this, R.color.colorPrimary);
                         break;
-                    case Constants.ORDER_STATUS_ASSIGNED:
+                    case Constants.ORDER_STATUS_PICKUP_COMPLETE:
+                        holder.setBackgroundColor(Activity_Main.this, R.color.colorGreen);
+                        break;
+                    case Constants.ORDER_STATUS_COMPLETE:
                         holder.setBackgroundColor(Activity_Main.this, R.color.colorAccent);
                         break;
 
                 }
+
+                // change foreground color of the list item if it is the selected item
                 if (mSelectedOrder != null) {
                     if (Objects.equals(order.getId(), mSelectedOrder.getId())) {
                         holder.setSelectedColor(Activity_Main.this, R.color.colorPrimaryLight);
@@ -547,9 +537,8 @@ public class Activity_Main extends AppCompatActivity implements
                     }
                 }
 
-
+                // fetch the pickup address from google.places
                 final Place[] thisPlace = new Place[1];
-
                 PendingResult<PlaceBuffer> result_pickup = Places.GeoDataApi.getPlaceById(mClient, order.getPickupLocationId());
 
                 result_pickup.setResultCallback(new ResultCallback<PlaceBuffer>() {
@@ -562,6 +551,7 @@ public class Activity_Main extends AppCompatActivity implements
                     }
                 });
 
+                // fetch the delivery address from google.places
                 PendingResult<PlaceBuffer> result_delivery = Places.GeoDataApi.getPlaceById(mClient, order.getDeliveryLocationId());
 
                 result_delivery.setResultCallback(new ResultCallback<PlaceBuffer>() {
@@ -572,6 +562,7 @@ public class Activity_Main extends AppCompatActivity implements
                     }
                 });
 
+                // set the onclick listener for when a order is selected from the list
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -605,26 +596,178 @@ public class Activity_Main extends AppCompatActivity implements
 
     }
 
-    private Query getDatabaseQuery() {
-        String strQuery = "true_" + mDisplayDateStartTimeInMillis + "_" + mDriver.getUid();
-        return mOrdersRef.orderByChild("inProgressDateDriverId").equalTo(strQuery);
+    private void paintDriverLocationToMap() {
+
+        if (mDriverMarker != null) {
+            mDriverMarker.remove();
+        }
+
+        // We only want to show the driver if the view is on today
+        if (mTodayDateStartTimeInMillis == mDisplayDateStartTimeInMillis) {
+
+            if (mLastLocation != null) {
+
+                // Add Marker for the driver
+                LatLng driverLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(driverLatLng)
+                        .title("me")
+                        .snippet("")
+                        .infoWindowAnchor(0.5f, 0.5f)
+                        .icon(Utils_General.vectorToBitmap(this, R.drawable.ic_local_shipping_accent_24dp,
+                                ContextCompat.getColor(this, R.color.colorPrimary)));
+
+                mDriverMarker = mGoogleMap.addMarker(markerOptions);
+
+            }
+
+            setMapCamera();
+        }
+
+
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    private void paintMarkersToMap() {
+        //Log.i(Constants.LOG_TAG, "paintMarkersToMap");
 
-        if (requestCode == Constants.REQUEST_CODE_SIGN_IN) {
+        // Clear any existing markers
+        mGoogleMap.clear();
+        mLocationMarkers = new ArrayList<>();
 
-            if (resultCode == RESULT_OK) {
-                // Sign-in succeeded, set up the UI
-                Utils_General.showToast(this, "Signed In!");
+        // Show the driver marker
+        paintDriverLocationToMap();
 
-            } else if (resultCode == RESULT_CANCELED) {
-                // Sign in was canceled by the user, finish the activity
-                Utils_General.showToast(this, "Signed In Cancelled!");
-                finish();
+        // Add Markers for pickup and delivery locations for this driver
+        if (mOrdersList != null) {
+            //Log.i(Constants.LOG_TAG, "we have orders");
+            for (int i = 0; i < mOrdersList.size(); i++) {
+
+                final Order order = mOrdersList.get(i);
+
+                if (mShowPickupLocations) {
+
+                    final int pickupIconColor;
+
+                    switch (order.getStatus()) {
+                        case Constants.ORDER_STATUS_ASSIGNED:
+                            pickupIconColor = R.color.colorAccent;
+                            break;
+                        default:
+                            pickupIconColor = R.color.colorGreen;
+                            break;
+                    }
+
+                    final PendingResult<PlaceBuffer> pickupResult =
+                            Places.GeoDataApi.getPlaceById(mClient, order.getPickupLocationId());
+
+                    pickupResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+                        @Override
+                        public void onResult(@NonNull PlaceBuffer places) {
+
+                            MarkerOptions markerOptions = new MarkerOptions();
+
+                            markerOptions.position(places.get(0).getLatLng())
+                                    .title(order.getCustomerName())
+                                    .snippet(places.get(0).getAddress().toString())
+                                    .infoWindowAnchor(0.5f, 0.5f)
+                                    .icon(Utils_General.vectorToBitmap(Activity_Main.this, R.drawable.ic_place_accent_24dp,
+                                            ContextCompat.getColor(Activity_Main.this, pickupIconColor)));
+
+                            Marker marker = mGoogleMap.addMarker(markerOptions);
+
+                            //Log.i(Constants.LOG_TAG, "add Marker to list");
+                            mLocationMarkers.add(marker);
+                            setMapCamera();
+                        }
+                    });
+                }
+
+                if (mShowDeliveryLocations) {
+
+                    final int deliveryIconColor;
+
+                    switch (order.getStatus()) {
+                        case Constants.ORDER_STATUS_OPEN:
+                        case Constants.ORDER_STATUS_BOOKED:
+                        case Constants.ORDER_STATUS_ASSIGNED:
+                        case Constants.ORDER_STATUS_PICKUP_COMPLETE:
+                            deliveryIconColor = R.color.colorAccent;
+                            break;
+                        default:
+                            deliveryIconColor = R.color.colorGreen;
+                            break;
+                    }
+
+                    final PendingResult<PlaceBuffer> deliveryResult =
+                            Places.GeoDataApi.getPlaceById(mClient, order.getDeliveryLocationId());
+
+                    deliveryResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+                        @Override
+                        public void onResult(@NonNull PlaceBuffer places) {
+
+                            MarkerOptions markerOptions = new MarkerOptions();
+
+                            markerOptions.position(places.get(0).getLatLng())
+                                    .title(order.getCustomerName())
+                                    .snippet(places.get(0).getAddress().toString())
+                                    .infoWindowAnchor(0.5f, 0.5f)
+                                    .icon(Utils_General.vectorToBitmap(Activity_Main.this, R.drawable.ic_place_accent_24dp,
+                                            ContextCompat.getColor(Activity_Main.this, deliveryIconColor)));
+
+                            Marker marker = mGoogleMap.addMarker(markerOptions);
+
+                            //Log.i(Constants.LOG_TAG, "add Marker to list");
+                            mLocationMarkers.add(marker);
+                            setMapCamera();
+                        }
+                    });
+                }
             }
+
+
+        }
+
+
+    }
+
+
+    private void setMapCamera() {
+
+        //Log.i(Constants.LOG_TAG, "setMapCamera called");
+
+        builder = new LatLngBounds.Builder();
+
+        boolean hasPoint = false;
+
+        if (mDriverMarker != null) {
+            // add the driver to the lat lng bounds
+            builder.include(mDriverMarker.getPosition());
+            hasPoint = true;
+        }
+
+        if (mLocationMarkers != null) {
+            //Log.i(Constants.LOG_TAG, "Markers are NOT null");
+
+            for (int i = 0; i < mLocationMarkers.size(); i++) {
+
+                final Marker marker = mLocationMarkers.get(i);
+
+                //Log.i(Constants.LOG_TAG, "add marker to build");
+
+                // add the driver to the lat lng bounds
+                builder.include(marker.getPosition());
+                hasPoint = true;
+
+            }
+        }
+
+        if (hasPoint) {
+            //mGoogleMap.setMaxZoomPreference(12);
+
+            LatLngBounds bounds = builder.build();
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 10);
+            mGoogleMap.animateCamera(cu);
         }
     }
 
@@ -632,6 +775,10 @@ public class Activity_Main extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         mMapView.onPause();
+
+        if (mClient != null) {
+            mClient.disconnect();
+        }
     }
 
     @Override
@@ -651,196 +798,104 @@ public class Activity_Main extends AppCompatActivity implements
         super.onDestroy();
         mMapView.onDestroy();
 
-        if (mFireAdapter != null) {
-            mFireAdapter.cleanup();
-        }
+//        if (mFireAdapter != null) {
+//            mFireAdapter.cleanup();
+//        }
         removeDriverFromActive();
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        if (mClient == null) {
+            buildGoogleApiClients();
+            mClient.connect();
+        } else {
+            if (!mClient.isConnected()) {
+                mClient.connect();
+            }
+        }
+    }
+
+    @Override
     protected void onStop() {
+        Log.i(Constants.LOG_TAG, "onstop Called");
         super.onStop();
-        removeDriverFromActive();
+        //removeDriverFromActive();
     }
 
-    @OnClick(R.id.btn_driver_order_previous_day)
-    public void getPreviousDay() {
+    @Override
+    public void onConnectionSuspended(int i) {
 
-        mSelectedOrder = null;
-        setDrawerButtons();
+    }
 
-        mDisplayDateStartTimeInMillis -= Constants.DAY;
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-        String yesterday = Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis);
+    }
 
-        if (mActionBar != null) {
-            mActionBar.setTitle(yesterday);
+    @Override
+    public void onLocationChanged(Location location) {
+
+        // Triggered when the driver's location changes
+        Log.i(Constants.LOG_TAG, "Location Changed");
+
+        if (getApplicationContext() != null) {
+
+            mLastLocation = location;
+
+            // get the latitude and longitude of the drivers current location
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+            // use the db ref to create a geofire reference to the node
+            GeoFire geoFireDriver = new GeoFire(mDriverLocationRef);
+
+            //Log.i(Constants.LOG_TAG, "Write geo location for firebase");
+            // Write the drivers location to the geofire db
+            geoFireDriver.setLocation(mDriver.getUid(), new GeoLocation(location.getLatitude(), location.getLongitude()));
+
+            paintDriverLocationToMap();
+
+            mFireAdapter.notifyDataSetChanged();
+
         }
 
-        tv_order_filter_date.setText(yesterday);
-
-        loadFirebaseAdapter();
-
-        detachFirebaseOrderListeners();
-        attachOrderReadListener();
-
     }
 
-    @OnClick(R.id.btn_driver_order_next_day)
-    public void getNextDay() {
+    private void removeDriverFromActive() {
 
-        mSelectedOrder = null;
-        setDrawerButtons();
-
-        mDisplayDateStartTimeInMillis += Constants.DAY;
-
-        String tomorrow = Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis);
-
-        if (mActionBar != null) {
-            mActionBar.setTitle(tomorrow);
+        if (mClient != null && mClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mClient, this);
         }
 
-        tv_order_filter_date.setText(tomorrow);
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Prepare the menu
-        //invalidateOptionsMenu();
-
-        loadFirebaseAdapter();
-
-        //mFireAdapter.notifyDataSetChanged();
-
-        detachFirebaseOrderListeners();
-        attachOrderReadListener();
-    }
-
-    @OnClick(R.id.btn_driver_pickup_complete)
-    public void completePickup() {
-
-        final Place[] thisPlace = new Place[1];
-
-        PendingResult<PlaceBuffer> result_pickup = Places.GeoDataApi.getPlaceById(mClient, mSelectedOrder.getPickupLocationId());
-
-        result_pickup.setResultCallback(new ResultCallback<PlaceBuffer>() {
-            @Override
-            public void onResult(@NonNull PlaceBuffer places) {
-                thisPlace[0] = places.get(0);
-
-
-                showAlertMessage("Confirm pickup has been completed for:",
-                        mSelectedOrder.getCustomerName(),
-                        thisPlace[0].getAddress().toString(),
-                        "Pickup completion has been canceled",
-                        Constants.ORDER_STATUS_PICKUP_COMPLETE);
-
-            }
-        });
-
-    }
-
-    @OnClick(R.id.btn_driver_delivery_complete)
-    public void completeDelivery() {
-
-        final Place[] thisPlace = new Place[1];
-
-        PendingResult<PlaceBuffer> result_delivery = Places.GeoDataApi.getPlaceById(mClient, mSelectedOrder.getDeliveryLocationId());
-
-        result_delivery.setResultCallback(new ResultCallback<PlaceBuffer>() {
-            @Override
-            public void onResult(@NonNull PlaceBuffer places) {
-                thisPlace[0] = places.get(0);
-
-
-                showAlertMessage("Confirm delivery has been completed for:",
-                        mSelectedOrder.getCustomerName(),
-                        thisPlace[0].getAddress().toString(),
-                        "Delivery completion has been canceled",
-                        Constants.ORDER_STATUS_COMPLETE);
-
-            }
-        });
-
-
-    }
-
-    @OnCheckedChanged(R.id.cb_driver_pickup_locations)
-    public void onPickupLocationsSelected(CompoundButton button, boolean checked){
-        mShowPickupLocations = checked;
-        paintMarkersToMap();
-    }
-
-    @OnCheckedChanged(R.id.cb_driver_delivery_locations)
-    public void onDeliveryLocationsSelected(CompoundButton button, boolean checked){
-        mShowDeliveryLocations = checked;
-        paintMarkersToMap();
-    }
-
-    @OnCheckedChanged({R.id.rb_driver_all, R.id.rb_driver_open, R.id.rb_driver_complete})
-    public void onRadioButtonCheckChanged(CompoundButton button, boolean checked) {
-        if (checked) {
-            switch (button.getId()) {
-                case R.id.rb_driver_all:
-                    mShowOpen = true;
-                    mShowComplete = true;
-                    break;
-                case R.id.rb_driver_open:
-                    mShowOpen = true;
-                    mShowComplete = false;
-                    break;
-                case R.id.rb_driver_complete:
-                    mShowOpen = true;
-                    mShowComplete = false;
-                    break;
-            }
-            paintMarkersToMap();
+            GeoFire geoFire = new GeoFire(mDriverLocationRef);
+            geoFire.removeLocation(userId);
         }
+
+
     }
 
+    private Query getDatabaseQueryForList() {
 
-    private void showAlertMessage(String title, String company, String address, final String cancelText, final String status) {
-        Log.i(Constants.LOG_TAG, "Alert Message called");
+        String strQueryStart = mDisplayDateStartTimeInMillis + "_" + mDriver.getUid() + Constants.FIREBASE_STATUS_SORT_PICKUP_COMPLETE;
+        String strQueryEnd = mDisplayDateStartTimeInMillis + "_" + mDriver.getUid() + Constants.FIREBASE_STATUS_SORT_COMPLETE;
+        return mOrdersRef.orderByChild("queryDateDriverId").startAt(strQueryStart).endAt(strQueryEnd);
+    }
 
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialog_confirm = inflater.inflate(R.layout.alert_confirm_location_complete, null);
+    private Query getDatabaseQueryForMap() {
 
-        TextView tv_location_pickup_name = dialog_confirm.findViewById(R.id.tv_location_pickup_name);
-        tv_location_pickup_name.setText(company);
-
-        TextView tv_location_pickup_address = dialog_confirm.findViewById(R.id.tv_location_pickup_address);
-        tv_location_pickup_address.setText(address);
-
-        new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setView(dialog_confirm)
-                .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                        mOrdersRef.child(mSelectedOrder.getId())
-                                .child(Constants.FIREBASE_CHILD_ORDER_STATUS)
-                                .setValue(status);
-
-                        mSelectedOrder.setStatus(status);
-
-                        paintMarkersToMap();
-                        setDrawerButtons();
-
-                        // TODO: let the user know the order has been picked up
-
-                    }
-                })
-                .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Utils_General.showToast(Activity_Main.this, cancelText);
-                    }
-                })
-                .show();
-
+        String strQuery = "true_" + mDisplayDateStartTimeInMillis + "_" + mDriver.getUid();
+        return mOrdersRef.orderByChild("inProgressDateDriverId").equalTo(strQuery);
     }
 
     private void attachOrderReadListener() {
 
-        mOrdersQuery = getDatabaseQuery();
+        // Get all orders for the selected date and driver
+        mOrdersQuery = getDatabaseQueryForMap();
 
         if (mOrdersEventListener == null) {
 
@@ -850,12 +905,14 @@ public class Activity_Main extends AppCompatActivity implements
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     //Log.i(Constants.LOG_TAG, "onDataChange in attachOrderListener");
 
+
+                    // Create a list of returned orders
                     ArrayList<Order> newOrderList = new ArrayList<>();
 
                     if (dataSnapshot != null) {
                         //Log.i(Constants.LOG_TAG, "we have an order snapshot");
 
-                        // Get each order that is in progress
+                        // Get each order that is in progress for the selected date and driver
                         for (DataSnapshot orders : dataSnapshot.getChildren()) {
 
                             Order order = orders.getValue(Order.class);
@@ -865,11 +922,11 @@ public class Activity_Main extends AppCompatActivity implements
                         }
                     }
 
-                    if (newOrderList.size() > mOrdersList.size()) {
-                        // Should be a new order, make a sound
-                        final MediaPlayer mp = MediaPlayer.create(Activity_Main.this, R.raw.alarm_rooster);
-                        //mp.start();
-                    }
+//                    if (newOrderList.size() > mOrdersList.size()) {
+//                        // Should be a new order, make a sound
+//                        final MediaPlayer mp = MediaPlayer.create(Activity_Main.this, R.raw.alarm_rooster);
+//                        //mp.start();
+//                    }
 
                     mOrdersList = newOrderList;
 
@@ -969,221 +1026,200 @@ public class Activity_Main extends AppCompatActivity implements
 
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
+    @OnClick(R.id.btn_driver_order_previous_day)
+    public void getPreviousDay() {
 
-        // Triggered when the driver's location changes
-        //Log.i(Constants.LOG_TAG, "Location Changed");
+        mSelectedOrder = null;
+        setDrawerButtons();
 
-        if (getApplicationContext() != null) {
+        mDisplayDateStartTimeInMillis -= Constants.DAY;
 
-            mLastLocation = location;
+        String yesterday = Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis);
 
-            // get the latitude and longitude of the drivers current location
-            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-            // use the db ref to create a geofire reference to the node
-            GeoFire geoFireDriver = new GeoFire(mDriverLocationRef);
-
-            Log.i(Constants.LOG_TAG, "Write geo location for firebase");
-            // Write the drivers location to the geofire db
-            geoFireDriver.setLocation(mDriver.getUid(), new GeoLocation(location.getLatitude(), location.getLongitude()));
-
-            paintDriverLocationToMap();
-
-            mFireAdapter.notifyDataSetChanged();
-
+        if (mActionBar != null) {
+            mActionBar.setTitle(yesterday);
         }
+
+        tv_order_filter_date.setText(yesterday);
+
+        loadFirebaseAdapter();
+
+        detachFirebaseOrderListeners();
+        attachOrderReadListener();
 
     }
 
+    @OnClick(R.id.btn_driver_order_next_day)
+    public void getNextDay() {
 
-    private void removeDriverFromActive() {
+        mSelectedOrder = null;
+        setDrawerButtons();
 
-        if (mClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mClient, this);
+        mDisplayDateStartTimeInMillis += Constants.DAY;
+
+        String tomorrow = Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis);
+
+        if (mActionBar != null) {
+            mActionBar.setTitle(tomorrow);
         }
 
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        tv_order_filter_date.setText(tomorrow);
 
-            GeoFire geoFire = new GeoFire(mDriverLocationRef);
-            geoFire.removeLocation(userId);
-        }
+        // Prepare the menu
+        //invalidateOptionsMenu();
 
+        loadFirebaseAdapter();
 
+        //mFireAdapter.notifyDataSetChanged();
+
+        detachFirebaseOrderListeners();
+        attachOrderReadListener();
     }
 
-    private void paintMarkersToMap() {
-        //Log.i(Constants.LOG_TAG, "paintMarkersToMap");
+    @OnClick(R.id.btn_driver_pickup_complete)
+    public void completePickup() {
 
-        // Clear any existing markers
-        mGoogleMap.clear();
-        mLocationMarkers = new ArrayList<>();
+        final Place[] thisPlace = new Place[1];
 
-        paintDriverLocationToMap();
+        PendingResult<PlaceBuffer> result_pickup = Places.GeoDataApi.getPlaceById(mClient, mSelectedOrder.getPickupLocationId());
 
-        // Add Markers for pickup and delivery locations for this driver
-        if (mOrdersList != null) {
-            //Log.i(Constants.LOG_TAG, "we have orders");
-            for (int i = 0; i < mOrdersList.size(); i++) {
-
-                final Order order = mOrdersList.get(i);
-
-                if (mShowPickupLocations) {
-
-                    final int pickupIconColor;
-
-                    switch (order.getStatus()) {
-                        case Constants.ORDER_STATUS_ASSIGNED:
-                            pickupIconColor = R.color.colorAccent;
-                            break;
-                        default:
-                            pickupIconColor = R.color.colorGreen;
-                            break;
-                    }
-
-                    final PendingResult<PlaceBuffer> pickupResult =
-                            Places.GeoDataApi.getPlaceById(mClient, order.getPickupLocationId());
-
-                    pickupResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
-                        @Override
-                        public void onResult(@NonNull PlaceBuffer places) {
-
-                            MarkerOptions markerOptions = new MarkerOptions();
-
-                            markerOptions.position(places.get(0).getLatLng())
-                                    .title(order.getCustomerName())
-                                    .snippet(places.get(0).getAddress().toString())
-                                    .infoWindowAnchor(0.5f, 0.5f)
-                                    .icon(Utils_General.vectorToBitmap(Activity_Main.this, R.drawable.ic_place_accent_24dp,
-                                            ContextCompat.getColor(Activity_Main.this, pickupIconColor)));
-
-                            Marker marker = mGoogleMap.addMarker(markerOptions);
-
-                            //Log.i(Constants.LOG_TAG, "add Marker to list");
-                            mLocationMarkers.add(marker);
-                            setMapCamera();
-                        }
-                    });
-                }
-
-                if (mShowDeliveryLocations) {
-
-                    final int deliveryIconColor;
-
-                    switch (order.getStatus()) {
-                        case Constants.ORDER_STATUS_OPEN:
-                        case Constants.ORDER_STATUS_BOOKED:
-                        case Constants.ORDER_STATUS_ASSIGNED:
-                        case Constants.ORDER_STATUS_PICKUP_COMPLETE:
-                            deliveryIconColor = R.color.colorAccent;
-                            break;
-                        default:
-                            deliveryIconColor = R.color.colorGreen;
-                            break;
-                    }
-
-                    final PendingResult<PlaceBuffer> deliveryResult =
-                            Places.GeoDataApi.getPlaceById(mClient, order.getDeliveryLocationId());
-
-                    deliveryResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
-                        @Override
-                        public void onResult(@NonNull PlaceBuffer places) {
-
-                            MarkerOptions markerOptions = new MarkerOptions();
-
-                            markerOptions.position(places.get(0).getLatLng())
-                                    .title(order.getCustomerName())
-                                    .snippet(places.get(0).getAddress().toString())
-                                    .infoWindowAnchor(0.5f, 0.5f)
-                                    .icon(Utils_General.vectorToBitmap(Activity_Main.this, R.drawable.ic_place_accent_24dp,
-                                            ContextCompat.getColor(Activity_Main.this, deliveryIconColor)));
-
-                            Marker marker = mGoogleMap.addMarker(markerOptions);
-
-                            //Log.i(Constants.LOG_TAG, "add Marker to list");
-                            mLocationMarkers.add(marker);
-                            setMapCamera();
-                        }
-                    });
-                }
-            }
+        result_pickup.setResultCallback(new ResultCallback<PlaceBuffer>() {
+            @Override
+            public void onResult(@NonNull PlaceBuffer places) {
+                thisPlace[0] = places.get(0);
 
 
-        }
-
-
-    }
-
-    private void paintDriverLocationToMap() {
-
-        if (mDriverMarker != null) {
-            mDriverMarker.remove();
-        }
-
-
-        if (mLastLocation != null) {
-
-            // Add Marker for the driver
-            LatLng driverLatLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(driverLatLng)
-                    .title("me")
-                    .snippet("")
-                    .infoWindowAnchor(0.5f, 0.5f)
-                    .icon(Utils_General.vectorToBitmap(this, R.drawable.ic_local_shipping_accent_24dp,
-                            ContextCompat.getColor(this, R.color.colorPrimary)));
-
-            mDriverMarker = mGoogleMap.addMarker(markerOptions);
-
-        }
-
-        setMapCamera();
-
-    }
-
-    private void setMapCamera() {
-
-        //Log.i(Constants.LOG_TAG, "setMapCamera called");
-
-        builder = new LatLngBounds.Builder();
-
-        boolean hasPoint = false;
-
-        if (mDriverMarker != null) {
-            // add the driver to the lat lng bounds
-            builder.include(mDriverMarker.getPosition());
-            hasPoint = true;
-        }
-
-        if (mLocationMarkers != null) {
-            //Log.i(Constants.LOG_TAG, "Markers are NOT null");
-
-            for (int i = 0; i < mLocationMarkers.size(); i++) {
-
-                final Marker marker = mLocationMarkers.get(i);
-
-                //Log.i(Constants.LOG_TAG, "add marker to build");
-
-                // add the driver to the lat lng bounds
-                builder.include(marker.getPosition());
-                hasPoint = true;
+                showAlertMessage("Confirm pickup has been completed for:",
+                        mSelectedOrder.getCustomerName(),
+                        thisPlace[0].getAddress().toString(),
+                        "Pickup completion has been canceled",
+                        Constants.ORDER_STATUS_PICKUP_COMPLETE);
 
             }
-        }
+        });
+    }
 
-        if (hasPoint) {
-            //mGoogleMap.setMaxZoomPreference(12);
+    @OnClick(R.id.btn_driver_delivery_complete)
+    public void completeDelivery() {
 
-            LatLngBounds bounds = builder.build();
-            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 10);
-            mGoogleMap.animateCamera(cu);
-        }
+        final Place[] thisPlace = new Place[1];
+
+        PendingResult<PlaceBuffer> result_delivery = Places.GeoDataApi.getPlaceById(mClient, mSelectedOrder.getDeliveryLocationId());
+
+        result_delivery.setResultCallback(new ResultCallback<PlaceBuffer>() {
+            @Override
+            public void onResult(@NonNull PlaceBuffer places) {
+                thisPlace[0] = places.get(0);
+
+
+                showAlertMessage("Confirm delivery has been completed for:",
+                        mSelectedOrder.getCustomerName(),
+                        thisPlace[0].getAddress().toString(),
+                        "Delivery completion has been canceled",
+                        Constants.ORDER_STATUS_COMPLETE);
+
+            }
+        });
 
 
     }
 
+    @OnCheckedChanged(R.id.cb_driver_pickup_locations)
+    public void onPickupLocationsSelected(CompoundButton button, boolean checked) {
+        mShowPickupLocations = checked;
+        paintMarkersToMap();
+    }
 
+    @OnCheckedChanged(R.id.cb_driver_delivery_locations)
+    public void onDeliveryLocationsSelected(CompoundButton button, boolean checked) {
+        mShowDeliveryLocations = checked;
+        paintMarkersToMap();
+    }
+
+    @OnCheckedChanged({R.id.rb_driver_all, R.id.rb_driver_open, R.id.rb_driver_complete})
+    public void onRadioButtonCheckChanged(CompoundButton button, boolean checked) {
+        if (checked) {
+            switch (button.getId()) {
+                case R.id.rb_driver_all:
+                    mShowOpen = true;
+                    mShowComplete = true;
+                    break;
+                case R.id.rb_driver_open:
+                    mShowOpen = true;
+                    mShowComplete = false;
+                    break;
+                case R.id.rb_driver_complete:
+                    mShowOpen = true;
+                    mShowComplete = false;
+                    break;
+            }
+            paintMarkersToMap();
+        }
+    }
+
+    private void showAlertMessage(String title, String company, String address,
+                                  final String cancelText, final String status) {
+        Log.i(Constants.LOG_TAG, "Alert Message called");
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialog_confirm = inflater.inflate(R.layout.alert_confirm_location_complete, null);
+
+        TextView tv_location_pickup_name = dialog_confirm.findViewById(R.id.tv_location_pickup_name);
+        tv_location_pickup_name.setText(company);
+
+        TextView tv_location_pickup_address = dialog_confirm.findViewById(R.id.tv_location_pickup_address);
+        tv_location_pickup_address.setText(address);
+
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setView(dialog_confirm)
+                .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        // Update the order status, it has been confirmed
+                        mSelectedOrder.setStatus(status);
+
+                        if (Objects.equals(status, Constants.ORDER_STATUS_COMPLETE)) {
+
+                            mSelectedOrder.setInProgress(false);
+                            mSelectedOrder.setInProgressDriverId("false_" + mDriver.getUid());
+
+                            mSelectedOrder.setQueryDateDriverId(mSelectedOrder.getPickupDate() + "_" + mDriver.getUid() + Constants.FIREBASE_STATUS_SORT_COMPLETE);
+
+                            // Construct query string for inprogress_date_driver
+                            String strQuery = "false_" +
+                                    mSelectedOrder.getPickupDate()
+                                    + "_" + mDriver.getUid();
+
+                            mSelectedOrder.setInProgressDateDriverId(strQuery);
+
+                        } else {
+
+                            mSelectedOrder.setQueryDateDriverId(mSelectedOrder.getPickupDate() + "_" + mDriver.getUid() + Constants.FIREBASE_STATUS_SORT_PICKUP_COMPLETE);
+                        }
+
+
+                        // Save the order to firebase
+                        mOrdersRef.child(mSelectedOrder.getId()).setValue(mSelectedOrder);
+
+                        detachFirebaseOrderListeners();
+                        attachOrderReadListener();
+
+                        paintMarkersToMap();
+                        setDrawerButtons();
+
+                        // TODO: let the user know the order has been picked up
+
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Utils_General.showToast(Activity_Main.this, cancelText);
+                    }
+                })
+                .show();
+
+    }
 }

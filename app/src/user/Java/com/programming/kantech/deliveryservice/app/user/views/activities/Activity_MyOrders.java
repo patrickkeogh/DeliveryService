@@ -1,8 +1,10 @@
 package com.programming.kantech.deliveryservice.app.user.views.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -91,7 +93,7 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
         mActionBar = this.getSupportActionBar();
 
         if (mActionBar != null) {
-            mActionBar.setDisplayHomeAsUpEnabled(false);
+            mActionBar.setDisplayHomeAsUpEnabled(true);
             mActionBar.setTitle("My Orders");
         }
 
@@ -230,15 +232,16 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
                 switch (order.getStatus()){
                     case Constants.ORDER_STATUS_BOOKED:
                         holder.setBackgroundColor(Activity_MyOrders.this, R.color.colorPrimary);
+                        holder.btn_order_show_map.setEnabled(false);
+                        holder.btn_order_show_map.setTextColor(ContextCompat.getColor(Activity_MyOrders.this, R.color.colorTextGrey));
                         break;
                     case Constants.ORDER_STATUS_ASSIGNED:
                         holder.setBackgroundColor(Activity_MyOrders.this, R.color.colorAccent);
+                        holder.btn_order_show_map.setEnabled(true);
+                        holder.btn_order_show_map.setTextColor(ContextCompat.getColor(Activity_MyOrders.this, R.color.colorGreen));
                         break;
 
                 }
-
-
-
 
                 holder.setOrderDate(Utils_General.getFormattedLongDateStringFromLongDate(order.getPickupDate()));
                 holder.setOrderStatus(order.getStatus());
@@ -265,16 +268,31 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
                     }
                 });
 
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                holder.btn_order_show_map.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(View view) {
 
-                        // Send the selected customer back to the main activity
-                        //finishTheActivity(location, thisPlace[0]);
+                        Log.i(Constants.LOG_TAG, "Show MAp clicked for: " + order.getCustomerName());
 
+                        Intent intent = new Intent(Activity_MyOrders.this, Activity_MyMap.class);
+                        startActivity(intent);
 
                     }
                 });
+
+                holder.btn_order_show_details.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        Log.i(Constants.LOG_TAG, "Show Details clicked for: " + order.getCustomerName());
+
+                        Intent intent = new Intent(Activity_MyOrders.this, Activity_OrderDetails.class);
+                        intent.putExtra(Constants.EXTRA_ORDER, order);
+                        startActivity(intent);
+                    }
+                });
+
+
 
             }
 

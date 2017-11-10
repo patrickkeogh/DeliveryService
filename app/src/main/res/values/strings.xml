@@ -102,5 +102,6 @@
     <string name="menu_item_manage_drivers">Manage Drivers</string>
     <string name="menu_item_manage_orders">Manage Orders</string>
     <string name="menu_item_home">Home</string>
+    <string name="title_cost_payment">Payment Charged</string>
 
 </resources>

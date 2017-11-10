@@ -28,6 +28,8 @@ public class Order implements Parcelable{
     private boolean inProgress;
     private String inProgressDriverId;
     private String inProgressDateDriverId;
+    private String sortDateDriverId;
+    private String queryDateDriverId;
     private long pickupDate;
     private String distance_text;
     private int distance;
@@ -41,7 +43,8 @@ public class Order implements Parcelable{
                  String customerId, String customerName, String driverId,
                  String type, String status, boolean inProgress,
                  String inProgressDriverId, String inProgressDateDriverId,
-                 long pickupDate, String distance_text, int distance, int amount, String driver) {
+                 long pickupDate, String distance_text, int distance, int amount,
+                 String driver, String sortDateDriver, String dateDriverId) {
         this.id = id;
         this.deliveryLocationId = deliveryLocationId;
         this.pickupLocationId = pickupLocationId;
@@ -58,6 +61,8 @@ public class Order implements Parcelable{
         this.distance = distance;
         this.amount = amount;
         this.driverName = driver;
+        this.sortDateDriverId = sortDateDriver;
+        this.queryDateDriverId = dateDriverId;
     }
 
     protected Order(Parcel in) {
@@ -79,6 +84,8 @@ public class Order implements Parcelable{
         distance_text = in.readString();
         distance = in.readInt();
         amount = in.readInt();
+        sortDateDriverId = in.readString();
+        queryDateDriverId = in.readString();
 
     }
 
@@ -102,6 +109,8 @@ public class Order implements Parcelable{
         dest.writeString(distance_text);
         dest.writeInt(distance);
         dest.writeInt(amount);
+        dest.writeString(sortDateDriverId);
+        dest.writeString(queryDateDriverId);
     }
 
     @Override
@@ -265,6 +274,22 @@ public class Order implements Parcelable{
         this.driverName = driverName;
     }
 
+    public String getSortDateDriverId() {
+        return sortDateDriverId;
+    }
+
+    public void setSortDateDriverId(String sortDateDriverId) {
+        this.sortDateDriverId = sortDateDriverId;
+    }
+
+    public String getQueryDateDriverId() {
+        return queryDateDriverId;
+    }
+
+    public void setQueryDateDriverId(String queryDateDriverId) {
+        this.queryDateDriverId = queryDateDriverId;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -282,6 +307,8 @@ public class Order implements Parcelable{
                 ", inProgress=" + inProgress +
                 ", inProgressDriverId='" + inProgressDriverId + '\'' +
                 ", inProgressDateDriverId='" + inProgressDateDriverId + '\'' +
+                ", sortDateDriverId='" + sortDateDriverId + '\'' +
+                ", queryDateDriverId='" + queryDateDriverId + '\'' +
                 ", pickupDate=" + pickupDate +
                 ", distance_text='" + distance_text + '\'' +
                 ", distance=" + distance +

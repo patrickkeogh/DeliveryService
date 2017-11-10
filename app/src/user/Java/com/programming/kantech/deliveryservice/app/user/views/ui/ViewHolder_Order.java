@@ -5,6 +5,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -24,34 +25,42 @@ public class ViewHolder_Order extends RecyclerView.ViewHolder {
     private final TextView tv_user_order_status;
     private final LinearLayout layout_user_order;
 
+    public Button btn_order_show_map;
+    public Button btn_order_show_details;
+
     private ClickListener mClickListener;
 
     private Context mContext;
 
     //Interface to send callbacks...
     public interface ClickListener {
-        public void onItemClick(View view, int position);
+        public void onShowMapClick(View view, int position);
     }
 
-    public void setOnClickListener(ClickListener clickListener) {
+    public void setOnMapClickListener(ClickListener clickListener) {
         mClickListener = clickListener;
     }
 
     public ViewHolder_Order(View itemView) {
         super(itemView);
 
-        itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mClickListener.onItemClick(v, getAdapterPosition());
-            }
-        });
+//        itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mClickListener.onItemClick(v, getAdapterPosition());
+//            }
+//        });
 
         tv_user_order_date = itemView.findViewById(R.id.tv_user_order_date);
         tv_user_order_pickup_address = itemView.findViewById(R.id.tv_user_order_pickup_address);
         tv_user_order_delivery_address = itemView.findViewById(R.id.tv_user_order_delivery_address);
         tv_user_order_status = itemView.findViewById(R.id.tv_user_order_status);
         layout_user_order = itemView.findViewById(R.id.layout_user_order);
+
+        btn_order_show_map = itemView.findViewById(R.id.btn_order_show_map);
+        btn_order_show_details = itemView.findViewById(R.id.btn_order_show_details);
+
+
     }
 
     public void setPickupAddress(String address) {
