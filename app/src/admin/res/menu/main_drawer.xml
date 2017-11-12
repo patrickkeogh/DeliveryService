@@ -28,9 +28,9 @@
         <menu>
 
             <item
-                android:id="@+id/nav_admin_call_in_order"
+                android:id="@+id/nav_admin_filters"
                 android:icon="@drawable/ic_menu_add"
-                android:title="Show All" />
+                android:title="@string/nav_admin_show_all" />
 
 
         </menu>

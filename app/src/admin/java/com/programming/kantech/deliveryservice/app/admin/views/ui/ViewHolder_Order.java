@@ -12,6 +12,7 @@ import com.programming.kantech.deliveryservice.app.R;
 
 /**
  * Created by patrick keogh on 2017-08-27.
+ *
  */
 
 public class ViewHolder_Order extends RecyclerView.ViewHolder {
@@ -21,7 +22,6 @@ public class ViewHolder_Order extends RecyclerView.ViewHolder {
     private final TextView tv_admin_order_pickup_address;
     private final TextView tv_admin_order_delivery_address;
     private final TextView tv_admin_order_status;
-    //private final TextView tv_admin_order_distance;
 
     private final LinearLayout layout_admin_order;
     private final CardView cv_order;
@@ -30,7 +30,7 @@ public class ViewHolder_Order extends RecyclerView.ViewHolder {
 
     //Interface to send callbacks...
     public interface ClickListener {
-        public void onItemClick(View view, int position);
+        void onItemClick(View view, int position);
     }
 
     public void setOnClickListener(ClickListener clickListener) {

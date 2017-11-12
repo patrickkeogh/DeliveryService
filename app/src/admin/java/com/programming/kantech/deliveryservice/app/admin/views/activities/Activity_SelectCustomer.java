@@ -46,14 +46,15 @@ import butterknife.ButterKnife;
 public class Activity_SelectCustomer extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
+    // Firebase member variables
     private DatabaseReference mCustomersRef;
     private DatabaseReference mMainOfficeRef;
 
-    // Member variables
+    // Local member variables
     private FirebaseRecyclerAdapter<Customer, ViewHolder_Customers> mFireAdapter;
-
     private GoogleApiClient mClient;
 
+    // Views to bind too
     @BindView(R.id.rv_customers_list)
     RecyclerView mRecyclerView;
 
@@ -108,6 +109,11 @@ public class Activity_SelectCustomer extends AppCompatActivity implements Google
 
     }
 
+    /**
+     * Called before closing to return a value to the calling activity
+     *
+     * @param customer The customer that will be returned to the calling activity
+     */
     private void finishTheActivity(Customer customer) {
 
         Intent resultIntent = new Intent();
@@ -123,19 +129,13 @@ public class Activity_SelectCustomer extends AppCompatActivity implements Google
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         loadFireAdapter();
-
-    }
-
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    public void onConnectionSuspended(int i) {}
 
-    }
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {}
 
     @Override
     public void onDestroy() {
@@ -191,28 +191,26 @@ public class Activity_SelectCustomer extends AppCompatActivity implements Google
 
             @Override
             public void populateViewHolder(final ViewHolder_Customers holder, final Customer customer, int position) {
-                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + customer.getCompany());
+                //Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + customer.getCompany());
 
                 holder.setName(customer.getCompany());
 
                 // Get head office from locations for this customer
-                mMainOfficeRef.child(customer.getId()).orderByChild("mainAddress").equalTo(true)
+                mMainOfficeRef.child(customer.getId()).orderByChild(Constants.FIREBASE_CHILD_MAIN_ADDRESS).equalTo(true)
                         .addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                Log.i(Constants.LOG_TAG, "onDataChange() called:" + dataSnapshot.toString());
+                                //Log.i(Constants.LOG_TAG, "onDataChange() called:" + dataSnapshot.toString());
 
                                 String placeId = "";
 
                                 for (DataSnapshot locations : dataSnapshot.getChildren()) {
 
                                     // Should only be 1 main address
-                                    placeId = (String) locations.child("placeId").getValue();
+                                    placeId = (String) locations.child(Constants.FIREBASE_CHILD_PLACE_ID).getValue();
                                 }
 
-                                //Location location = dataSnapshot.getValue(Location.class);
-
-                                Log.i(Constants.LOG_TAG, "Main Location:" + placeId);
+                                //Log.i(Constants.LOG_TAG, "Main Location:" + placeId);
 
                                 if (!Objects.equals(placeId, "")) {
                                     PendingResult<PlaceBuffer> placeResult;
@@ -225,7 +223,7 @@ public class Activity_SelectCustomer extends AppCompatActivity implements Google
 
                                             Place myPlace = places.get(0);
 
-                                            Log.i(Constants.LOG_TAG, "PLACE:" + myPlace.getAddress());
+                                            //Log.i(Constants.LOG_TAG, "PLACE:" + myPlace.getAddress());
 
                                             holder.setAddress(myPlace.getAddress().toString());
 
@@ -237,7 +235,7 @@ public class Activity_SelectCustomer extends AppCompatActivity implements Google
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
-                                // TODO add something here
+                                Log.e(Constants.LOG_TAG, databaseError.toString());
 
                             }
                         });
@@ -246,7 +244,7 @@ public class Activity_SelectCustomer extends AppCompatActivity implements Google
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // Send the selected customer back to the main activity
+                        // Send the selected customer back to the calling activity
                         finishTheActivity(customer);
                     }
                 });

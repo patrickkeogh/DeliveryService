@@ -24,7 +24,7 @@ public class ViewHolder_Driver extends RecyclerView.ViewHolder {
 
     //Interface to send callbacks...
     public interface ClickListener {
-        public void onItemClick(View view, int position);
+        void onItemClick(View view, int position);
     }
 
     public void setOnClickListener(ViewHolder_Driver.ClickListener clickListener) {

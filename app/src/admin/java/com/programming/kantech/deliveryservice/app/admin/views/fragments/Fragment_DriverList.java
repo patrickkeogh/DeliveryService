@@ -112,8 +112,6 @@ public class Fragment_DriverList extends Fragment {
 
             @Override
             public void populateViewHolder(ViewHolder_Driver holder, final Driver driver, int position) {
-                //Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + driver.toString());
-
                 holder.setName(driver.getDisplayName());
                 holder.setId(driver.getUid());
 
@@ -135,8 +133,6 @@ public class Fragment_DriverList extends Fragment {
         mDriverRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //remove loading indicator
-
                 // Perform initial setup, this will only be called once
                 if(dataSnapshot.hasChildren()){
                     showList(true);

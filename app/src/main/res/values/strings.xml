@@ -107,5 +107,22 @@
     <string name="action_driver_orders_next">Next Day</string>
     <string name="action_driver_orders_select_day">Select Day</string>
     <string name="title_customer">Customer</string>
+    <string name="title_manage_customers">Manage Customers</string>
+    <string name="title_customer_details">Customer Details</string>
+    <string name="title_driver_details">Driver Details</string>
+    <string name="title_add_new_customer">Add New Customer</string>
+    <string name="title_add_new_order">Add New Order</string>
+    <string name="title_manage_drivers">Manage Drivers</string>
+    <string name="title_select_a_date">Select A Date</string>
+    <string name="error_company_is_required">Company is required</string>
+    <string name="error_contact_name_is_required">Contact name is required</string>
+    <string name="error_phone_number">Contact phone number is not valid</string>
+    <string name="error_msg">The new customer form has errors.</string>
+    <string name="alert_title_add_new_customer">Add the following new customer?</string>
+    <string name="msg_customer_saved">The new customer has been successfully saved</string>
+    <string name="alert_title_assign_driver">Assign the following driver?</string>
+    <string name="toast_driver_not_selected">Driver Not Selected</string>
+    <string name="toast_driver_selected">Driver Selected</string>
+    <string name="nav_admin_show_all">Show All</string>
 
 </resources>

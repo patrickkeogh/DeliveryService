@@ -157,12 +157,13 @@ public class Constants {
     public static final String FIREBASE_NODE_DRIVER_PHOTOS = "driver_photos";
 
     // Child Fields
-    public static final String FIREBASE_CHILD_MAIN_ADDRESS = "main_address";
+    public static final String FIREBASE_CHILD_MAIN_ADDRESS = "mainAddress";
     public static final String FIREBASE_CHILD_DRIVER_APPROVED = "driverApproved";
     public static final String FIREBASE_CHILD_DEVICE = "device";
     public static final String FIREBASE_CHILD_LOCATIONS = "locations";
     public static final String FIREBASE_CHILD_INPROGRESS = "inProgress";
     public static final String FIREBASE_CHILD_PICKUP_DATE = "pickupDate";
+    public static final String FIREBASE_CHILD_PLACE_ID = "placeId";
 
     public static final String FIREBASE_CHILD_ORDER_STATUS = "status";
     public static final String FIREBASE_CHILD_ORDER_CUST_ID = "customerId";

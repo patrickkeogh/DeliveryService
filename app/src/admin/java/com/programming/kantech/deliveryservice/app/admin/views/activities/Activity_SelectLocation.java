@@ -49,7 +49,7 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
 
     private DatabaseReference mLocationsRef;
 
-    // Member variables
+    // Local member variables
     private FirebaseRecyclerAdapter<Location, ViewHolder_Locations> mFireAdapter;
     private GoogleApiClient mClient;
     private Customer mCustomer;
@@ -76,18 +76,12 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
         ButterKnife.bind(this);
 
         if (savedInstanceState != null) {
-
-            Log.i(Constants.LOG_TAG, "Activity_Details savedInstanceState is not null");
             if (savedInstanceState.containsKey(Constants.STATE_INFO_CUSTOMER)) {
-                Log.i(Constants.LOG_TAG, "we found the recipe key in savedInstanceState");
                 mCustomer = savedInstanceState.getParcelable(Constants.STATE_INFO_CUSTOMER);
             }
-
         } else {
-            Log.i(Constants.LOG_TAG, "Activity_Details savedInstanceState is null, get data from intent: ");
             mCustomer = getIntent().getParcelableExtra(Constants.EXTRA_CUSTOMER);
         }
-
 
         if (mCustomer == null) {
             throw new IllegalArgumentException("Must pass EXTRA_CUSTOMER");
@@ -145,7 +139,6 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i(Constants.LOG_TAG, "onActivityResult in Frag,ment");
         if (requestCode == Constants.REQUEST_CODE_LOCATION_PICKER && resultCode == Activity.RESULT_OK) {
             Place place = PlacePicker.getPlace(this, data);
 
@@ -161,7 +154,6 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.i(Constants.LOG_TAG, "onConnected called");
         loadFirebaseAdapter();
     }
 
@@ -180,7 +172,7 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
      *
      */
     public void onGetLocationButtonClicked() {
-        Log.i(Constants.LOG_TAG, "onGetLocationButtonClicked() called");
+        //Log.i(Constants.LOG_TAG, "onGetLocationButtonClicked() called");
         try {
 
             // Start a new Activity for the Place Picker API, this will trigger {@code #onActivityResult}
@@ -197,7 +189,7 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
     }
 
     private void addLocation(Place place) {
-        Log.i(Constants.LOG_TAG, "addLocation() calledplaceid:" + place.getId());
+        //Log.i(Constants.LOG_TAG, "addLocation() calledplaceid:" + place.getId());
 
         final Location location = new Location();
         location.setCustId(mCustomer.getId());
@@ -224,7 +216,7 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
 
     private void buildApiClient() {
         if (mClient == null) {
-            Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
+            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
 
             mClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -245,7 +237,7 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
 
             @Override
             public void populateViewHolder(final ViewHolder_Locations holder, final Location location, int position) {
-                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + location.getPlaceId());
+                //Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + location.getPlaceId());
 
                 final Place[] thisPlace = new Place[1];
 
@@ -257,7 +249,7 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
 
                         thisPlace[0] = places.get(0);
 
-                        Log.i(Constants.LOG_TAG, "PLACE:" + thisPlace[0].getAddress());
+                        //Log.i(Constants.LOG_TAG, "PLACE:" + thisPlace[0].getAddress());
 
                         holder.setName(thisPlace[0].getName().toString());
                         holder.setAddress(thisPlace[0].getAddress().toString());
@@ -269,7 +261,7 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
                     @Override
                     public void onClick(View v) {
 
-                        // Send the selected customer back to the main activity
+                        // Send the selected location back to the main activity
                         finishTheActivity(location, thisPlace[0]);
 
 
@@ -281,7 +273,6 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
         };
 
         mRecyclerView.setAdapter(mFireAdapter);
-
 
     }
 

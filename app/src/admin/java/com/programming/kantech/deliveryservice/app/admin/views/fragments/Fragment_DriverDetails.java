@@ -162,8 +162,6 @@ public class Fragment_DriverDetails extends Fragment {
             ValueEventListener listener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Log.w(Constants.LOG_TAG, "loadPost:onDataChange");
-
                     // Get Post object and use the values to update the UI
                     mDriver = dataSnapshot.getValue(Driver.class);
                     setViewData();

@@ -54,6 +54,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     private GoogleApiClient mClient;
     private DatabaseReference mLocationsRef;
 
+    // Views to bind too
     @BindView(R.id.tv_customer_address)
     TextView tv_customer_address;
 
@@ -69,7 +70,6 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     @BindView(R.id.rv_customer_locations_list)
     RecyclerView rv_customer_locations_list;
 
-    // Define a new interface onCustomerSelected that triggers a callback in the host activity
     LocationAddedListener mCallback;
 
     public interface LocationAddedListener {
@@ -100,17 +100,12 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
 
         // Load the saved state if there is one
         if (savedInstanceState != null) {
-            Log.i(Constants.LOG_TAG, "Fragment_Step savedInstanceState is not null");
             if (savedInstanceState.containsKey(Constants.STATE_INFO_CUSTOMER)) {
-                Log.i(Constants.LOG_TAG, "we found the step key in savedInstanceState");
                 mCustomer = savedInstanceState.getParcelable(Constants.STATE_INFO_CUSTOMER);
             }
-
         } else {
-
             Bundle args = getArguments();
             mCustomer = args.getParcelable(Constants.EXTRA_CUSTOMER);
-            Log.i(Constants.LOG_TAG, "Fragment_Step savedInstanceState is null, get data from intent:" + mCustomer);
         }
 
         // Get the fragment layout for the driving list
@@ -176,12 +171,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
         placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
             @Override
             public void onResult(@NonNull PlaceBuffer places) {
-
-                //Log.i(Constants.LOG_TAG, "PLACE:" + places.get(0).getAddress().toString());
-
                 tv_customer_address.setText(places.get(0).getAddress().toString());
-
-
             }
         });
 
@@ -191,12 +181,10 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
 
     @Override
     public void onConnectionSuspended(int i) {
-
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     @Override
@@ -240,11 +228,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     }
 
     private void buildApiClient() {
-        //Log.i(Constants.LOG_TAG, "buildApiClient() called");
-
         if (mClient == null) {
-            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
-
             // Build up the LocationServices API client
             // Uses the addApi method to request the LocationServices API
             // Also uses enableAutoManage to automatically know when to connect/suspend the client
@@ -272,20 +256,13 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
 
             @Override
             public void populateViewHolder(final ViewHolder_Locations holder, Location location, int position) {
-                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + location.toString());
-
                 PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mClient, location.getPlaceId());
 
                 placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
                     @Override
                     public void onResult(@NonNull PlaceBuffer places) {
-
-                        Log.i(Constants.LOG_TAG, "PLACE:" + places.get(0).getAddress().toString());
-
                         holder.setName(places.get(0).getName().toString());
                         holder.setAddress(places.get(0).getAddress().toString());
-
-
                     }
                 });
 
@@ -303,7 +280,6 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //Log.i(Constants.LOG_TAG, "onActivityResult in Fragment");
         if (requestCode == Constants.REQUEST_CODE_LOCATION_PICKER && resultCode == Activity.RESULT_OK) {
             Place place = PlacePicker.getPlace(getContext(), data);
 
@@ -318,7 +294,6 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     }
 
     public void onGetLocationButtonClicked() {
-        //Log.i(Constants.LOG_TAG, "onGetLocationButtonClicked() called");
         try {
 
             // Start a new Activity for the Place Picker API, this will trigger {@code #onActivityResult}

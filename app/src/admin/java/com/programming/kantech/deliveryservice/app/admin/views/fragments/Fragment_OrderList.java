@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -266,9 +265,6 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
 
             @Override
             public void populateViewHolder(final ViewHolder_Order holder, final Order order, int position) {
-                //Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + order.getCustomerName());
-
-                //mLayout.setBackgroundColor(ContextCompat.getColor(Activity_MyOrders.this, R.color.colorAccent));
 
                 // change the background color of the list item depending on the status
                 switch (order.getStatus()) {
@@ -392,8 +388,6 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
     }
 
     private void orderSelected(Order order) {
-        Log.i(Constants.LOG_TAG, "orderSelected()");
-
         mSelectedOrder = order;
         mFireAdapter.notifyDataSetChanged();
 

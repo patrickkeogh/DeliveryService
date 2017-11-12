@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +39,7 @@ import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by patrick keogh on 2017-08-14.
+ *
  */
 
 public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.ConnectionCallbacks,
@@ -208,12 +208,10 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
 
     @Override
     public void onConnectionSuspended(int i) {
-
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
 
@@ -295,7 +293,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
         if (requestCode == Constants.REQUEST_CODE_SELECT_DRIVER) {
             if (resultCode == RESULT_OK) {
                 // Customer was successfully selected
-                Utils_General.showToast(getContext(), "Driver Selected");
+                Utils_General.showToast(getContext(), getString(R.string.toast_driver_selected));
 
                 // Get the customer from the intent data
                 mSelectedDriver = data.getParcelableExtra(Constants.EXTRA_DRIVER);
@@ -306,7 +304,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
                 //setupForm();
 
             } else if (resultCode == RESULT_CANCELED) {
-                Utils_General.showToast(getContext(), "Driver Not Selected");
+                Utils_General.showToast(getContext(), getString(R.string.toast_driver_not_selected));
                 //finish();
             }
         }
@@ -325,7 +323,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
             tv_driver.setText(mSelectedDriver.getDisplayName());
 
             new AlertDialog.Builder(getContext())
-                    .setTitle("Assign the following driver?")
+                    .setTitle(R.string.alert_title_assign_driver)
                     .setView(dialog_confirm)
                     .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
                         @Override
@@ -347,18 +345,6 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
                                     + "_" + mSelectedDriver.getUid();
 
                             mOrder.setInProgressDateDriverId(strQuery);
-
-//                            mOrder.setSortDateDriverId("b_" +
-//                                    sortDate + "_" + mSelectedDriver.getUid());
-//
-//                            // Construct query string for inprogress_date_driver
-//                            // sort string (reps a status) + date + driverId + inProgress
-//
-//                            String strQuery = Constants.FIREBASE_STATUS_SORT_ASSIGNED + sortDate + "_" +
-//                                    mSelectedDriver.getUid() + "_true";
-//
-//
-//                            mOrder.setInProgressDateDriverId(strQuery);
 
                             // Save the order to firebase
                             mOrdersRef.child(mOrder.getId()).setValue(mOrder);

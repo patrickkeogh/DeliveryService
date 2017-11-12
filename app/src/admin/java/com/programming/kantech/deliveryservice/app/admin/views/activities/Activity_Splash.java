@@ -21,7 +21,7 @@ import java.util.Arrays;
 
 /**
  * Created by patrick on 2017-11-03.
- * Will apear in the back ground while performing start up
+ * Will appear in the back ground while performing start up
  * operations.
  */
 

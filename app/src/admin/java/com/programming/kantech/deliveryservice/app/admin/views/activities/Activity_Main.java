@@ -27,7 +27,6 @@ import android.widget.LinearLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
@@ -72,9 +71,8 @@ public class Activity_Main extends AppCompatActivity implements
         Fragment_CustomerDetails.LocationAddedListener,
         NavigationView.OnNavigationItemSelectedListener {
 
-
+    // Local member variables
     private FragmentManager mFragmentManager;
-
     private ActionBar mActionBar;
 
     // Track whether to display a two-column or single-column UI
@@ -85,11 +83,7 @@ public class Activity_Main extends AppCompatActivity implements
     // 12:00 AM of the selected day
     private long mDisplayDateStartTimeInMillis;
 
-    private boolean mShowDriverIcon = true;
-    private boolean mShowDrivers = true;
-    private boolean mShowOrderIcon = true;
-    private boolean mShowOrders = true;
-
+    // Whether to show date nav menu options or not
     private boolean mShowDateNav = true;
     private boolean mToolBarNavigationListenerIsRegistered;
 
@@ -110,10 +104,9 @@ public class Activity_Main extends AppCompatActivity implements
 
 
     // Member variables for the Firebase database
-    //private DatabaseReference mUserRef;
     private DatabaseReference mDriverRef;
 
-
+    // Refs to the date nav buttons
     private MenuItem mMenuItem_Previous;
     private MenuItem mMenuItem_Next;
     private MenuItem mMenuItem_Date;
@@ -124,6 +117,7 @@ public class Activity_Main extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Either get the currect filter date from state or use today
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(Constants.STATE_INFO_DATE_FILTER)) {
                 mDisplayDateStartTimeInMillis = savedInstanceState.getLong(Constants.STATE_INFO_DATE_FILTER);
@@ -140,9 +134,8 @@ public class Activity_Main extends AppCompatActivity implements
 
         ButterKnife.bind(this);
 
+        // Get a reference to the Fragment Manager
         mFragmentManager = getSupportFragmentManager();
-
-
 
         // Set the support action bar
         setSupportActionBar(mToolbar);
@@ -167,10 +160,6 @@ public class Activity_Main extends AppCompatActivity implements
         mNavView.setNavigationItemSelectedListener(this);
         mToolBarNavigationListenerIsRegistered = true;
 
-        Menu nav_Menu = mNavView.getMenu();
-        nav_Menu.findItem(R.id.nav_admin_manage_drivers).setVisible(true);
-
-        //mUserRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_ADMIN);
         mDriverRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_DRIVERS);
 
         // Get the current orientation
@@ -280,7 +269,12 @@ public class Activity_Main extends AppCompatActivity implements
             Fragment_OrderList frag_order_list = Fragment_OrderList.newInstance(mDisplayDateStartTimeInMillis);
             replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_LIST, frag_order_list, false);
 
+        }else if (id == R.id.nav_admin_filters) {
+
+            Utils_General.showToast(this, "This option has not been implemented yet!");
+
         }
+
 
         mDrawer.closeDrawer(GravityCompat.START);
         return true;
@@ -309,26 +303,11 @@ public class Activity_Main extends AppCompatActivity implements
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        Log.i(Constants.LOG_TAG, "onPrepareOptionsMenu called");
+        //Log.i(Constants.LOG_TAG, "onPrepareOptionsMenu called");
 
         mMenuItem_Previous.setVisible(mShowDateNav);
         mMenuItem_Next.setVisible(mShowDateNav);
         mMenuItem_Date.setVisible(mShowDateNav);
-
-//        mMenuItem_Driver.setVisible(mShowDriverIcon);
-//        if (!mShowDrivers) {
-//            mMenuItem_Driver.setIcon(R.drawable.ic_menu_drive);
-//        } else {
-//            mMenuItem_Driver.setIcon(R.drawable.ic_menu_drive_white);
-//        }
-//
-//        mMenuItem_Order.setVisible(mShowOrderIcon);
-//        if (!mShowOrders) {
-//            mMenuItem_Order.setIcon(R.drawable.ic_shopping_cart);
-//        } else {
-//            mMenuItem_Order.setIcon(R.drawable.ic_shopping_cart_white);
-//        }
-
 
         super.onPrepareOptionsMenu(menu);
         return true;
@@ -349,22 +328,8 @@ public class Activity_Main extends AppCompatActivity implements
 
                 if (mFragmentManager.findFragmentById(R.id.container_master) != null) {
 
-                    // Get the fragment in the master container
-
-                    Fragment frag = mFragmentManager.findFragmentById(R.id.container_master);
-
-                    if(frag instanceof Fragment_MainDetails){
-                        Fragment_MainDetails fragment = Fragment_MainDetails.newInstance(mDisplayDateStartTimeInMillis);
-                        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
-                    }else if(frag instanceof Fragment_OrderList){
-                        Fragment_OrderList frag_order_list = Fragment_OrderList.newInstance(mDisplayDateStartTimeInMillis);
-                        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_LIST, frag_order_list, false);
-                    }
+                    reloadFragWithNewDateFilter();
                 }
-
-
-
-                //replaceMasterListFragment();
 
                 return true;
 
@@ -379,17 +344,7 @@ public class Activity_Main extends AppCompatActivity implements
 
                 if (mFragmentManager.findFragmentById(R.id.container_master) != null) {
 
-                    // Get the fragment in the master container
-
-                    Fragment frag = mFragmentManager.findFragmentById(R.id.container_master);
-
-                    if(frag instanceof Fragment_MainDetails){
-                        Fragment_MainDetails fragment = Fragment_MainDetails.newInstance(mDisplayDateStartTimeInMillis);
-                        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
-                    }else if(frag instanceof Fragment_OrderList){
-                        Fragment_OrderList frag_order_list = Fragment_OrderList.newInstance(mDisplayDateStartTimeInMillis);
-                        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_LIST, frag_order_list, false);
-                    }
+                    reloadFragWithNewDateFilter();
                 }
 
 
@@ -410,13 +365,13 @@ public class Activity_Main extends AppCompatActivity implements
                         cal.get(Calendar.MONTH),
                         cal.get(Calendar.DAY_OF_MONTH));
                 datePicker.setCancelable(false);
-                datePicker.setTitle("Select A Date");
+                datePicker.setTitle(getString(R.string.title_select_a_date));
                 datePicker.show();
 
                 return true;
 
             case R.id.action_sign_out:
-                Log.i(Constants.LOG_TAG, "Sign out clicked:");
+                //Log.i(Constants.LOG_TAG, "Sign out clicked:");
                 AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -432,11 +387,26 @@ public class Activity_Main extends AppCompatActivity implements
 
                 return true;
             case android.R.id.home:
-                Log.i(Constants.LOG_TAG, "Home clicked");
+                //Log.i(Constants.LOG_TAG, "Home clicked");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
 
+        }
+    }
+
+    private void reloadFragWithNewDateFilter() {
+
+        // Get the fragment in the master container
+        Fragment frag = mFragmentManager.findFragmentById(R.id.container_master);
+
+        // replace map or order list when filter changes
+        if(frag instanceof Fragment_MainDetails){
+            Fragment_MainDetails fragment = Fragment_MainDetails.newInstance(mDisplayDateStartTimeInMillis);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
+        }else if(frag instanceof Fragment_OrderList){
+            Fragment_OrderList frag_order_list = Fragment_OrderList.newInstance(mDisplayDateStartTimeInMillis);
+            replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_LIST, frag_order_list, false);
         }
     }
 
@@ -455,15 +425,6 @@ public class Activity_Main extends AppCompatActivity implements
 
         // Get a fragment transaction to replace fragments
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        if (!Objects.equals(fragment_tag, Constants.TAG_FRAGMENT_MAIN_DETAILS)) {
-            mShowDriverIcon = false;
-            mShowOrderIcon = false;
-
-        } else {
-            mShowDriverIcon = true;
-            mShowOrderIcon = true;
-        }
 
         invalidateOptionsMenu();
 
@@ -502,35 +463,6 @@ public class Activity_Main extends AppCompatActivity implements
 
     }
 
-//    @Override
-//    public void onGetCustomerSelected() {
-//        Log.i(Constants.LOG_TAG, "onGetCustomerSelected called");
-//
-//        //Fragment_CustomerList fragment = Fragment_CustomerList.newInstance();
-//        //replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_LIST, fragment);
-//
-//        Intent intent = new Intent(this, Activity_SelectCustomer.class);
-//        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CUSTOMER);
-//
-//    }
-//
-//    @Override
-//    public void onGetLocationPickup(Customer customer) {
-//        Log.i(Constants.LOG_TAG, "onGetLocationPickup called CustKey:" + customer.getId());
-//
-//        Intent intent = new Intent(this, Activity_SelectLocation.class);
-//
-//        intent.putExtra(Constants.EXTRA_CUSTOMER_KEY, customer.getId());
-//        intent.putExtra(Constants.EXTRA_CUSTOMER_NAME, customer.getCompany());
-//        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_PICKUP_LOCATION);
-//
-//    }
-//
-//    @Override
-//    public void onGetLocationDelivery() {
-//
-//    }
-
     // Callback from Fragment_CustomerList
     @Override
     public void onCustomerSelected(Customer customer) {
@@ -548,7 +480,7 @@ public class Activity_Main extends AppCompatActivity implements
     @Override
     public void onAddCustomerClicked() {
 
-        Log.i(Constants.LOG_TAG, "onAddCustomerClicked() called");
+        //Log.i(Constants.LOG_TAG, "onAddCustomerClicked() called");
 
         Fragment_CustomerAdd fragment = Fragment_CustomerAdd.newInstance();
         replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_CUSTOMER_ADD, fragment, true);
@@ -557,7 +489,7 @@ public class Activity_Main extends AppCompatActivity implements
 
     @Override
     public void onOrderClicked(Order order) {
-        Log.i(Constants.LOG_TAG, "onOrderSelected() called");
+        //Log.i(Constants.LOG_TAG, "onOrderSelected() called");
 
         Fragment_OrderDetails fragment = Fragment_OrderDetails.newInstance(order);
 
@@ -582,8 +514,9 @@ public class Activity_Main extends AppCompatActivity implements
 
     @Override
     public void onFragmentLoaded(String tag) {
-        Log.i(Constants.LOG_TAG, "onFragmentLoaded Calleed():" + tag);
+        //Log.i(Constants.LOG_TAG, "onFragmentLoaded Calleed():" + tag);
 
+        // determine if full screen or not
         if (mLandscapeView) {
 
             switch (tag) {
@@ -612,9 +545,12 @@ public class Activity_Main extends AppCompatActivity implements
             }
         }
 
+        // the formatted date show in the action bar
         String showDate = Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis);
 
 
+        // show or hide the date nav button depending on fragment(tag) loaded
+        // also we only display the date on fragments that have date filtering
         switch (tag) {
             case Constants.TAG_FRAGMENT_MAIN_DETAILS:
                 mShowDateNav = true;
@@ -627,39 +563,39 @@ public class Activity_Main extends AppCompatActivity implements
                 break;
 
             case Constants.TAG_FRAGMENT_ORDER_DETAILS:
-                if (!mLandscapeView) enableViews(true, "Order Details");
-                if (!mLandscapeView) mShowDateNav = false;;
+                if (!mLandscapeView) enableViews(true,getString(R.string.title_order_details));
+                if (!mLandscapeView) mShowDateNav = false;
                 break;
 
             case Constants.TAG_FRAGMENT_CUSTOMER_LIST:
                 mShowDateNav = false;
-                enableViews(false, "Manage Customers");
+                enableViews(false, getString(R.string.title_manage_customers));
                 break;
 
             case Constants.TAG_FRAGMENT_CUSTOMER_DETAILS:
                 mShowDateNav = false;
-                if (!mLandscapeView) enableViews(true, "Customer Details");
+                if (!mLandscapeView) enableViews(true, getString(R.string.title_customer_details));
 
                 break;
 
             case Constants.TAG_FRAGMENT_DRIVER_LIST:
                 mShowDateNav = false;
-                enableViews(false, "Manage Drivers");
+                enableViews(false, getString(R.string.title_manage_drivers));
                 break;
 
             case Constants.TAG_FRAGMENT_DRIVER_DETAILS:
                 mShowDateNav = false;
-                if (!mLandscapeView) enableViews(true, "Driver Details");
+                if (!mLandscapeView) enableViews(true, getString(R.string.title_driver_details));
                 break;
 
             case Constants.TAG_FRAGMENT_CUSTOMER_ADD:
                 mShowDateNav = false;
-                enableViews(true, "Add New Customer");
+                enableViews(true, getString(R.string.title_add_new_customer));
                 break;
 
             case Constants.TAG_FRAGMENT_ORDER_ADD:
                 mShowDateNav = false;
-                enableViews(true, "Add New Order");
+                enableViews(true, getString(R.string.title_add_new_order));
                 break;
         }
 
@@ -750,22 +686,10 @@ public class Activity_Main extends AppCompatActivity implements
                 clearDetailsContainer();
             }
 
+            // replace the map or list with new date filter
             if (mFragmentManager.findFragmentById(R.id.container_master) != null) {
-
-                // Get the fragment in the master container
-
-                Fragment frag = mFragmentManager.findFragmentById(R.id.container_master);
-
-                if(frag instanceof Fragment_MainDetails){
-                    Fragment_MainDetails fragment = Fragment_MainDetails.newInstance(mDisplayDateStartTimeInMillis);
-                    replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
-                }else if(frag instanceof Fragment_OrderList){
-                    Fragment_OrderList frag_order_list = Fragment_OrderList.newInstance(mDisplayDateStartTimeInMillis);
-                    replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_LIST, frag_order_list, false);
-                }
+                reloadFragWithNewDateFilter();
             }
-
-            //replaceMasterListFragment();
 
         }
     };

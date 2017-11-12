@@ -6,11 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -57,23 +55,17 @@ import butterknife.ButterKnife;
 public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
+    // Local member variables
     private GoogleMap mGoogleMap;
     private GoogleApiClient mGoogleApiClient;
-    //private Marker mDriverMarker;
     private ArrayList<Driver> mDriversList = new ArrayList<>();
     private ArrayList<Order> mOrdersList = new ArrayList<>();
-
     private ArrayList<LatLng> mCoordsList = new ArrayList<>();
-
-    //private List<Marker> mMarkers_Drivers = new ArrayList<>();
 
     // 12:00 AM of the selected day
     private long mDisplayDateStartTimeInMillis;
 
-
-    private boolean mShowOrders = true;
-    private boolean mShowDrivers = true;
-
+    // Firebase member variables
     private DatabaseReference mActiveDriverLocationRef;
     private ChildEventListener mActiveDriversEventListener;
 
@@ -81,11 +73,15 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     private DatabaseReference mOrdersRef;
     private ValueEventListener mOrdersEventListener;
 
+    // Fragement views
     @BindView(R.id.mapView)
     MapView mMapView;
 
-    // Define a new interface StepNavClickListener that triggers a callback in the host activity
+    // interface MainDetailsFragmentListener that triggers a callback in the host activity
     MainDetailsFragmentListener mCallback;
+
+    public Fragment_MainDetails() {
+    }
 
     // MainDetailsFragmentListener interface, calls a method in the host activity
     // depending on the order selected in the master list
@@ -123,8 +119,6 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
         if (mDisplayDateStartTimeInMillis == 0) {
             throw new IllegalArgumentException("Must pass EXTRA_DATE_FILTER");
-        }else{
-            Log.i(Constants.LOG_TAG, "Saved date for mp:" + Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis));
         }
 
         // Get the fragment layout for the driving list
@@ -202,15 +196,16 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
         mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
 
-        // Show all active drivers
-        if (mShowDrivers) {
-            attachDriverReadListener();
-        }
-
-        // Get all orders not completed
-        if (mShowOrders) {
-            //attachOrderReadListener();
-        }
+//        // Show all active drivers
+//        boolean mShowDrivers = true;
+//        if (mShowDrivers) {
+//            attachDriverReadListener();
+//        }
+//
+//        // Get all orders not completed
+//        if (mShowOrders) {
+//            attachOrderReadListener();
+//        }
     }
 
     private void paintMarkers() {
@@ -221,17 +216,15 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
         // Add Marker for home office
         // This will have to be downloaded
-        LatLng home = new LatLng(44.3916, -79.6882);
-        drawMarker(home, "HOME", "Kan-Tech Delivery Service",
-                Utils_General.vectorToBitmap(getContext(), R.drawable.ic_menu_home,
-                        ContextCompat.getColor(getContext(), R.color.colorAccent)));
+        // This only hard codes for testing purposes
+//        LatLng home = new LatLng(44.3916, -79.6882);
+//        drawMarker(home, "HOME", "Kan-Tech Delivery Service",
+//                Utils_General.vectorToBitmap(getContext(), R.drawable.ic_menu_home,
+//                        ContextCompat.getColor(getContext(), R.color.colorAccent)));
 
 
         if (mDriversList != null) {
             if (mDriversList.size() != 0) {
-
-                //Log.i(Constants.LOG_TAG, "Paint Markers: Driver list is not null or zero");
-
                 // Add markers for active drivers
                 for (int i = 0; i < mDriversList.size(); i++) {
 
@@ -362,8 +355,6 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     private LatLngBounds.Builder builder;
 
     private void drawMarker(LatLng point, String title, String snip, BitmapDescriptor bitmapDescriptor) {
-        //Log.i(Constants.LOG_TAG, "drawMarker()");
-
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(point)
                 .title(title)
@@ -406,8 +397,6 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                         for (DataSnapshot orders : dataSnapshot.getChildren()) {
 
                             Order order = orders.getValue(Order.class);
-                            //Log.i(Constants.LOG_TAG, "ORDERS:" + order.getCustomerName());
-
                             mOrdersList.add(order);
                         }
                     }
@@ -433,9 +422,6 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
             mActiveDriversEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-                    //Log.i(Constants.LOG_TAG, "onChildAdded");
-
                     String driverKey = dataSnapshot.getKey();
 
                     final Double strLat = (Double) dataSnapshot.child("l").child("0").getValue();
@@ -542,44 +528,44 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
     }
 
-    public void showDrivers(boolean b) {
-        // Whether to show the drivers or not
-
-        mDriversList = new ArrayList<>();
-
-        mShowDrivers = b;
-
-        // Show all active drivers
-        if (mShowDrivers) {
-            attachDriverReadListener();
-        } else {
-            paintMarkers();
-            detachFirebaseDriverListeners();
-        }
-
-    }
-
-    public void showOrders(boolean b) {
-
-        Toast.makeText(getActivity(), "Fragment 1: Refresh called.",
-                Toast.LENGTH_SHORT).show();
-
-        // Whether to show the drivers or not
-
-        mOrdersList = new ArrayList<>();
-
-        mShowOrders = b;
-
-        // Show all active drivers
-        if (mShowOrders) {
-            attachOrderReadListener();
-        } else {
-            paintMarkers();
-            detachFirebaseOrderListeners();
-        }
-
-
-    }
+//    public void showDrivers(boolean b) {
+//        // Whether to show the drivers or not
+//
+//        mDriversList = new ArrayList<>();
+//
+//        mShowDrivers = b;
+//
+//        // Show all active drivers
+//        if (mShowDrivers) {
+//            attachDriverReadListener();
+//        } else {
+//            paintMarkers();
+//            detachFirebaseDriverListeners();
+//        }
+//
+//    }
+//
+//    public void showOrders(boolean b) {
+//
+//        Toast.makeText(getActivity(), "Fragment 1: Refresh called.",
+//                Toast.LENGTH_SHORT).show();
+//
+//        // Whether to show the drivers or not
+//
+//        mOrdersList = new ArrayList<>();
+//
+//        mShowOrders = b;
+//
+//        // Show all active drivers
+//        if (mShowOrders) {
+//            attachOrderReadListener();
+//        } else {
+//            paintMarkers();
+//            detachFirebaseOrderListeners();
+//        }
+//
+//
+//    }
 
     private Query getDatabaseQueryForMap() {
 

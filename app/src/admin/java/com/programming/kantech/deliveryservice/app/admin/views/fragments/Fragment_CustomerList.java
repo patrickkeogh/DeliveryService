@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -110,12 +109,9 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(Constants.STATE_INFO_CUSTOMER)) {
-                Log.i(Constants.LOG_TAG, "we found the recipe key in savedInstanceState");
                 mSelectedCustomer = savedInstanceState.getParcelable(Constants.STATE_INFO_CUSTOMER);
             }
-
         } else {
-            Log.i(Constants.LOG_TAG, "Activity_Photo savedInstanceState is null, get data from intent: ");
             mSelectedCustomer = getArguments().getParcelable(Constants.EXTRA_CUSTOMER);
         }
 
@@ -149,12 +145,6 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-//        LinearLayoutManager layoutManager =
-//                new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-
-        /* setLayoutManager associates the LayoutManager we created above with our RecyclerView */
-        //mCustomerRecyclerView.setLayoutManager(layoutManager);
 
         HPLinearLayoutManager hpLinearLayoutManager = new HPLinearLayoutManager(getContext());
         rv_customer_list.setLayoutManager(hpLinearLayoutManager);
@@ -190,13 +180,10 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
         }
     }
 
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        //Log.i(Constants.LOG_TAG, "onConnected called");
         loadFirebaseAdapter();
     }
-
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -366,8 +353,6 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
     }
 
     private void customerSelected(Customer customer) {
-        Log.i(Constants.LOG_TAG, "customerSelected()");
-
         mSelectedCustomer = customer;
 
         // redraw the list to show the selected customer

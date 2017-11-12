@@ -41,7 +41,7 @@ import butterknife.OnClick;
 
 public class Fragment_CustomerAdd extends Fragment {
 
-    // View to bind to
+    // Views to bind to
     @BindView(R.id.et_customer_add_company)
     EditText et_customer_add_company;
 
@@ -157,11 +157,10 @@ public class Fragment_CustomerAdd extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i(Constants.LOG_TAG, "onActivityResult in Frag,ment");
         if (requestCode == Constants.REQUEST_CODE_PLACE_PICKER && resultCode == Activity.RESULT_OK) {
             Place place = PlacePicker.getPlace(getContext(), data);
             if (place == null) {
-                Log.i(Constants.LOG_TAG, "No place selected");
+                //Log.i(Constants.LOG_TAG, "No place selected");
                 return;
             }
 
@@ -177,7 +176,6 @@ public class Fragment_CustomerAdd extends Fragment {
      *
      */
     public void onGetLocationButtonClicked() {
-        Log.i(Constants.LOG_TAG, "onGetLocationButtonClicked() called");
         try {
 
             // Start a new Activity for the Place Picker API, this will trigger {@code #onActivityResult}
@@ -198,29 +196,27 @@ public class Fragment_CustomerAdd extends Fragment {
      *
      */
     public void onAddCustomerClicked() {
-        Log.i(Constants.LOG_TAG, "onGetLocationButtonClicked() called");
-
         boolean hasErrors = false;
 
         // Validate the customer info
 
         if (et_customer_add_company.getText().length() == 0) {
-            et_customer_add_company.setError("Company is required");
+            et_customer_add_company.setError(getString(R.string.error_company_is_required));
             hasErrors = true;
         }
 
         if (et_customer_add_contact.getText().length() == 0) {
-            et_customer_add_contact.setError("Contact name is required");
+            et_customer_add_contact.setError(getString(R.string.error_contact_name_is_required));
             hasErrors = true;
         }
 
         if (et_customer_add_phone.getText().length() != 14) {
-            et_customer_add_phone.setError("Contact phone number is not valid");
+            et_customer_add_phone.setError(getString(R.string.error_phone_number));
             hasErrors = true;
         }
 
         if (hasErrors) {
-            Utils_General.showToast(getContext(), "The new customer form has errors.");
+            Utils_General.showToast(getContext(), getString(R.string.error_msg));
         } else {
 
             // Avoid passing null as parent to dialogs
@@ -236,7 +232,7 @@ public class Fragment_CustomerAdd extends Fragment {
             tv_confirm_company_address.setText(mPlace.getAddress());
 
             new AlertDialog.Builder(getContext())
-            .setTitle("Add the following new customer?")
+            .setTitle(R.string.alert_title_add_new_customer)
             .setView(dialog_confirm)
             .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
@@ -252,7 +248,7 @@ public class Fragment_CustomerAdd extends Fragment {
                     mLocation.setPlaceId(mPlace.getId());
                     mLocation.setMainAddress(true);
 
-                    Log.i(Constants.LOG_TAG, "Customer:" + mCustomer.toString());
+                    //Log.i(Constants.LOG_TAG, "Customer:" + mCustomer.toString());
 
                     mCustomerRef.push()
                     .setValue(mCustomer, new DatabaseReference.CompletionListener() {
@@ -293,7 +289,7 @@ public class Fragment_CustomerAdd extends Fragment {
 
                         // Inform user the new customer has been added and
                         // send them back to the management screen with the new customer highlighted
-                        Utils_General.showToast(getContext(), "The new customer has been successfully saved");
+                        Utils_General.showToast(getContext(), getString(R.string.msg_customer_saved));
                         mCallback.onCustomerSaved(mCustomer);
 
 

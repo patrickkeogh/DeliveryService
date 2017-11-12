@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -31,7 +30,7 @@ import butterknife.ButterKnife;
 
 public class Activity_SelectDriver extends AppCompatActivity{
 
-    // Member variables
+    // Local member variables
     private FirebaseRecyclerAdapter<Driver, ViewHolder_Driver> mFireAdapter;
 
     @BindView(R.id.rv_drivers_list)
@@ -89,7 +88,7 @@ public class Activity_SelectDriver extends AppCompatActivity{
 
             @Override
             public void populateViewHolder(final ViewHolder_Driver holder, final Driver driver, int position) {
-                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + driver.getDisplayName());
+                //Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + driver.getDisplayName());
 
                 holder.setPhoto(driver.getPhotoUrl(), Activity_SelectDriver.this);
 
@@ -117,6 +116,11 @@ public class Activity_SelectDriver extends AppCompatActivity{
 
     }
 
+    /**
+     * Called when the activity is starting
+     *
+     * @param driver The Driver object to return to the calling activity
+     */
     private void finishTheActivity(Driver driver) {
 
         Intent resultIntent = new Intent();
@@ -136,7 +140,4 @@ public class Activity_SelectDriver extends AppCompatActivity{
             mFireAdapter.cleanup();
         }
     }
-
-
-
 }
