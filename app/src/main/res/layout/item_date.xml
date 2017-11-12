@@ -15,7 +15,7 @@
             android:layout_height="40dp"
             android:layout_gravity="fill"
             android:layout_marginEnd="@dimen/margin_8dp"
-            android:src="@drawable/ic_date_range_24dp" />
+            android:src="@drawable/ic_date_range_accent_24dp" />
 
         <TextView
             android:id="@+id/tv_selected_date"

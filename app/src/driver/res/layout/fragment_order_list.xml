@@ -12,10 +12,33 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_orders_list"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tv_orders_filter_date"
+                android:background="@color/colorPrimaryLight"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:paddingStart="@dimen/margin_16dp"
+                android:paddingTop="@dimen/padding_8dp"
+                android:paddingBottom="@dimen/padding_8dp"
+                android:paddingEnd="@dimen/padding_8dp"
+                android:text="Monday March, 1st, 2017"
+                android:layout_width="match_parent"
+                android:layout_height="40dp" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_orders_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+
+
+
 
     </FrameLayout>
 

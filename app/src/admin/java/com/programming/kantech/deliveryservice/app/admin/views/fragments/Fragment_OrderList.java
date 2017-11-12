@@ -42,7 +42,6 @@ import butterknife.OnClick;
 /**
  * Created by patrick keogh on 2017-08-27.
  * Uses FirebaseDatabase-UI, ButterKnife
- *
  */
 
 public class Fragment_OrderList extends Fragment implements GoogleApiClient.ConnectionCallbacks,
@@ -191,7 +190,6 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
     }
 
 
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         loadFirebaseAdapter();
@@ -245,15 +243,20 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
 
                 //mLayout.setBackgroundColor(ContextCompat.getColor(Activity_MyOrders.this, R.color.colorAccent));
 
-//                switch (order.getStatus()){
-//                    case Constants.ORDER_STATUS_BOOKED:
-//                        holder.setBackgroundColor(Activity_ShowOrders, R.color.colorPrimary);
-//                        break;
-//                    case Constants.ORDER_STATUS_ASSIGNED:
-//                        holder.setBackgroundColor(Activity_MyOrders.this, R.color.colorAccent);
-//                        break;
-//
-//              }
+                // change the background color of the list item depending on the status
+                switch (order.getStatus()) {
+                    case Constants.ORDER_STATUS_BOOKED:
+                    case Constants.ORDER_STATUS_ASSIGNED:
+                        holder.setBackgroundColor(getContext(), R.color.colorPrimary);
+                        break;
+                    case Constants.ORDER_STATUS_PICKUP_COMPLETE:
+                        holder.setBackgroundColor(getContext(), R.color.colorGreen);
+                        break;
+                    case Constants.ORDER_STATUS_COMPLETE:
+                        holder.setBackgroundColor(getContext(), R.color.colorAccent);
+                        break;
+
+                }
 
                 if (mSelectedOrder != null) {
                     if (Objects.equals(order.getId(), mSelectedOrder.getId())) {
@@ -311,9 +314,9 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
                 //remove loading indicator
 
                 // Perform initial setup, this will only be called once
-                if(dataSnapshot.hasChildren()){
+                if (dataSnapshot.hasChildren()) {
                     showList(true);
-                }else{
+                } else {
                     showList(false);
                 }
 
@@ -323,9 +326,9 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
                     public void onItemRangeInserted(int positionStart, int itemCount) {
 
                         int count = mFireAdapter.getItemCount();
-                        if(count == 0){
+                        if (count == 0) {
                             showList(false);
-                        }else{
+                        } else {
                             showList(true);
                         }
                     }
@@ -333,9 +336,9 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
                     @Override
                     public void onItemRangeRemoved(int positionStart, int itemCount) {
                         int count = mFireAdapter.getItemCount();
-                        if(count == 0){
+                        if (count == 0) {
                             showList(false);
-                        }else{
+                        } else {
                             showList(true);
                         }
                     }
@@ -352,10 +355,10 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
 
     private void showList(boolean bShowList) {
 
-        if(bShowList){
+        if (bShowList) {
             rv_orders_list.setVisibility(View.VISIBLE);
             tv_empty_view.setVisibility(View.GONE);
-        }else{
+        } else {
             rv_orders_list.setVisibility(View.GONE);
             tv_empty_view.setVisibility(View.VISIBLE);
         }

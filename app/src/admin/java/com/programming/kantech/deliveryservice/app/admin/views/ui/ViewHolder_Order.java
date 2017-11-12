@@ -2,6 +2,7 @@ package com.programming.kantech.deliveryservice.app.admin.views.ui;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -15,15 +16,15 @@ import com.programming.kantech.deliveryservice.app.R;
 
 public class ViewHolder_Order extends RecyclerView.ViewHolder {
 
-    private final TextView tv_admin_order_name;
+    private final TextView tv_admin_order_customer;
     private final TextView tv_admin_order_date;
     private final TextView tv_admin_order_pickup_address;
     private final TextView tv_admin_order_delivery_address;
     private final TextView tv_admin_order_status;
-    private final TextView tv_admin_order_distance;
+    //private final TextView tv_admin_order_distance;
 
     private final LinearLayout layout_admin_order;
-    private final LinearLayout layout_admin_order_inside;
+    private final CardView cv_order;
 
     private ClickListener mClickListener;
 
@@ -46,28 +47,29 @@ public class ViewHolder_Order extends RecyclerView.ViewHolder {
             }
         });
 
-        tv_admin_order_name = itemView.findViewById(R.id.tv_admin_order_name);
+        tv_admin_order_customer = itemView.findViewById(R.id.tv_admin_order_customer);
         tv_admin_order_date = itemView.findViewById(R.id.tv_admin_order_date);
         tv_admin_order_pickup_address = itemView.findViewById(R.id.tv_admin_order_pickup_address);
         tv_admin_order_delivery_address = itemView.findViewById(R.id.tv_admin_order_delivery_address);
         tv_admin_order_status = itemView.findViewById(R.id.tv_admin_order_status);
-        tv_admin_order_distance = itemView.findViewById(R.id.tv_admin_order_distance);
+        //tv_admin_order_distance = itemView.findViewById(R.id.tv_admin_order_distance);
+
+        cv_order = itemView.findViewById(R.id.cv_order);
 
         layout_admin_order = itemView.findViewById(R.id.layout_admin_order);
-        layout_admin_order_inside = itemView.findViewById(R.id.layout_admin_order_inside);
     }
 
     public void setCustomerName(String name) {
-        tv_admin_order_name.setText(name);
+        tv_admin_order_customer.setText(name);
     }
 
     public void setOrderDate(String date) {
         tv_admin_order_date.setText(date);
     }
 
-    public void setDistance(String distance) {
-        tv_admin_order_distance.setText(distance);
-    }
+//    public void setDistance(String distance) {
+//        tv_admin_order_distance.setText(distance);
+//    }
 
     public void setPickupAddress(String address) {
         tv_admin_order_pickup_address.setText(address);
@@ -84,11 +86,13 @@ public class ViewHolder_Order extends RecyclerView.ViewHolder {
     }
 
     public void setBackgroundColor(Context context, int colorId){
+
         layout_admin_order.setBackgroundColor(ContextCompat.getColor(context, colorId));
     }
 
     public void setSelectedColor(Context context, int colorId){
-        layout_admin_order_inside.setBackgroundColor(ContextCompat.getColor(context, colorId));
+
+        cv_order.setBackgroundColor(ContextCompat.getColor(context, colorId));
     }
 
 

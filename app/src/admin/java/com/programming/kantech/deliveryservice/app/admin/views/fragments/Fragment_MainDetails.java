@@ -45,6 +45,9 @@ import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by patrick keogh on 2017-09-01.
  * Main screen for this app.  Will show a map of driver and orders for a given date
@@ -64,6 +67,9 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
     //private List<Marker> mMarkers_Drivers = new ArrayList<>();
 
+    // 12:00 AM of the selected day
+    private long mDisplayDateStartTimeInMillis;
+
 
     private boolean mShowOrders = true;
     private boolean mShowDrivers = true;
@@ -74,6 +80,9 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     private Query mOrdersQuery;
     private ValueEventListener mOrdersEventListener;
 
+    @BindView(R.id.mapView)
+    MapView mapView;
+
     // Define a new interface StepNavClickListener that triggers a callback in the host activity
     MainDetailsFragmentListener mCallback;
 
@@ -81,6 +90,21 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     // depending on the order selected in the master list
     public interface MainDetailsFragmentListener {
         void onFragmentLoaded(String tag);
+    }
+
+    /**
+     * Static factory method that takes a order object parameter,
+     * initializes the fragment's arguments, and returns the
+     * new fragment to the client.
+     */
+    public static Fragment_MainDetails newInstance(long date_in) {
+        Fragment_MainDetails f = new Fragment_MainDetails();
+        Bundle args = new Bundle();
+
+        // Add any required arguments for start up - None needed right now
+        args.putLong(Constants.EXTRA_DATE_FILTER, date_in);
+        f.setArguments(args);
+        return f;
     }
 
     /**
@@ -97,11 +121,23 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(Constants.STATE_INFO_DATE_FILTER)) {
+                mDisplayDateStartTimeInMillis = savedInstanceState.getLong(Constants.STATE_INFO_DATE_FILTER);
+            }
+        } else {
+            mDisplayDateStartTimeInMillis = getArguments().getLong(Constants.EXTRA_DATE_FILTER);
+        }
+
+        if (mDisplayDateStartTimeInMillis == 0) {
+            throw new IllegalArgumentException("Must pass EXTRA_DATE_FILTER");
+        }
 
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_main_details, container, false);
 
-        mMapView = rootView.findViewById(R.id.mapView);
+        ButterKnife.bind(this, rootView);
+
         mMapView.onCreate(savedInstanceState);
 
         mMapView.onResume(); // needed to get the map to display immediately
@@ -118,7 +154,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                 .getReference().child(Constants.FIREBASE_NODE_DRIVER_LOCATIONS);
 
         mOrdersQuery = FirebaseDatabase.getInstance()
-                .getReference().child(Constants.FIREBASE_NODE_ORDERS).orderByChild("inProgress").equalTo(true);
+                .getReference().child(Constants.FIREBASE_NODE_ORDERS).orderByChild(Constants.FIREBASE_CHILD_INPROGRESS).equalTo(true);
 
         return rootView;
 
@@ -138,7 +174,6 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                     + " must implement MainDetailsFragmentListener");
         }
     }
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -169,7 +204,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
         // Get all orders not completed
         if (mShowOrders) {
-            attachOrderReadListener();
+            //attachOrderReadListener();
         }
     }
 

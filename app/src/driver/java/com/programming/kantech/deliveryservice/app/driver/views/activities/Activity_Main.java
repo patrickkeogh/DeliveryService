@@ -201,7 +201,7 @@ public class Activity_Main extends AppCompatActivity implements
         }
 
         if (mDriver == null) {
-            throw new IllegalArgumentException("Must pass EXTRA_DRIVER");
+            throw new IllegalArgumentException("Must pass EXTRA_DRIVERccc");
         }
 
         // use ButterKnife to inject the layout views
@@ -213,12 +213,24 @@ public class Activity_Main extends AppCompatActivity implements
         // Set the support action bar
         setSupportActionBar(mToolbar);
 
+        // Create the display date, today at 00:00 hrs
+        Calendar date = new GregorianCalendar();
+        mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
+        mTodayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
+
+
+        //Log.i(Constants.LOG_TAG, "Start Time for today in Millis:" + mDisplayDateStartTimeInMillis);
+
+        String showDate = Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis);
+
+        tv_order_filter_date.setText(showDate);
+
         // Set the action bar back button to look like an up button
         mActionBar = this.getSupportActionBar();
 
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(false);
-            //mActionBar.setTitle(showDate);
+            mActionBar.setTitle(showDate);
         }
 
         // Setup the Navigation Drawer
@@ -262,17 +274,7 @@ public class Activity_Main extends AppCompatActivity implements
 
         showOrHideFilterView();
 
-        // Create the display date, today at 00:00 hrs
-        Calendar date = new GregorianCalendar();
-        mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
-        mTodayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
 
-
-        //Log.i(Constants.LOG_TAG, "Start Time for today in Millis:" + mDisplayDateStartTimeInMillis);
-
-        String showDate = Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis);
-
-        tv_order_filter_date.setText(showDate);
 
 
     }
@@ -288,6 +290,11 @@ public class Activity_Main extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_driver_orders:
+                Intent intent_orders = new Intent(this, Activity_ShowOrders.class);
+                intent_orders.putExtra(Constants.EXTRA_DRIVER, mDriver);
+                startActivity(intent_orders);
+                return true;
             case R.id.action_driver_filter:
 
                 showOrHideFilterView();
@@ -731,7 +738,6 @@ public class Activity_Main extends AppCompatActivity implements
 
     }
 
-
     private void setMapCamera() {
 
         //Log.i(Constants.LOG_TAG, "setMapCamera called");
@@ -1136,26 +1142,26 @@ public class Activity_Main extends AppCompatActivity implements
         paintMarkersToMap();
     }
 
-    @OnCheckedChanged({R.id.rb_driver_all, R.id.rb_driver_open, R.id.rb_driver_complete})
-    public void onRadioButtonCheckChanged(CompoundButton button, boolean checked) {
-        if (checked) {
-            switch (button.getId()) {
-                case R.id.rb_driver_all:
-                    mShowOpen = true;
-                    mShowComplete = true;
-                    break;
-                case R.id.rb_driver_open:
-                    mShowOpen = true;
-                    mShowComplete = false;
-                    break;
-                case R.id.rb_driver_complete:
-                    mShowOpen = true;
-                    mShowComplete = false;
-                    break;
-            }
-            paintMarkersToMap();
-        }
-    }
+//    @OnCheckedChanged({R.id.rb_driver_all, R.id.rb_driver_open, R.id.rb_driver_complete})
+//    public void onRadioButtonCheckChanged(CompoundButton button, boolean checked) {
+//        if (checked) {
+//            switch (button.getId()) {
+//                case R.id.rb_driver_all:
+//                    mShowOpen = true;
+//                    mShowComplete = true;
+//                    break;
+//                case R.id.rb_driver_open:
+//                    mShowOpen = true;
+//                    mShowComplete = false;
+//                    break;
+//                case R.id.rb_driver_complete:
+//                    mShowOpen = true;
+//                    mShowComplete = false;
+//                    break;
+//            }
+//            paintMarkersToMap();
+//        }
+//    }
 
     private void showAlertMessage(String title, String company, String address,
                                   final String cancelText, final String status) {
@@ -1196,7 +1202,8 @@ public class Activity_Main extends AppCompatActivity implements
 
                         } else {
 
-                            mSelectedOrder.setQueryDateDriverId(mSelectedOrder.getPickupDate() + "_" + mDriver.getUid() + Constants.FIREBASE_STATUS_SORT_PICKUP_COMPLETE);
+                            mSelectedOrder.setQueryDateDriverId(mSelectedOrder.getPickupDate() + "_" +
+                                    mDriver.getUid() + Constants.FIREBASE_STATUS_SORT_PICKUP_COMPLETE);
                         }
 
 

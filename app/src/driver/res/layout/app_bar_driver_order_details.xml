@@ -19,6 +19,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_driver_splash" />
+    <include layout="@layout/content_driver_order_details" />
 
 </android.support.design.widget.CoordinatorLayout>

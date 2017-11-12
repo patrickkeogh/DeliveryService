@@ -1,13 +1,12 @@
-package com.programming.kantech.deliveryservice.app.driver.views.fragments;
+package com.programming.kantech.deliveryservice.app.driver.views.activities;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -24,19 +23,27 @@ import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by patri on 2017-10-11.
+ * Created by patrick on 2017-11-10.
+ *
  */
 
-public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+public class Activity_OrderDetails extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener{
 
     private Order mSelectedOrder;
+    private ActionBar mActionBar;
     private GoogleApiClient mClient;
+
+    // Bind the layout views
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
 
     @BindView(R.id.tv_order_details_company)
     TextView tv_order_details_company;
@@ -56,33 +63,22 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
     @BindView(R.id.tv_order_details_value)
     TextView tv_order_details_value;
 
-
-    // Mandatory empty constructor
-    public Fragment_OrderDetails() {
-
-    }
-
-    /**
-     * Static factory method that takes an order parameter,
-     * initializes the fragment's arguments, and returns the
-     * new fragment to the client.
-     */
-    public static Fragment_OrderDetails newInstance(Order order) {
-        Fragment_OrderDetails f = new Fragment_OrderDetails();
-        Bundle args = new Bundle();
-        args.putParcelable(Constants.EXTRA_ORDER, order);
-        f.setArguments(args);
-        return f;
-    }
-
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_order_details);
 
-        final View rootView = inflater.inflate(R.layout.fragment_order_details, container, false);
+        ButterKnife.bind(this);
 
-        ButterKnife.bind(this, rootView);
+        // Set the support action bar
+        setSupportActionBar(mToolbar);
+        // Set the action bar back button to look like an up button
+        mActionBar = this.getSupportActionBar();
+
+        if (mActionBar != null) {
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+            mActionBar.setTitle("Order Details");
+        }
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(Constants.STATE_INFO_ORDER)) {
@@ -90,12 +86,12 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
             }
         } else {
 
-            mSelectedOrder = getArguments().getParcelable(Constants.EXTRA_ORDER);
+            mSelectedOrder = getIntent().getParcelableExtra(Constants.EXTRA_ORDER);
         }
 
         if (mSelectedOrder == null) {
             throw new IllegalArgumentException("Must pass EXTRA_ORDER");
-        } else {
+        }else{
 
             tv_order_details_company.setText(mSelectedOrder.getCustomerName());
             tv_order_details_date.setText(Utils_General.getFormattedLongDateStringFromLongDate(mSelectedOrder.getPickupDate()));
@@ -114,16 +110,13 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
 
             String distance_text = km + " km " + " @ $2.13/km";
 
-            String display_amount = Utils_General.getCostString(getContext(), mSelectedOrder.getAmount());
+            String display_amount = Utils_General.getCostString(this, mSelectedOrder.getAmount());
 
             display_amount += " (" + distance_text + ")";
 
 
             tv_order_details_value.setText(display_amount);
         }
-
-        return rootView;
-
     }
 
     @Override
@@ -131,7 +124,6 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
         super.onSaveInstanceState(outState);
         outState.putParcelable(Constants.STATE_INFO_ORDER, mSelectedOrder);
     }
-
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -192,21 +184,21 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    protected void onDestroy() {
+        super.onDestroy();
         mClient = null;
     }
 
     private void buildApiClient() {
-        Log.i(Constants.LOG_TAG, "buildApiClient() called");
+        //Log.i(Constants.LOG_TAG, "buildApiClient() called");
 
         if (mClient == null) {
-            Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
+            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
 
             // Build up the LocationServices API client
             // Uses the addApi method to request the LocationServices API
             // Also uses enableAutoManage to automatically know when to connect/suspend the client
-            mClient = new GoogleApiClient.Builder(getContext())
+            mClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(Places.GEO_DATA_API)

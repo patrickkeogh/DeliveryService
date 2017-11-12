@@ -81,6 +81,7 @@ public class Constants {
     public static final String STATE_INFO_USER = "com.programming.kantech.deliveryservice.app.state.user";
     public static final String STATE_INFO_LOCATION_SELECT_MESSAGE = "com.programming.kantech.deliveryservice.app.state.location.message";
     public static final String STATE_INFO_ORDERS_LIST = "com.programming.kantech.deliveryservice.app.state.orders.list";
+    public static final String STATE_INFO_DATE_FILTER = "com.programming.kantech.deliveryservice.app.state.orders.date_filter";
 
     public static final String STATE_INFO_FRAGMENT_DETAILS = "com.programming.kantech.deliveryservice.app.state.admin.fragment.details";
     public static final String STATE_INFO_FRAGMENT_MASTER = "com.programming.kantech.deliveryservice.app.state.admin.fragment.master";
@@ -99,6 +100,7 @@ public class Constants {
     public static final String EXTRA_ACTIVITY_REF = "com.programming.kantech.deliveryservice.app.extra.activity_ref";
     public static final String EXTRA_ORDER = "com.programming.kantech.deliveryservice.app.extra.order";
     public static final String EXTRA_USER = "com.programming.kantech.deliveryservice.app.extra.user";
+    public static final String EXTRA_DATE_FILTER = "com.programming.kantech.deliveryservice.app.extra.date_filter";
     public static final String EXTRA_LOCATION_SELECT_MESSAGE = "com.programming.kantech.deliveryservice.app.extra.location.message";
 
     /**

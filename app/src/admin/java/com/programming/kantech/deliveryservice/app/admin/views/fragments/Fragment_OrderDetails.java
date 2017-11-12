@@ -102,7 +102,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
     }
 
     /**
-     * Static factory method that takes a driver object parameter,
+     * Static factory method that takes a order object parameter,
      * initializes the fragment's arguments, and returns the
      * new fragment to the client.
      */

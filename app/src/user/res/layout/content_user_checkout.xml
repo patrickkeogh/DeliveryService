@@ -136,7 +136,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:drawablePadding="@dimen/margin_8dp"
-                android:drawableStart="@drawable/ic_date_range_24dp"
+                android:drawableStart="@drawable/ic_date_range_accent_24dp"
                 android:gravity="center_vertical"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 tools:text="Monday July 13th, 2017" />
@@ -202,7 +202,7 @@
                     android:layout_gravity="fill"
                     android:layout_marginEnd="@dimen/margin_8dp"
                     android:foregroundGravity="center_vertical"
-                    android:src="@drawable/ic_date_range_24dp"
+                    android:src="@drawable/ic_date_range_accent_24dp"
                     android:contentDescription="@string/content_description_expiry_date" />
 
                 <LinearLayout

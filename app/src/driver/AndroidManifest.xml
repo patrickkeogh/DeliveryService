@@ -26,13 +26,35 @@
         </activity>
         <activity
             android:name="com.programming.kantech.deliveryservice.app.driver.views.activities.Activity_NewDriverRequest"
-            android:label="@string/app_name"></activity>
+            android:label="@string/app_name">
+
+        </activity>
         <activity
             android:name="com.programming.kantech.deliveryservice.app.driver.views.activities.Activity_ShowOrders"
-            android:label="@string/app_name"></activity>
+            android:launchMode="singleTop"
+            android:label="@string/app_name">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.programming.kantech.deliveryservice.app.driver.views.activities.Activity_Main" />
+
+        </activity>
+
+        <activity
+            android:name="com.programming.kantech.deliveryservice.app.driver.views.activities.Activity_OrderDetails"
+            android:label="@string/app_name">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.programming.kantech.deliveryservice.app.driver.views.activities.Activity_ShowOrders" />
+
+        </activity>
+
         <activity
             android:name="com.programming.kantech.deliveryservice.app.driver.views.activities.Activity_Photo"
-            android:label="@string/app_name"></activity>
+            android:label="@string/app_name">
+
+        </activity>
 
         <service android:name="com.programming.kantech.deliveryservice.app.driver.services.Service_DriverLocation" />
         <service

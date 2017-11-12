@@ -5,16 +5,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -36,21 +32,19 @@ import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 import com.programming.kantech.deliveryservice.app.utils.Utils_Preferences;
 
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
  * Created by patrick on 2017-11-03.
+ * An activity used to limit access to the app, until verified and logged in.
  */
 
 public class Activity_Splash extends AppCompatActivity {
 
     // The driver object for the logged in auth user
     private Driver mDriver;
-    private ActionBar mActionBar;
 
     // Member variables for the Firebase Authorization
     private FirebaseAuth mFirebaseAuth;
@@ -58,9 +52,6 @@ public class Activity_Splash extends AppCompatActivity {
 
     // Member variables for the Firebase database Refs
     private DatabaseReference mDriverRef;
-
-    @BindView(R.id.toolbar)
-    Toolbar mToolbar;
 
     @BindView(R.id.tv_request_title)
     TextView mTitle;
@@ -78,16 +69,7 @@ public class Activity_Splash extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        // Set the support action bar
-        setSupportActionBar(mToolbar);
-
-        // Set the action bar back button to look like an up button
-        mActionBar = this.getSupportActionBar();
-
-        if (mActionBar != null) {
-            mActionBar.setDisplayHomeAsUpEnabled(false);
-            mActionBar.setTitle("Checking ...");
-        }
+        initializeApp();
 
         mFirebaseAuth = FirebaseAuth.getInstance();
 
@@ -215,19 +197,24 @@ public class Activity_Splash extends AppCompatActivity {
                     // run some code
 
                     mDriver = dataSnapshot.getValue(Driver.class);
-                    Log.i(Constants.LOG_TAG, "The driver is in the db:" + mDriver.toString());
+                    //Log.i(Constants.LOG_TAG, "The driver is in the db:" + mDriver.toString());
 
-                    if (!mDriver.getDriverApproved()) {
-                        showDriverNotAuthorized(user);
-                    } else {
-                        Intent intent = new Intent(Activity_Splash.this, Activity_Main.class);
-                        intent.putExtra(Constants.EXTRA_DRIVER, mDriver);
-                        startActivity(intent);
-                        finish();
+                    if(mDriver != null){
+
+                        if (!mDriver.getDriverApproved()) {
+                            showDriverNotAuthorized(user);
+                        } else {
+                            Intent intent = new Intent(Activity_Splash.this, Activity_Main.class);
+                            intent.putExtra(Constants.EXTRA_DRIVER, mDriver);
+                            startActivity(intent);
+                            finish();
+                        }
                     }
 
+
+
                 } else {
-                    Log.i(Constants.LOG_TAG, "The driver is not in the database");
+                    //Log.i(Constants.LOG_TAG, "The driver is not in the database");
                     // User is not in the driver db. add them
                     mDriver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(), "", false, false, "", "");
 

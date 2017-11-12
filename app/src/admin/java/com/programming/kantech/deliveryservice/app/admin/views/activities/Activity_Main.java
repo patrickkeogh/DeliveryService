@@ -1,5 +1,6 @@
 package com.programming.kantech.deliveryservice.app.admin.views.activities;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -26,8 +28,6 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
@@ -44,8 +44,12 @@ import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
+import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -77,6 +81,9 @@ public class Activity_Main extends AppCompatActivity implements
     private boolean mLandscapeView;
     private boolean mIsFirstTimeLoaded = true;
     private ActionBarDrawerToggle mDrawerToggle;
+
+    // 12:00 AM of the selected day
+    private long mDisplayDateStartTimeInMillis;
 
     private boolean mShowDriverIcon = true;
     private boolean mShowDrivers = true;
@@ -119,6 +126,10 @@ public class Activity_Main extends AppCompatActivity implements
 
         mFragmentManager = getSupportFragmentManager();
 
+        // Create the display date, today at 00:00 hrs
+        Calendar date = new GregorianCalendar();
+        mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
+
         // Set the support action bar
         setSupportActionBar(mToolbar);
 
@@ -151,24 +162,6 @@ public class Activity_Main extends AppCompatActivity implements
         // Get the current orientation
         mLandscapeView = (findViewById(R.id.layout_for_two_cols) != null);
         Log.i(Constants.LOG_TAG, "Update Landscape variable to:" + mLandscapeView);
-
-//        if (savedInstanceState != null) {
-//            Log.i(Constants.LOG_TAG, "We have a state");
-//            if (savedInstanceState.containsKey(Constants.STATE_INFO_FRAGMENT_DETAILS)) {
-//                mContainerDetailsTag = savedInstanceState.getString(Constants.STATE_INFO_FRAGMENT_DETAILS);
-//                //showOrHideContainers(mContainerDetailsTag);
-//            }
-//
-//            if (savedInstanceState.containsKey(Constants.STATE_INFO_FRAGMENT_MASTER)) {
-//                mContainerMasterTag = savedInstanceState.getString(Constants.STATE_INFO_FRAGMENT_MASTER);
-//                //showOrHideContainers(mContainerMasterTag);
-//            }
-//
-//            if (savedInstanceState.containsKey(Constants.STATE_INFO_FRAGMENT_FULLSCREEN)) {
-//                mContainerFullScreenTag = savedInstanceState.getString(Constants.STATE_INFO_FRAGMENT_FULLSCREEN);
-//                //showOrHideContainers(mContainerFullScreenTag);
-//            }
-//        }
 
         if (savedInstanceState == null && mIsFirstTimeLoaded) {
             // add main fragment to master container on first start
@@ -244,15 +237,11 @@ public class Activity_Main extends AppCompatActivity implements
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        // What ever is here we should remove the details container of there is one,
-        // and remove anything on the back stack as these are all root items
-
         // if we are in 2 pane mode, remove what ever is in the details container
         // when loading the lookup lists
-        if (mLandscapeView) {
-            clearDetailsContainer();
-        }
+        if (mLandscapeView) clearDetailsContainer();
 
+        // Any nav item selected should be a root item so clear the backstack
         for (int i = 0; i < mFragmentManager.getBackStackEntryCount(); ++i) {
             mFragmentManager.popBackStack();
         }
@@ -295,7 +284,7 @@ public class Activity_Main extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
+        inflater.inflate(R.menu.menu_main, menu);
 
 //        mMenuItem_Driver = menu.findItem(R.id.action_show_drivers);
 //        mMenuItem_Order = menu.findItem(R.id.action_show_orders);
@@ -329,6 +318,54 @@ public class Activity_Main extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+
+            case R.id.action_driver_orders_previous:
+
+                mDisplayDateStartTimeInMillis -= Constants.DAY;
+
+                //remove details frag if one is loaded
+                if (mLandscapeView) {
+                    clearDetailsContainer();
+                }
+
+
+
+                //replaceMasterListFragment();
+
+                return true;
+
+            case R.id.action_driver_orders_next:
+
+                mDisplayDateStartTimeInMillis += Constants.DAY;
+
+                if (mLandscapeView) {
+                    clearDetailsContainer();
+                }
+
+                //replaceMasterListFragment();
+
+
+                return true;
+
+            case R.id.action_driver_orders_select_date:
+
+                if (mLandscapeView) {
+                    clearDetailsContainer();
+                }
+
+                Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date
+
+                // Create the DatePickerDialog instance
+                DatePickerDialog datePicker = new DatePickerDialog(this,
+                        R.style.ThemeOverlay_AppCompat_Dialog_Alert, datePickerListener,
+                        cal.get(Calendar.YEAR),
+                        cal.get(Calendar.MONTH),
+                        cal.get(Calendar.DAY_OF_MONTH));
+                datePicker.setCancelable(false);
+                datePicker.setTitle("Select A Date");
+                datePicker.show();
+
+                return true;
 
             case R.id.action_sign_out:
                 Log.i(Constants.LOG_TAG, "Sign out clicked:");
@@ -416,44 +453,6 @@ public class Activity_Main extends AppCompatActivity implements
         mDriverRef.child(driver.getUid()).setValue(driver);
 
     }
-
-//    private void detachDatabaseReadListeners() {
-//        if (mDriversTableEventListener != null) {
-//            mDriverRef.removeEventListener(mDriversTableEventListener);
-//            mDriversTableEventListener = null;
-//        }
-//    }
-
-//    private void attachDatabaseReadListeners() {
-//
-//        if (mDriversTableEventListener == null) {
-//            mDriversTableEventListener = new ChildEventListener() {
-//                @Override
-//                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-////                    FriendlyMessage friendlyMessage = dataSnapshot.getValue(FriendlyMessage.class);
-////                    mMessageAdapter.add(friendlyMessage);
-//
-//                    //Utils_General.showToast(getApplicationContext(), "Child Changed");
-//
-//                }
-//
-//                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//                }
-//
-//                public void onChildRemoved(DataSnapshot dataSnapshot) {
-//                }
-//
-//                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//                }
-//
-//                public void onCancelled(DatabaseError databaseError) {
-//                }
-//            };
-//            mDriverRef.addChildEventListener(mDriversTableEventListener);
-//        }
-//
-//
-//    }
 
 //    @Override
 //    public void onGetCustomerSelected() {
@@ -565,10 +564,12 @@ public class Activity_Main extends AppCompatActivity implements
             }
         }
 
+        String showDate = Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis);
+
         switch (tag) {
             case Constants.TAG_FRAGMENT_MAIN_DETAILS:
                 //showOrHideContainers(tag);
-                enableViews(false, "Live");
+                enableViews(false, showDate);
                 break;
 
             case Constants.TAG_FRAGMENT_ORDER_LIST:
@@ -609,7 +610,7 @@ public class Activity_Main extends AppCompatActivity implements
     @Override
     public void onCustomerSaved(Customer customer) {
 
-        getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        mFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
         Fragment_CustomerDetails fragment = Fragment_CustomerDetails.newInstance(customer);
 
@@ -626,7 +627,7 @@ public class Activity_Main extends AppCompatActivity implements
     public void onLocationAdded(Customer customer) {
         //Log.i(Constants.LOG_TAG, "onCustomerSelected called CustKey:" + customer);
 
-        getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        mFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
         Fragment_CustomerDetails fragment = Fragment_CustomerDetails.newInstance(customer);
 
@@ -660,4 +661,30 @@ public class Activity_Main extends AppCompatActivity implements
             outState.putString(Constants.STATE_INFO_FRAGMENT_DETAILS, tag_details);
         }
     }
+
+    // Date picker listener
+    private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
+
+        // when dialog box is closed, below method will be called.
+        public void onDateSet(DatePicker view, int selectedYear,
+                              int selectedMonth, int selectedDay) {
+
+            final Calendar c = Calendar.getInstance();
+            c.set(Calendar.YEAR, selectedYear);
+            c.set(Calendar.MONTH, selectedMonth);
+            c.set(Calendar.DAY_OF_MONTH, selectedDay);
+
+            c.set(Calendar.HOUR, 0);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 0);
+
+
+            mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(c.getTimeInMillis());
+
+            Log.i(Constants.LOG_TAG, Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis));
+
+            //replaceMasterListFragment();
+
+        }
+    };
 }

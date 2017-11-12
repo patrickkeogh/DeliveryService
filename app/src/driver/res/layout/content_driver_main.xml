@@ -21,7 +21,7 @@
         android:layout_marginStart="50dp"
         android:layout_marginTop="50dp"
         android:layout_width="250dp"
-        android:layout_height="280dp">
+        android:layout_height="108dp">
 
         <TextView
             android:textColor="@color/colorWhite"
@@ -64,64 +64,64 @@
             android:layout_width="match_parent"
             android:layout_height="2dp" />
 
-        <TextView
-            android:textColor="@color/colorWhite"
-            android:background="@color/colorMapTitleFilter"
-            android:gravity="center"
-            android:text="Order Filters"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:layout_width="match_parent"
-            android:layout_height="40dp" />
+        <!--<TextView-->
+            <!--android:textColor="@color/colorWhite"-->
+            <!--android:background="@color/colorMapTitleFilter"-->
+            <!--android:gravity="center"-->
+            <!--android:text="Order Filters"-->
+            <!--android:textAppearance="@style/TextAppearance.AppCompat.Large"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="40dp" />-->
 
 
 
-        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/rg_driver_options"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+        <!--<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"-->
+            <!--android:id="@+id/rg_driver_options"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="vertical">-->
 
-            <RadioButton
-                android:id="@+id/rb_driver_all"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:checked="true"
-                android:textColor="@color/colorWhite"
-                android:buttonTint="@color/colorWhite"
-                android:text="All Orders" />
+            <!--<RadioButton-->
+                <!--android:id="@+id/rb_driver_all"-->
+                <!--android:textAppearance="@style/TextAppearance.AppCompat.Medium"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="40dp"-->
+                <!--android:checked="true"-->
+                <!--android:textColor="@color/colorWhite"-->
+                <!--android:buttonTint="@color/colorWhite"-->
+                <!--android:text="All Orders" />-->
 
-            <View
-                android:background="@color/colorPrimaryLight"
-                android:layout_width="match_parent"
-                android:layout_height="2dp" />
+            <!--<View-->
+                <!--android:background="@color/colorPrimaryLight"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="2dp" />-->
 
-            <RadioButton
-                android:id="@+id/rb_driver_open"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:textColor="@color/colorWhite"
-                android:buttonTint="@color/colorWhite"
-                android:text="Open Orders" />
+            <!--<RadioButton-->
+                <!--android:id="@+id/rb_driver_open"-->
+                <!--android:textAppearance="@style/TextAppearance.AppCompat.Medium"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="40dp"-->
+                <!--android:textColor="@color/colorWhite"-->
+                <!--android:buttonTint="@color/colorWhite"-->
+                <!--android:text="Open Orders" />-->
 
-            <View
-                android:background="@color/colorPrimaryLight"
-                android:layout_width="match_parent"
-                android:layout_height="2dp" />
+            <!--<View-->
+                <!--android:background="@color/colorPrimaryLight"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="2dp" />-->
 
-            <RadioButton
-                android:id="@+id/rb_driver_complete"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:textColor="@color/colorWhite"
-                android:buttonTint="@color/colorWhite"
-                android:text="Complete Orders" />
+            <!--<RadioButton-->
+                <!--android:id="@+id/rb_driver_complete"-->
+                <!--android:textAppearance="@style/TextAppearance.AppCompat.Medium"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="40dp"-->
+                <!--android:textColor="@color/colorWhite"-->
+                <!--android:buttonTint="@color/colorWhite"-->
+                <!--android:text="Complete Orders" />-->
 
 
 
-            </RadioGroup>
+            <!--</RadioGroup>-->
 
 
 

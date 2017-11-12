@@ -30,7 +30,7 @@
 
             <TextView
                 android:id="@+id/tv_order_date"
-                android:drawableStart="@drawable/ic_date_range_24dp"
+                android:drawableStart="@drawable/ic_date_range_accent_24dp"
                 android:drawablePadding="@dimen/padding_8dp"
                 android:gravity="center_vertical"
                 android:layout_width="match_parent"

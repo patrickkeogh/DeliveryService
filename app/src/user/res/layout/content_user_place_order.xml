@@ -160,7 +160,7 @@
                     android:layout_height="@dimen/icon_width_height"
                     android:layout_marginEnd="@dimen/margin_8dp"
                     android:contentDescription="@string/content_description_select_order_date"
-                    android:src="@drawable/ic_date_range_24dp" />
+                    android:src="@drawable/ic_date_range_accent_24dp" />
 
                 <TextView
                     android:id="@+id/tv_selected_date"
