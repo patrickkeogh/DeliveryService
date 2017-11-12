@@ -55,6 +55,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -678,8 +679,7 @@ public class Activity_Main extends AppCompatActivity implements
                                     .title(order.getCustomerName())
                                     .snippet(places.get(0).getAddress().toString())
                                     .infoWindowAnchor(0.5f, 0.5f)
-                                    .icon(Utils_General.vectorToBitmap(Activity_Main.this, R.drawable.ic_place_accent_24dp,
-                                            ContextCompat.getColor(Activity_Main.this, pickupIconColor)));
+                                    .icon(BitmapDescriptorFactory.defaultMarker(Utils_General.getMarkerColorByStatus(order.getStatus())));
 
                             Marker marker = mGoogleMap.addMarker(markerOptions);
 
@@ -719,8 +719,10 @@ public class Activity_Main extends AppCompatActivity implements
                                     .title(order.getCustomerName())
                                     .snippet(places.get(0).getAddress().toString())
                                     .infoWindowAnchor(0.5f, 0.5f)
-                                    .icon(Utils_General.vectorToBitmap(Activity_Main.this, R.drawable.ic_place_accent_24dp,
-                                            ContextCompat.getColor(Activity_Main.this, deliveryIconColor)));
+                                    .icon(BitmapDescriptorFactory.defaultMarker(Utils_General.getMarkerColorByStatus(order.getStatus())));
+
+//                                    .icon(Utils_General.vectorToBitmap(Activity_Main.this, R.drawable.ic_place_accent_24dp,
+//                                            ContextCompat.getColor(Activity_Main.this, deliveryIconColor)));
 
                             Marker marker = mGoogleMap.addMarker(markerOptions);
 

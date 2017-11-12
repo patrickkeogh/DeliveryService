@@ -27,13 +27,14 @@ import java.util.Locale;
 
 /**
  * Created by patrick keogh on 2017-08-09.
+ *
  * @class Utils_General
  * @brief Helper methods shared by various Activities.
  */
 
 public class Utils_General {
 
-    public static String[] getSpinnerMonths(){
+    public static String[] getSpinnerMonths() {
 
         String[] months = new String[12];
 
@@ -48,7 +49,7 @@ public class Utils_General {
         return months;
     }
 
-    public static String[] getSpinnerYears(){
+    public static String[] getSpinnerYears() {
 
         String[] years = new String[12];
 
@@ -97,9 +98,9 @@ public class Utils_General {
      *
      * @return Calendar object for current date
      */
-    public static Calendar getTodayAtStartTime(){
+    public static Calendar getTodayAtStartTime() {
 
-        Calendar dateAtMidnight =  new GregorianCalendar();
+        Calendar dateAtMidnight = new GregorianCalendar();
 
         // reset hour, minutes, seconds and millis
         dateAtMidnight.set(Calendar.HOUR_OF_DAY, 0);
@@ -115,7 +116,7 @@ public class Utils_General {
      *
      * @return long the supplied date at 00:00:00 in milliseconds
      */
-    public static long getStartTimeForDate( long date_in){
+    public static long getStartTimeForDate(long date_in) {
         Log.i(Constants.LOG_TAG, "getStartTimeForDate:" + date_in);
 
         Calendar date = new GregorianCalendar();
@@ -136,9 +137,9 @@ public class Utils_General {
      *
      * @return Calendar object for current date
      */
-    public static Calendar getTodayAtEndTime(){
+    public static Calendar getTodayAtEndTime() {
 
-        Calendar dateAtMidnight =  new GregorianCalendar();
+        Calendar dateAtMidnight = new GregorianCalendar();
 
         // reset hour, minutes, seconds and millis
         dateAtMidnight.set(Calendar.HOUR_OF_DAY, 23);
@@ -218,6 +219,25 @@ public class Utils_General {
         currency.setMinimumFractionDigits(2);
 
         return currency.format(amount);
+    }
+
+    public static float getMarkerColorByStatus(String status) {
+
+        float markerColor;
+
+        switch (status) {
+            case Constants.ORDER_STATUS_COMPLETE:
+                markerColor = BitmapDescriptorFactory.HUE_RED;
+                break;
+
+            default:
+                markerColor = BitmapDescriptorFactory.HUE_GREEN;
+                break;
+
+        }
+
+
+        return markerColor;
     }
 
     /**

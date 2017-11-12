@@ -166,7 +166,7 @@ public class Activity_Main extends AppCompatActivity implements
         if (savedInstanceState == null && mIsFirstTimeLoaded) {
             // add main fragment to master container on first start
             mIsFirstTimeLoaded = false;
-            Fragment_MainDetails fragment = Fragment_MainDetails.newInstance();
+            Fragment_MainDetails fragment = Fragment_MainDetails.newInstance(mDisplayDateStartTimeInMillis);
             replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
 
         }
@@ -248,7 +248,7 @@ public class Activity_Main extends AppCompatActivity implements
 
         if (id == R.id.nav_admin_home) {
 
-            Fragment_MainDetails fragment = Fragment_MainDetails.newInstance();
+            Fragment_MainDetails fragment = Fragment_MainDetails.newInstance(mDisplayDateStartTimeInMillis);
             replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
 
         } else if (id == R.id.nav_admin_manage_drivers) {
@@ -319,7 +319,7 @@ public class Activity_Main extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
-            case R.id.action_driver_orders_previous:
+            case R.id.action_admin_orders_previous:
 
                 mDisplayDateStartTimeInMillis -= Constants.DAY;
 
@@ -328,26 +328,49 @@ public class Activity_Main extends AppCompatActivity implements
                     clearDetailsContainer();
                 }
 
+                if (mFragmentManager.findFragmentById(R.id.container_master) != null) {
+
+                    // Get the fragment in the master container
+
+                    Fragment frag = mFragmentManager.findFragmentById(R.id.container_master);
+
+                    if(frag instanceof Fragment_MainDetails){
+                        Fragment_MainDetails fragment = Fragment_MainDetails.newInstance(mDisplayDateStartTimeInMillis);
+                        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
+                    }
+                }
+
 
 
                 //replaceMasterListFragment();
 
                 return true;
 
-            case R.id.action_driver_orders_next:
+            case R.id.action_admin_orders_next:
 
                 mDisplayDateStartTimeInMillis += Constants.DAY;
 
+                //remove details frag if one is loaded
                 if (mLandscapeView) {
                     clearDetailsContainer();
                 }
 
-                //replaceMasterListFragment();
+                if (mFragmentManager.findFragmentById(R.id.container_master) != null) {
+
+                    // Get the fragment in the master container
+
+                    Fragment frag = mFragmentManager.findFragmentById(R.id.container_master);
+
+                    if(frag instanceof Fragment_MainDetails){
+                        Fragment_MainDetails fragment = Fragment_MainDetails.newInstance(mDisplayDateStartTimeInMillis);
+                        replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
+                    }
+                }
 
 
                 return true;
 
-            case R.id.action_driver_orders_select_date:
+            case R.id.action_admin_orders_select_date:
 
                 if (mLandscapeView) {
                     clearDetailsContainer();

@@ -3,21 +3,21 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_driver_orders_previous"
+        android:id="@+id/action_admin_orders_previous"
         android:icon="@drawable/ic_chevron_left_white_24dp"
         android:title="@string/action_driver_orders_previous"
         android:orderInCategory="100"
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/action_driver_orders_next"
+        android:id="@+id/action_admin_orders_next"
         android:icon="@drawable/ic_chevron_right_white_24dp"
         android:title="@string/action_driver_orders_next"
         android:orderInCategory="200"
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/action_driver_orders_select_date"
+        android:id="@+id/action_admin_orders_select_date"
         android:icon="@drawable/ic_date_range_white_24dp"
         android:title="@string/action_driver_orders_select_day"
         android:orderInCategory="300"

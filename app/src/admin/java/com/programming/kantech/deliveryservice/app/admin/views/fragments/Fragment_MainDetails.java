@@ -56,7 +56,6 @@ import butterknife.ButterKnife;
 public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private MapView mMapView;
     private GoogleMap mGoogleMap;
     private GoogleApiClient mGoogleApiClient;
     //private Marker mDriverMarker;
@@ -78,10 +77,11 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     private ChildEventListener mActiveDriversEventListener;
 
     private Query mOrdersQuery;
+    private DatabaseReference mOrdersRef;
     private ValueEventListener mOrdersEventListener;
 
     @BindView(R.id.mapView)
-    MapView mapView;
+    MapView mMapView;
 
     // Define a new interface StepNavClickListener that triggers a callback in the host activity
     MainDetailsFragmentListener mCallback;
@@ -105,15 +105,6 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
         args.putLong(Constants.EXTRA_DATE_FILTER, date_in);
         f.setArguments(args);
         return f;
-    }
-
-    /**
-     * Static factory method that,
-     * initializes the fragment's arguments, and returns the
-     * new fragment to the client.
-     */
-    public static Fragment_MainDetails newInstance() {
-        return new Fragment_MainDetails();
     }
 
     @Nullable
@@ -150,11 +141,11 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
         mMapView.getMapAsync(this);
 
+        // Get a root reference to the orders table
+        mOrdersRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_ORDERS);
+
         mActiveDriverLocationRef = FirebaseDatabase.getInstance()
                 .getReference().child(Constants.FIREBASE_NODE_DRIVER_LOCATIONS);
-
-        mOrdersQuery = FirebaseDatabase.getInstance()
-                .getReference().child(Constants.FIREBASE_NODE_ORDERS).orderByChild(Constants.FIREBASE_CHILD_INPROGRESS).equalTo(true);
 
         return rootView;
 
@@ -215,6 +206,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
         builder = new LatLngBounds.Builder();
 
         // Add Marker for home office
+        // This will have to be downloaded
         LatLng home = new LatLng(44.3916, -79.6882);
         drawMarker(home, "HOME", "Kan-Tech Delivery Service",
                 Utils_General.vectorToBitmap(getContext(), R.drawable.ic_menu_home,
@@ -248,6 +240,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
                 final Order order = mOrdersList.get(i);
 
+
                 final PendingResult<PlaceBuffer> pickupResult =
                         Places.GeoDataApi.getPlaceById(mGoogleApiClient, order.getPickupLocationId());
 
@@ -256,7 +249,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                     public void onResult(@NonNull PlaceBuffer places) {
 
                         drawMarker(places.get(0).getLatLng(), order.getCustomerName(), places.get(0).getAddress().toString(),
-                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                                BitmapDescriptorFactory.defaultMarker(Utils_General.getMarkerColorByStatus(order.getStatus())));
                     }
                 });
 
@@ -268,7 +261,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                     public void onResult(@NonNull PlaceBuffer places) {
 
                         drawMarker(places.get(0).getLatLng(), order.getCustomerName(), places.get(0).getAddress().toString(),
-                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                                BitmapDescriptorFactory.defaultMarker(Utils_General.getMarkerColorByStatus(order.getStatus())));
                     }
                 });
             }
@@ -378,8 +371,10 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
         });
     }
 
-
     private void attachOrderReadListener() {
+
+        // Get all orders for the selected date and driver
+        mOrdersQuery = getDatabaseQueryForMap();
 
         if (mOrdersEventListener == null) {
 
@@ -435,7 +430,11 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                     if (strLat != null && strLng != null) {
 
                         // Get the driver just signed in
-                        DatabaseReference driverRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_DRIVERS).child(driverKey);
+                        DatabaseReference driverRef = FirebaseDatabase
+                                .getInstance()
+                                .getReference()
+                                .child(Constants.FIREBASE_NODE_DRIVERS)
+                                .child(driverKey);
 
                         driverRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -566,6 +565,12 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
         }
 
 
+    }
+
+    private Query getDatabaseQueryForMap() {
+
+        //String strQuery = "true_" + mDisplayDateStartTimeInMillis + "_" + mDriver.getUid();
+        return mOrdersRef.orderByChild("pickupDate").equalTo(mDisplayDateStartTimeInMillis);
     }
 }
 
