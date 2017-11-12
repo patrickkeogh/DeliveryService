@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,7 +94,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     }
 
     /**
-     * Static factory method that takes a order object parameter,
+     * Static factory method that takes a datetime object parameter,
      * initializes the fragment's arguments, and returns the
      * new fragment to the client.
      */
@@ -122,6 +123,8 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
         if (mDisplayDateStartTimeInMillis == 0) {
             throw new IllegalArgumentException("Must pass EXTRA_DATE_FILTER");
+        }else{
+            Log.i(Constants.LOG_TAG, "Saved date for mp:" + Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis));
         }
 
         // Get the fragment layout for the driving list
@@ -149,6 +152,17 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
         return rootView;
 
+    }
+
+    /**
+     * Save the current state of this fragment
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Store the driver in the instance state
+        outState.putLong(Constants.STATE_INFO_DATE_FILTER, mDisplayDateStartTimeInMillis);
     }
 
     // Override onAttach to make sure that the container activity has implemented the callback
@@ -569,8 +583,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
     private Query getDatabaseQueryForMap() {
 
-        //String strQuery = "true_" + mDisplayDateStartTimeInMillis + "_" + mDriver.getUid();
-        return mOrdersRef.orderByChild("pickupDate").equalTo(mDisplayDateStartTimeInMillis);
+        return mOrdersRef.orderByChild(Constants.FIREBASE_CHILD_PICKUP_DATE).equalTo(mDisplayDateStartTimeInMillis);
     }
 }
 

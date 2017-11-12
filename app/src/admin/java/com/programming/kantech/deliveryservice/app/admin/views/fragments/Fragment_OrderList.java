@@ -26,6 +26,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Order;
@@ -52,6 +53,9 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
     private RecyclerView.AdapterDataObserver mObserver;
     private GoogleApiClient mClient;
     private Order mSelectedOrder;
+
+    // 12:00 AM of the selected day
+    private long mDisplayDateStartTimeInMillis;
 
 
     // Member variables for Firebase
@@ -88,19 +92,36 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
     }
 
     /**
-     * Static factory method that
+     * Static factory method that takes a datetime object parameter,
      * initializes the fragment's arguments, and returns the
      * new fragment to the client.
      */
-    public static Fragment_OrderList newInstance() {
+    public static Fragment_OrderList newInstance(long date_in) {
+        Fragment_OrderList f = new Fragment_OrderList();
+        Bundle args = new Bundle();
 
-        return new Fragment_OrderList();
+        // Add any required arguments for start up - None needed right now
+        args.putLong(Constants.EXTRA_DATE_FILTER, date_in);
+        f.setArguments(args);
+        return f;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(Constants.STATE_INFO_DATE_FILTER)) {
+                mDisplayDateStartTimeInMillis = savedInstanceState.getLong(Constants.STATE_INFO_DATE_FILTER);
+            }
+        } else {
+            mDisplayDateStartTimeInMillis = getArguments().getLong(Constants.EXTRA_DATE_FILTER);
+        }
+
+        if (mDisplayDateStartTimeInMillis == 0) {
+            throw new IllegalArgumentException("Must pass EXTRA_DATE_FILTER");
+        }
 
         // Get the fragment layout for the driving list
         final View rootView = inflater.inflate(R.layout.fragment_order_list, container, false);
@@ -112,6 +133,17 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
 
         return rootView;
 
+    }
+
+    /**
+     * Save the current state of this fragment
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Store the driver in the instance state
+        outState.putLong(Constants.STATE_INFO_DATE_FILTER, mDisplayDateStartTimeInMillis);
     }
 
     @Override
@@ -218,15 +250,10 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
         }
     }
 
-//    private Query getDatabaseRef() {
-//        //Log.i(Constants.LOG_TAG, "CustId:" + mAppUser.getId());
-//
-//        // Add filtering here
-//
-//        return mOrdersRef;
-//
-//
-//    }
+    private Query getDatabaseQuery() {
+
+        return mOrdersRef.orderByChild(Constants.FIREBASE_CHILD_PICKUP_DATE).equalTo(mDisplayDateStartTimeInMillis);
+    }
 
     private void loadFirebaseAdapter() {
         //Log.i(Constants.LOG_TAG, "loadFirebaseAdapter");
@@ -235,7 +262,7 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
                 Order.class,
                 R.layout.item_admin_order,
                 ViewHolder_Order.class,
-                mOrdersRef) {
+                getDatabaseQuery()) {
 
             @Override
             public void populateViewHolder(final ViewHolder_Order holder, final Order order, int position) {

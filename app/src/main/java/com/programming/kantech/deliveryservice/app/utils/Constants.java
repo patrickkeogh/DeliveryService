@@ -162,6 +162,7 @@ public class Constants {
     public static final String FIREBASE_CHILD_DEVICE = "device";
     public static final String FIREBASE_CHILD_LOCATIONS = "locations";
     public static final String FIREBASE_CHILD_INPROGRESS = "inProgress";
+    public static final String FIREBASE_CHILD_PICKUP_DATE = "pickupDate";
 
     public static final String FIREBASE_CHILD_ORDER_STATUS = "status";
     public static final String FIREBASE_CHILD_ORDER_CUST_ID = "customerId";
