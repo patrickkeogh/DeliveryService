@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +48,7 @@ import butterknife.OnClick;
 public class Fragment_OrderList extends Fragment implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    // Member variables
+    // Local member variables
     private FirebaseRecyclerAdapter<Order, ViewHolder_Order> mFireAdapter;
     private RecyclerView.AdapterDataObserver mObserver;
     private GoogleApiClient mClient;
@@ -162,6 +163,8 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
          * FIREBASE ADAPTOR
          */
         rv_orders_list.setHasFixedSize(false);
+
+
 
     }
 
@@ -330,14 +333,17 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
 
         rv_orders_list.setAdapter(mFireAdapter);
 
+        Query countRef = getDatabaseQuery();
+
         // Hide or show the list depending on if there are records
-        mOrdersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        countRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //remove loading indicator
 
                 // Perform initial setup, this will only be called once
                 if (dataSnapshot.hasChildren()) {
+                    Log.i(Constants.LOG_TAG, "we have records");
                     showList(true);
                 } else {
                     showList(false);

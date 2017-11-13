@@ -31,8 +31,19 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_orders_list"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tv_empty_view"
+                android:text="@string/msg_there_are_no_orders_to_show"
+                android:visibility="visible"
+                android:padding="@dimen/padding_8dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 

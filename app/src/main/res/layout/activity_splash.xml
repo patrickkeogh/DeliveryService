@@ -17,23 +17,35 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/app_name_full"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+            android:textColor="@color/colorPrimaryDark"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
         <TextView
+            android:id="@+id/tv_splash_subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="@string/title_app_admin_application"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            android:text="@string/title_app_driver_application"
+            android:textColor="@color/colorPrimaryLight"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
 
         <TextView
+            android:id="@+id/tv_splash_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:layout_marginTop="@dimen/margin_16dp"
-            android:text="@string/msg_initializing_app"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+        <TextView
+            android:id="@+id/tv_splash_message2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="@dimen/margin_8dp"
+
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
         <ProgressBar
             android:id="@+id/pb_loading_indicator"

@@ -65,12 +65,18 @@ public class Activity_Splash extends AppCompatActivity {
     @BindView(R.id.pb_loading_indicator)
     ProgressBar mProgressBar;
 
+    @BindView(R.id.tv_splash_subtitle)
+    TextView tv_splash_subtitle;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
         ButterKnife.bind(this);
+
+        // Set the subtitle for the splash page
+        tv_splash_subtitle.setText(R.string.app_title_driver);
 
         initializeApp();
 
@@ -197,7 +203,7 @@ public class Activity_Splash extends AppCompatActivity {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i(Constants.LOG_TAG, "onDataChange()called for driver");
+                //Log.i(Constants.LOG_TAG, "onDataChange()called for driver");
 
                 // Check if a driver document was found for the use signed in (by userId)
                 if (dataSnapshot.exists()) {
@@ -205,9 +211,9 @@ public class Activity_Splash extends AppCompatActivity {
 
                     mDriver = dataSnapshot.getValue(Driver.class);
 
-                    tv_splash_message.setText(R.string.msg_checking_status);
+                    tv_splash_message.setText(R.string.msg_splash_initializing_app);
 
-                    if(mDriver != null){
+                    if (mDriver != null) {
 
                         if (!mDriver.getDriverApproved()) {
                             showDriverNotAuthorized(user);
@@ -222,11 +228,10 @@ public class Activity_Splash extends AppCompatActivity {
                                     startActivity(intent);
                                     finish();
                                 }
-                            }, 5000); // This is just for testing
+                            }, 5000); // This is just for testing, maybe lol
 
-                            }
+                        }
                     }
-
 
 
                 } else {
@@ -245,10 +250,6 @@ public class Activity_Splash extends AppCompatActivity {
 
             }
         });
-
-        //checkIfAuthorized();
-        //attachDatabaseReadListeners();
-
     }
 
     private void sendTokenToServer(FirebaseUser user) {

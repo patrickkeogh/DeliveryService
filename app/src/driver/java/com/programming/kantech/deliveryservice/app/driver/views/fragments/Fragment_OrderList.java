@@ -21,9 +21,12 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
@@ -45,13 +48,18 @@ import butterknife.ButterKnife;
 public class Fragment_OrderList extends Fragment implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
+    // Local member variables
     private FirebaseRecyclerAdapter<Order, ViewHolder_OrderHistory> mFireAdapter;
     private GoogleApiClient mClient;
+    private RecyclerView.AdapterDataObserver mObserver;
     private Order mSelectedOrder;
     private Driver mDriver;
 
     @BindView(R.id.rv_orders_list)
     RecyclerView rv_orders_list;
+
+    @BindView(R.id.tv_empty_view)
+    TextView tv_empty_view;
 
     @BindView(R.id.tv_orders_filter_date)
     TextView tv_orders_filter_date;
@@ -277,13 +285,14 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
 
                 }
 
-//                if (mSelectedOrder != null) {
-//                    if (Objects.equals(order.getId(), mSelectedOrder.getId())) {
-//                        holder.setSelectedColor(getContext(), R.color.colorPrimaryLight);
-//                    } else {
-//                        holder.setSelectedColor(getContext(), R.color.colorWhite);
-//                    }
-//                }
+                // Highlight the selected item
+                if (mSelectedOrder != null) {
+                    if (Objects.equals(order.getId(), mSelectedOrder.getId())) {
+                        holder.setSelectedColor(getContext(), R.color.colorPrimaryLight);
+                    } else {
+                        holder.setSelectedColor(getContext(), R.color.colorWhite);
+                    }
+                }
 
                 holder.setCustomerName(order.getCustomerName());
 
@@ -326,6 +335,65 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
         };
 
         rv_orders_list.setAdapter(mFireAdapter);
+
+        Query countRef = getDatabaseQuery();
+
+        // Hide or show the list depending on if there are records
+        countRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //remove loading indicator
+
+                // Perform initial setup, this will only be called once
+                if (dataSnapshot.hasChildren()) {
+                    //Log.i(Constants.LOG_TAG, "we have records");
+                    showList(true);
+                } else {
+                    showList(false);
+                }
+
+                // Create an observer to check if the list changes in the future
+                mObserver = new RecyclerView.AdapterDataObserver() {
+                    @Override
+                    public void onItemRangeInserted(int positionStart, int itemCount) {
+
+                        int count = mFireAdapter.getItemCount();
+                        if (count == 0) {
+                            showList(false);
+                        } else {
+                            showList(true);
+                        }
+                    }
+
+                    @Override
+                    public void onItemRangeRemoved(int positionStart, int itemCount) {
+                        int count = mFireAdapter.getItemCount();
+                        if (count == 0) {
+                            showList(false);
+                        } else {
+                            showList(true);
+                        }
+                    }
+                };
+                mFireAdapter.registerAdapterDataObserver(mObserver);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void showList(boolean bShowList) {
+
+        if (bShowList) {
+            rv_orders_list.setVisibility(View.VISIBLE);
+            tv_empty_view.setVisibility(View.GONE);
+        } else {
+            rv_orders_list.setVisibility(View.GONE);
+            tv_empty_view.setVisibility(View.VISIBLE);
+        }
     }
 
     private void orderSelected(Order order) {

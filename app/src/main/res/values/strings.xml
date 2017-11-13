@@ -87,7 +87,7 @@
     <string name="title_order_driver_assigned">Driver Assigned</string>
     <string name="msg_there_are_no_customers_to_show">There are no customers to show.</string>
     <string name="msg_there_are_no_drivers_to_show">There are no drivers to show.</string>
-    <string name="msg_there_are_no_orders_to_show">There are no orders to show.</string>
+    <string name="msg_there_are_no_orders_to_show">There are no orders to show for the selected date.</string>
     <string name="alert_confirm_new_order">Please confirm a new order for:</string>
     <string name="title_app_admin_application">Admin Application</string>
     <string name="msg_initializing_app">Initializing App ...</string>
@@ -114,25 +114,36 @@
     <string name="title_add_new_order">Add New Order</string>
     <string name="title_manage_drivers">Manage Drivers</string>
     <string name="title_select_a_date">Select A Date</string>
+
     <string name="error_company_is_required">Company is required</string>
     <string name="error_contact_name_is_required">Contact name is required</string>
     <string name="error_phone_number">Contact phone number is not valid</string>
     <string name="error_msg">The new customer form has errors.</string>
+
     <string name="alert_title_add_new_customer">Add the following new customer?</string>
-    <string name="msg_customer_saved">The new customer has been successfully saved</string>
+
+
     <string name="alert_title_assign_driver">Assign the following driver?</string>
+
     <string name="toast_driver_not_selected">Driver Not Selected</string>
     <string name="toast_driver_selected">Driver Selected</string>
+
     <string name="nav_admin_show_all">Show All</string>
+
     <string name="btn_select_order">Select Order</string>
     <string name="btn_pickup_complete">Pickup Complete</string>
     <string name="btn_delivery_complete">Delivery Complete</string>
+
     <string name="title_app_driver_application">Driver Application</string>
+
     <string name="msg_approval_failed">Approval failed ...</string>
     <string name="msg_driver_notification">You will be notified when driver aprroval is complete.</string>
     <string name="msg_signing_in">Signing in ...</string>
     <string name="msg_sign_in_complete">Sign in complete</string>
     <string name="msg_sign_in_cancelled">Sign in cancelled</string>
     <string name="msg_checking_status">Checking status ...</string>
-
+    <string name="msg_customer_saved">The new customer has been successfully saved</string>
+    <string name="app_title_admin">Admin Application</string>
+    <string name="msg_splash_initializing_app">Initializing application ...</string>
+    <string name="app_title_driver">Driver Application</string>
 </resources>

@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdate;
@@ -27,6 +29,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -58,9 +61,13 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     // Local member variables
     private GoogleMap mGoogleMap;
     private GoogleApiClient mGoogleApiClient;
+    private LatLngBounds.Builder builder;
+
     private ArrayList<Driver> mDriversList = new ArrayList<>();
+    private ArrayList<Marker> mDriverMarkers = new ArrayList<>();
+
     private ArrayList<Order> mOrdersList = new ArrayList<>();
-    private ArrayList<LatLng> mCoordsList = new ArrayList<>();
+    private ArrayList<Marker> mOrderMarkers = new ArrayList<>();
 
     // 12:00 AM of the selected day
     private long mDisplayDateStartTimeInMillis;
@@ -208,11 +215,11 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 //        }
     }
 
-    private void paintMarkers() {
+    private void paintHomeMarker() {
 
         // Clear any existing markers
-        mGoogleMap.clear();
-        builder = new LatLngBounds.Builder();
+//        mGoogleMap.clear();
+//        builder = new LatLngBounds.Builder();
 
         // Add Marker for home office
         // This will have to be downloaded
@@ -222,57 +229,6 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 //                Utils_General.vectorToBitmap(getContext(), R.drawable.ic_menu_home,
 //                        ContextCompat.getColor(getContext(), R.color.colorAccent)));
 
-
-        if (mDriversList != null) {
-            if (mDriversList.size() != 0) {
-                // Add markers for active drivers
-                for (int i = 0; i < mDriversList.size(); i++) {
-
-                    Driver d = mDriversList.get(i);
-                    LatLng coords = mCoordsList.get(i);
-                    drawMarker(coords, d.getDisplayName(), "",
-                            Utils_General.vectorToBitmap(getContext(), R.drawable.ic_local_shipping_accent_24dp,
-                                    ContextCompat.getColor(getContext(), R.color.colorPrimary)));
-
-                }
-
-            }
-
-        }
-
-
-        // Add Markers for pickup and delivery locations
-        if (mOrdersList != null) {
-            for (int i = 0; i < mOrdersList.size(); i++) {
-
-                final Order order = mOrdersList.get(i);
-
-
-                final PendingResult<PlaceBuffer> pickupResult =
-                        Places.GeoDataApi.getPlaceById(mGoogleApiClient, order.getPickupLocationId());
-
-                pickupResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
-                    @Override
-                    public void onResult(@NonNull PlaceBuffer places) {
-
-                        drawMarker(places.get(0).getLatLng(), order.getCustomerName(), places.get(0).getAddress().toString(),
-                                BitmapDescriptorFactory.defaultMarker(Utils_General.getMarkerColorByStatus(order.getStatus())));
-                    }
-                });
-
-                final PendingResult<PlaceBuffer> deliveryResult =
-                        Places.GeoDataApi.getPlaceById(mGoogleApiClient, order.getDeliveryLocationId());
-
-                deliveryResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
-                    @Override
-                    public void onResult(@NonNull PlaceBuffer places) {
-
-                        drawMarker(places.get(0).getLatLng(), order.getCustomerName(), places.get(0).getAddress().toString(),
-                                BitmapDescriptorFactory.defaultMarker(Utils_General.getMarkerColorByStatus(order.getStatus())));
-                    }
-                });
-            }
-        }
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -352,29 +308,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
     }
 
-    private LatLngBounds.Builder builder;
 
-    private void drawMarker(LatLng point, String title, String snip, BitmapDescriptor bitmapDescriptor) {
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(point)
-                .title(title)
-                .snippet(snip)
-                .infoWindowAnchor(0.5f, 0.5f)
-                .icon(bitmapDescriptor);
-
-        mGoogleMap.addMarker(markerOptions);
-
-        builder.include(markerOptions.getPosition());
-
-        mGoogleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
-                LatLngBounds bounds = builder.build();
-                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 10);
-                mGoogleMap.animateCamera(cu);
-            }
-        });
-    }
 
     private void attachOrderReadListener() {
 
@@ -390,8 +324,11 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                     //Log.i(Constants.LOG_TAG, "onDataChange in attachOrderListener on Fragment_MainDetails");
                     mOrdersList = new ArrayList<>();
 
+
+
                     if (dataSnapshot != null) {
-                        //Log.i(Constants.LOG_TAG, "we have a snapshot");
+                        Log.i(Constants.LOG_TAG, "we have a snapshot");
+
 
                         // Get each order that is in progress
                         for (DataSnapshot orders : dataSnapshot.getChildren()) {
@@ -401,7 +338,9 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                         }
                     }
 
-                    paintMarkers();
+                    Log.i(Constants.LOG_TAG, "OrderCount:" + mOrdersList.size());
+
+                    repaintOrderMarkers();
                 }
 
                 @Override
@@ -448,8 +387,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                                         //Log.i(Constants.LOG_TAG, "driver was added:" + driver.toString());
 
                                         mDriversList.add(driver);
-                                        mCoordsList.add(new LatLng(strLat, strLng));
-                                        paintMarkers();
+                                        addDriverMarker(driver, new LatLng(strLat, strLng));
                                     }
                                 }
                             }
@@ -462,6 +400,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                     }
                 }
 
+                // This is called when a drivers location changes
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     if (dataSnapshot.exists()) {
 
@@ -482,14 +421,10 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                                 Driver d = mDriversList.get(i);
 
                                 if (Objects.equals(d.getUid(), driverKey)) {
-                                    mCoordsList.set(i, driverLatLng);
+                                    updateDriverMarker(i, driverLatLng);
                                 }
                             }
-
-                            paintMarkers();
                         }
-
-
                     }
                 }
 
@@ -507,11 +442,15 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
                             if (Objects.equals(d.getUid(), driverKey)) {
                                 mDriversList.remove(i);
-                                mCoordsList.remove(i);
+                                removeDriverMarker(i);
                             }
                         }
 
-                        paintMarkers();
+                        // remove driver marker and reset camera
+
+                        //removerDriverMarker();
+
+                        //paintMarkers();
 
                     }
                 }
@@ -525,6 +464,150 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
             mActiveDriverLocationRef.addChildEventListener(mActiveDriversEventListener);
         }
 
+
+    }
+
+    private void updateDriverMarker(int index, LatLng point) {
+
+        // get the marker from the object array
+        Marker marker = mDriverMarkers.get(index);
+
+        // Change the position of the marker
+        marker.setPosition(point);
+
+        // Update the camera
+        updateCamera();
+
+    }
+
+    private void removeDriverMarker(int index) {
+
+        // get the marker ref from the object array
+        Marker marker = mDriverMarkers.get(index);
+
+        // remove the driver marker
+        marker.remove();
+
+        //remove the marker ref from the object array
+        mDriverMarkers.remove(index);
+
+        // update the camera
+        updateCamera();
+
+    }
+
+    private void addDriverMarker(Driver driver, LatLng point) {
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(point)
+                .title(driver.getDisplayName())
+                .snippet("something")
+                .infoWindowAnchor(0.5f, 0.5f)
+                .icon(Utils_General.vectorToBitmap(getContext(), R.drawable.ic_local_shipping_accent_24dp,
+                        ContextCompat.getColor(getContext(), R.color.colorPrimary)));
+
+        Marker marker = mGoogleMap.addMarker(markerOptions);
+
+        mDriverMarkers.add(marker);
+
+        updateCamera();
+
+    }
+
+    private void addOrderMarker(String location, Order order, Place place) {
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(place.getLatLng())
+                .title(order.getCustomerName())
+                .snippet(place.getAddress().toString())
+                .infoWindowAnchor(0.5f, 0.5f)
+                .icon(BitmapDescriptorFactory.defaultMarker(Utils_General.getMarkerColorByStatus(location, order.getStatus())));
+
+        Marker marker = mGoogleMap.addMarker(markerOptions);
+
+        mOrderMarkers.add(marker);
+
+        updateCamera();
+
+
+    }
+
+    private void repaintOrderMarkers() {
+
+        // clear all order markers from the map
+        for (Marker oldMarker : mOrderMarkers) {
+            oldMarker.remove();
+        }
+
+        // clear the order marker list
+        mOrderMarkers = new ArrayList<>();
+
+        // if we have orders to show
+        if (mOrdersList != null) {
+
+            for (final Order order : mOrdersList) {
+
+                // get the order pickup address
+                final PendingResult<PlaceBuffer> pickupResult =
+                        Places.GeoDataApi.getPlaceById(mGoogleApiClient, order.getPickupLocationId());
+
+                pickupResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+                    @Override
+                    public void onResult(@NonNull PlaceBuffer places) {
+
+                        // add the order pickup location marker
+                        addOrderMarker(Constants.ORDER_MARKER_LOCATION_TYPE_PICKUP, order, places.get(0));
+                    }
+                });
+
+                // get the order delivery address
+                final PendingResult<PlaceBuffer> deliveryResult =
+                        Places.GeoDataApi.getPlaceById(mGoogleApiClient, order.getDeliveryLocationId());
+
+                deliveryResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+                    @Override
+                    public void onResult(@NonNull PlaceBuffer places) {
+
+                        // add the order delivery location marker
+                        addOrderMarker(Constants.ORDER_MARKER_LOCATION_TYPE_DELIVERY, order, places.get(0));
+                    }
+                });
+            }
+        }
+
+        updateCamera();
+
+    }
+
+    private void updateCamera() {
+
+        builder = new LatLngBounds.Builder();
+
+        // add each driver marker position to the bounds builder
+        for (Marker driverMarker : mDriverMarkers) {
+
+            builder.include(driverMarker.getPosition());
+        }
+
+        // add each order marker position to the bounds builder
+        for (Marker orderMarker : mOrderMarkers) {
+
+            builder.include(orderMarker.getPosition());
+        }
+
+        mGoogleMap.setMaxZoomPreference(12);
+
+        mGoogleMap.setMinZoomPreference(8);
+
+        mGoogleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                LatLngBounds bounds = builder.build();
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 10);
+                mGoogleMap.moveCamera(cu);
+                //mGoogleMap.animateCamera(cu);
+            }
+        });
 
     }
 
@@ -569,7 +652,8 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
     private Query getDatabaseQueryForMap() {
 
-        return mOrdersRef.orderByChild(Constants.FIREBASE_CHILD_PICKUP_DATE).equalTo(mDisplayDateStartTimeInMillis);
+        return mOrdersRef.orderByChild(Constants.FIREBASE_CHILD_PICKUP_DATE)
+                .equalTo(mDisplayDateStartTimeInMillis);
     }
 }
 

@@ -23,6 +23,7 @@ public class ViewHolder_OrderHistory extends RecyclerView.ViewHolder {
     private final TextView tv_user_order_date;
     private final TextView tv_user_order_status;
     private final LinearLayout layout_user_order;
+    private final LinearLayout layout_selected;
 
     private ClickListener mClickListener;
 
@@ -53,6 +54,7 @@ public class ViewHolder_OrderHistory extends RecyclerView.ViewHolder {
         tv_user_order_delivery_address = itemView.findViewById(R.id.tv_user_order_delivery_address);
         tv_user_order_status = itemView.findViewById(R.id.tv_user_order_status);
         layout_user_order = itemView.findViewById(R.id.layout_user_order);
+        layout_selected = itemView.findViewById(R.id.layout_selected);
 
     }
 
@@ -78,6 +80,10 @@ public class ViewHolder_OrderHistory extends RecyclerView.ViewHolder {
 
     public void setBackgroundColor(Context context, int colorId){
         layout_user_order.setBackgroundColor(ContextCompat.getColor(context, colorId));
+    }
+
+    public void setSelectedColor(Context context, int colorId){
+        layout_selected.setBackgroundColor(ContextCompat.getColor(context, colorId));
     }
 
 

@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.BuildConfig;
@@ -18,6 +20,9 @@ import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import java.util.Arrays;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by patrick on 2017-11-03.
@@ -31,18 +36,35 @@ public class Activity_Splash extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mFirebaseAuthListener;
 
-    // Member variables for the Firebase database Refs
-    //private DatabaseReference mAdminRef;
+    @BindView(R.id.tv_splash_subtitle)
+    TextView tv_splash_subtitle;
+
+    @BindView(R.id.tv_splash_message)
+    TextView tv_splash_message;
+
+    @BindView(R.id.tv_splash_message2)
+    TextView tv_splash_message2;
+
+    @BindView(R.id.pb_loading_indicator)
+    ProgressBar mProgressBar;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        ButterKnife.bind(this);
+
+        // Set the subtitle for the splash page
+        tv_splash_subtitle.setText(R.string.app_title_admin);
+
         mFirebaseAuth = FirebaseAuth.getInstance();
 
         // Where would a better place to call this be?
         FirebaseMessaging.getInstance().subscribeToTopic(Constants.FIREBASE_NOTIFICATION_TOPIC_ADMIN);
+
+        tv_splash_message.setText(R.string.msg_signing_in);
 
         createAuthListener();
 
@@ -73,12 +95,12 @@ public class Activity_Splash extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
                 // Sign-in succeeded, set up the UI
-                Utils_General.showToast(this, "Signed In!");
+                tv_splash_message.setText(R.string.msg_sign_in_complete);
 
             } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
-                Utils_General.showToast(this, "Signed In Cancelled!");
-                //finish();
+                Utils_General.showToast(this, getString(R.string.msg_sign_in_cancelled));
+                tv_splash_message.setText(R.string.msg_sign_in_cancelled);
             }
         }
 
@@ -94,7 +116,7 @@ public class Activity_Splash extends AppCompatActivity {
 
                 if (user != null) {
                     // Signed In
-                    //Utils_General.showToast(Activity_Main_old.this, "You are now signed in");
+                    tv_splash_message.setText(R.string.msg_sign_in_complete);
 
                     onSignedInInitialize(user);
                 } else {
@@ -117,7 +139,11 @@ public class Activity_Splash extends AppCompatActivity {
     }
 
     private void onSignedInInitialize(final FirebaseUser user) {
-        Log.i(Constants.LOG_TAG, "Log the users name:" + user.getDisplayName());
+        //Log.i(Constants.LOG_TAG, "Log the users name:" + user.getDisplayName());
+
+        tv_splash_message.setText(R.string.msg_splash_initializing_app);
+
+        // This only for testing, maybe lol
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -128,7 +154,7 @@ public class Activity_Splash extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-        }, 5000);
+        }, 2000);
 
 
 

@@ -24,12 +24,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Created by patrick keogh on 2017-08-09.
  *
- * @class Utils_General
- * @brief Helper methods shared by various Activities.
  */
 
 public class Utils_General {
@@ -152,8 +151,6 @@ public class Utils_General {
 
     public static String getFormattedLongDateStringFromLongDate(long dateIn) {
 
-        String strTime;
-
         // create a calendar
         Calendar cal = Calendar.getInstance();
 
@@ -169,18 +166,18 @@ public class Utils_General {
                         //    30    31
                         "th", "st"};
 
-        SimpleDateFormat formatDayOfMonth = new SimpleDateFormat("d");
+        SimpleDateFormat formatDayOfMonth = new SimpleDateFormat("d", Locale.getDefault());
         int day = Integer.parseInt(formatDayOfMonth.format(cal.getTime()));
         String strDay = day + suffixes[day];
 
 
-        SimpleDateFormat dayOfWeek = new SimpleDateFormat("EEEE");
+        SimpleDateFormat dayOfWeek = new SimpleDateFormat("EEEE", Locale.getDefault());
         String strDayOfWeek = dayOfWeek.format(cal.getTime());
 
-        SimpleDateFormat monthOfYear = new SimpleDateFormat("MMMM");
+        SimpleDateFormat monthOfYear = new SimpleDateFormat("MMMM", Locale.getDefault());
         String strMonthOfYear = monthOfYear.format(cal.getTime());
 
-        SimpleDateFormat year = new SimpleDateFormat("yyyy");
+        SimpleDateFormat year = new SimpleDateFormat("yyyy", Locale.getDefault());
         String strYear = year.format(cal.getTime());
 
 
@@ -194,19 +191,27 @@ public class Utils_General {
      */
     public static BitmapDescriptor vectorToBitmap(Context context, @DrawableRes int id, @ColorInt int color) {
         Drawable vectorDrawable = ResourcesCompat.getDrawable(context.getResources(), id, null);
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
-                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        DrawableCompat.setTint(vectorDrawable, color);
-        vectorDrawable.draw(canvas);
+
+        Bitmap bitmap = null;
+        if (vectorDrawable != null) {
+            bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                    vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+
+            Canvas canvas = new Canvas(bitmap);
+            vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            DrawableCompat.setTint(vectorDrawable, color);
+            vectorDrawable.draw(canvas);
+        }
+
+
+
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
     /**
      * Formats an integer to a currency
      */
-    public static String getCostString(Context context, int amount_in) {
+    public static String getCostString(int amount_in) {
 
         double amount = (double) (amount_in);
 
@@ -221,13 +226,24 @@ public class Utils_General {
         return currency.format(amount);
     }
 
-    public static float getMarkerColorByStatus(String status) {
+    public static float getMarkerColorByStatus(String location, String status) {
 
         float markerColor;
 
         switch (status) {
+            case Constants.ORDER_STATUS_BOOKED:
+                markerColor = BitmapDescriptorFactory.HUE_BLUE;
+                break;
             case Constants.ORDER_STATUS_COMPLETE:
                 markerColor = BitmapDescriptorFactory.HUE_RED;
+                break;
+            case Constants.ORDER_STATUS_PICKUP_COMPLETE:
+                if(Objects.equals(location, Constants.ORDER_MARKER_LOCATION_TYPE_PICKUP)){
+                    markerColor = BitmapDescriptorFactory.HUE_RED;
+                }else{
+                    markerColor = BitmapDescriptorFactory.HUE_GREEN;
+                }
+
                 break;
 
             default:

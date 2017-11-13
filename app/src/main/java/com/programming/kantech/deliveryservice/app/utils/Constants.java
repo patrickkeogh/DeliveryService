@@ -205,6 +205,10 @@ public class Constants {
     public static final String ORDER_TYPE_PHONE = "PHONE";
     public static final String ORDER_TYPE_USER = "USER";
 
+    public static final String ORDER_MARKER_LOCATION_TYPE_PICKUP = "pickup";
+
+    public static final String ORDER_MARKER_LOCATION_TYPE_DELIVERY = "delivery";
+
     public static final String ORDER_STATUS_OPEN = "OPEN";
     public static final String ORDER_STATUS_BOOKED = "BOOKED";
     public static final String ORDER_STATUS_ASSIGNED = "DRIVER ASSIGNED";
