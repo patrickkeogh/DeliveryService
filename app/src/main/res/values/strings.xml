@@ -124,5 +124,15 @@
     <string name="toast_driver_not_selected">Driver Not Selected</string>
     <string name="toast_driver_selected">Driver Selected</string>
     <string name="nav_admin_show_all">Show All</string>
+    <string name="btn_select_order">Select Order</string>
+    <string name="btn_pickup_complete">Pickup Complete</string>
+    <string name="btn_delivery_complete">Delivery Complete</string>
+    <string name="title_app_driver_application">Driver Application</string>
+    <string name="msg_approval_failed">Approval failed ...</string>
+    <string name="msg_driver_notification">You will be notified when driver aprroval is complete.</string>
+    <string name="msg_signing_in">Signing in ...</string>
+    <string name="msg_sign_in_complete">Sign in complete</string>
+    <string name="msg_sign_in_cancelled">Sign in cancelled</string>
+    <string name="msg_checking_status">Checking status ...</string>
 
 </resources>

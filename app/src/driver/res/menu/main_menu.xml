@@ -9,13 +9,6 @@
         android:orderInCategory="100"
         app:showAsAction="ifRoom"/>
 
-
-    <item
-        android:id="@+id/action_driver_photo"
-        android:title="@string/action_driver_myphoto"
-        android:orderInCategory="300"
-        app:showAsAction="never"/>
-
     <item
         android:id="@+id/action_driver_orders"
         android:title="@string/action_driver_myorders"

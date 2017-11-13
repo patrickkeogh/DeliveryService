@@ -32,13 +32,13 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * Created by patri on 2017-09-14.
+ * Created by patrick keogh on 2017-09-14.
+ * NOT BEING USED YET
+ *
  */
 
 public class Activity_Photo extends AppCompatActivity {
 
-    // Member variables
-    private ActionBar mActionBar;
     private Driver mDriver;
 
     // Firebase references
@@ -67,14 +67,11 @@ public class Activity_Photo extends AppCompatActivity {
 
         if (savedInstanceState != null) {
 
-            Log.i(Constants.LOG_TAG, "Activity_Photo savedInstanceState is not null");
             if (savedInstanceState.containsKey(Constants.STATE_INFO_DRIVER)) {
-                Log.i(Constants.LOG_TAG, "we found the recipe key in savedInstanceState");
                 mDriver = savedInstanceState.getParcelable(Constants.STATE_INFO_DRIVER);
             }
 
         } else {
-            Log.i(Constants.LOG_TAG, "Activity_Photo savedInstanceState is null, get data from intent: ");
             mDriver = getIntent().getParcelableExtra(Constants.EXTRA_DRIVER);
         }
 
@@ -85,7 +82,7 @@ public class Activity_Photo extends AppCompatActivity {
         } else {
             if (!Objects.equals(mDriver.getThumbUrl(), "")) {
 
-                Log.i(Constants.LOG_TAG, "Load the photo with Picasso:" + mDriver.getPhotoUrl());
+                //Log.i(Constants.LOG_TAG, "Load the photo with Picasso:" + mDriver.getPhotoUrl());
 
                 Glide.with(Activity_Photo.this).load(mDriver.getThumbUrl()).dontAnimate().into(mImageView);
             }
@@ -93,12 +90,11 @@ public class Activity_Photo extends AppCompatActivity {
 
         }
 
-
         // Set the support action bar
         setSupportActionBar(mToolbar);
 
         // Set the action bar back button to look like an up button
-        mActionBar = this.getSupportActionBar();
+        ActionBar mActionBar = this.getSupportActionBar();
 
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(false);
@@ -146,7 +142,7 @@ public class Activity_Photo extends AppCompatActivity {
                         public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
                             // When the image has successfully uploaded, we get its download URL
                             final Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                            final StorageMetadata metadata = taskSnapshot.getMetadata();
+                            //final StorageMetadata metadata = taskSnapshot.getMetadata();
 
                             //metadata.getName();
 
@@ -165,7 +161,7 @@ public class Activity_Photo extends AppCompatActivity {
                             mDriver.setPhotoUrl(downloadUrl.toString());
                             //mDriver.setThumbUrl(uri.toString());
                             mDriverRef.setValue(mDriver);
-                            Log.i(Constants.LOG_TAG, "Photo was saved to firebase storage:" + mDriver.getPhotoUrl());
+                            //Log.i(Constants.LOG_TAG, "Photo was saved to firebase storage:" + mDriver.getPhotoUrl());
 
                             Glide.with(Activity_Photo.this)
                                     .load(mDriver.getPhotoUrl())
@@ -218,10 +214,10 @@ public class Activity_Photo extends AppCompatActivity {
     @OnClick(R.id.btn_driver_photo_upload)
     public void select_photo() {
 
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/jpeg");
-        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-        startActivityForResult(Intent.createChooser(intent, "Complete action using"), Constants.REQUEST_CODE_SELECT_PHOTO);
+//        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//        intent.setType("image/jpeg");
+//        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+//        startActivityForResult(Intent.createChooser(intent, "Complete action using"), Constants.REQUEST_CODE_SELECT_PHOTO);
 
     }
 

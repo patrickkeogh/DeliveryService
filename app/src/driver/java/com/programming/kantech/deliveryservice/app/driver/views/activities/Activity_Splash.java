@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.BuildConfig;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -53,11 +55,12 @@ public class Activity_Splash extends AppCompatActivity {
     // Member variables for the Firebase database Refs
     private DatabaseReference mDriverRef;
 
-    @BindView(R.id.tv_request_title)
-    TextView mTitle;
 
-    @BindView(R.id.tv_request_message)
-    TextView mMessage;
+    @BindView(R.id.tv_splash_message)
+    TextView tv_splash_message;
+
+    @BindView(R.id.tv_splash_message2)
+    TextView tv_splash_message2;
 
     @BindView(R.id.pb_loading_indicator)
     ProgressBar mProgressBar;
@@ -76,14 +79,12 @@ public class Activity_Splash extends AppCompatActivity {
         // TODO: Where would a better place to call this be?
         FirebaseMessaging.getInstance().subscribeToTopic(Constants.FIREBASE_NOTIFICATION_TOPIC_ADMIN);
 
+        tv_splash_message.setText(R.string.msg_signing_in);
+
         createAuthListener();
 
         mDriverRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_DRIVERS);
     }
-
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -95,11 +96,20 @@ public class Activity_Splash extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.i(Constants.LOG_TAG, "onOptionsItemSelected:" + item.getItemId());
+        //Log.i(Constants.LOG_TAG, "onOptionsItemSelected:" + item.getItemId());
         switch (item.getItemId()) {
             case R.id.action_sign_out:
-                //removeDriverFromActive();
-                AuthUI.getInstance().signOut(this);
+                //Utils_General.showToast(this, "Signout called");
+                AuthUI.getInstance()
+                        .signOut(this)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            public void onComplete(@NonNull Task<Void> task) {
+                                // user is now signed out
+                                startActivity(new Intent(Activity_Splash.this, Activity_Splash.class));
+                                finish();
+                            }
+                        });
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -129,12 +139,12 @@ public class Activity_Splash extends AppCompatActivity {
 
             if (resultCode == RESULT_OK) {
                 // Sign-in succeeded, set up the UI
-                Utils_General.showToast(this, "Signed In!");
+                tv_splash_message.setText(R.string.msg_sign_in_complete);
 
             } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
-                Utils_General.showToast(this, "Signed In Cancelled!");
-                //finish();
+                Utils_General.showToast(this, getString(R.string.msg_sign_in_cancelled));
+                tv_splash_message.setText(R.string.msg_sign_in_cancelled);
             }
         }
 
@@ -150,13 +160,10 @@ public class Activity_Splash extends AppCompatActivity {
 
                 if (user != null) {
                     // Signed In
-                    //Utils_General.showToast(Activity_Main_old.this, "You are now signed in");
+                    tv_splash_message.setText(R.string.msg_sign_in_complete);
 
                     onSignedInInitialize(user);
                 } else {
-                    // Not signed in
-                    //onSignedOutCleanup();
-
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
@@ -197,31 +204,38 @@ public class Activity_Splash extends AppCompatActivity {
                     // run some code
 
                     mDriver = dataSnapshot.getValue(Driver.class);
-                    //Log.i(Constants.LOG_TAG, "The driver is in the db:" + mDriver.toString());
+
+                    tv_splash_message.setText(R.string.msg_checking_status);
 
                     if(mDriver != null){
 
                         if (!mDriver.getDriverApproved()) {
                             showDriverNotAuthorized(user);
                         } else {
-                            Intent intent = new Intent(Activity_Splash.this, Activity_Main.class);
-                            intent.putExtra(Constants.EXTRA_DRIVER, mDriver);
-                            startActivity(intent);
-                            finish();
-                        }
+
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Intent intent = new Intent(Activity_Splash.this, Activity_Main.class);
+                                    intent.putExtra(Constants.EXTRA_DRIVER, mDriver);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }, 5000); // This is just for testing
+
+                            }
                     }
 
 
 
                 } else {
-                    //Log.i(Constants.LOG_TAG, "The driver is not in the database");
                     // User is not in the driver db. add them
                     mDriver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(), "", false, false, "", "");
 
                     mDriverRef.child(user.getUid()).setValue(mDriver);
-                    //mDriverDBReference.push().setValue(driver);
 
-                    //checkIfAuthorized(user);
+                    showDriverNotAuthorized(user);
 
                 }
             }
@@ -246,23 +260,23 @@ public class Activity_Splash extends AppCompatActivity {
     }
 
     private void showDriverNotAuthorized(FirebaseUser user) {
+
+        // Notify the user they have not been approved yet.
+        // Will need to add something for when drivers are rejected or blocked
+
         // ToDo: Check if token has been sent before
         //if (!Utils_Preferences.getHasTokenBeenSent(getApplicationContext()))
         sendTokenToServer(user);
 
-        mProgressBar.setVisibility(View.VISIBLE);
-
-        Log.i(Constants.LOG_TAG, "checkIfAuthorized() in DriverSplash has been called");
+        //Log.i(Constants.LOG_TAG, "Log the users name:" + user.getDisplayName());
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.i(Constants.LOG_TAG, "stop progress bar");
-                //Do something after 10 secs
-                mProgressBar.setVisibility(View.GONE);
-                mTitle.setText(R.string.request_new_driver_title_completed);
-                mMessage.setText(R.string.request_new_driver_message_completed);
+                tv_splash_message.setText(R.string.msg_approval_failed);
+                tv_splash_message2.setText(R.string.msg_driver_notification);
+                mProgressBar.setVisibility(View.INVISIBLE);
             }
         }, 5000);
 

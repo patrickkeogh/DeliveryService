@@ -5,11 +5,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -37,7 +35,6 @@ import android.widget.TextView;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.BuildConfig;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -64,15 +61,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
@@ -85,10 +79,8 @@ import com.programming.kantech.deliveryservice.app.data.retrofit.ApiInterface;
 import com.programming.kantech.deliveryservice.app.driver.views.ui.ViewHolder_Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
-import com.programming.kantech.deliveryservice.app.utils.Utils_Preferences;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -103,7 +95,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Created by patri on 2017-10-04.
+ * Created by patrick keogh on 2017-10-04.
+ * Main activity, displays a map showing drivers and destinations
  */
 
 public class Activity_Main extends AppCompatActivity implements
@@ -122,7 +115,6 @@ public class Activity_Main extends AppCompatActivity implements
 
     // Get a ref to our api service that will fetch distances between 2 places
     private ApiInterface apiService;
-
 
     // Determines if the filter view should be visible on the screen
     private boolean mShowFilter = true;
@@ -143,8 +135,8 @@ public class Activity_Main extends AppCompatActivity implements
     private ArrayList<Marker> mLocationMarkers = new ArrayList<>();
 
     // booleans used to filter by order status
-    private boolean mShowOpen = true;
-    private boolean mShowComplete = true;
+    //private boolean mShowOpen = true;
+    //private boolean mShowComplete = true;
     private boolean mShowDeliveryLocations = true;
     private boolean mShowPickupLocations = true;
 
@@ -153,7 +145,7 @@ public class Activity_Main extends AppCompatActivity implements
     private long mTodayDateStartTimeInMillis;
 
     // Firebase member variables
-    private DatabaseReference mDriverRef;
+    //private DatabaseReference mDriverRef;
     private DatabaseReference mOrdersRef;
     private DatabaseReference mDriverLocationRef;
     private Query mOrdersQuery;
@@ -256,7 +248,7 @@ public class Activity_Main extends AppCompatActivity implements
         mMapView.getMapAsync(this);
 
         // Get a root reference to the Drivers Node
-        mDriverRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_DRIVERS);
+        //mDriverRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_DRIVERS);
 
         // Get a root reference to the orders table
         mOrdersRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_ORDERS);
@@ -655,17 +647,6 @@ public class Activity_Main extends AppCompatActivity implements
 
                 if (mShowPickupLocations) {
 
-                    final int pickupIconColor;
-
-                    switch (order.getStatus()) {
-                        case Constants.ORDER_STATUS_ASSIGNED:
-                            pickupIconColor = R.color.colorAccent;
-                            break;
-                        default:
-                            pickupIconColor = R.color.colorGreen;
-                            break;
-                    }
-
                     final PendingResult<PlaceBuffer> pickupResult =
                             Places.GeoDataApi.getPlaceById(mClient, order.getPickupLocationId());
 
@@ -692,20 +673,6 @@ public class Activity_Main extends AppCompatActivity implements
 
                 if (mShowDeliveryLocations) {
 
-                    final int deliveryIconColor;
-
-                    switch (order.getStatus()) {
-                        case Constants.ORDER_STATUS_OPEN:
-                        case Constants.ORDER_STATUS_BOOKED:
-                        case Constants.ORDER_STATUS_ASSIGNED:
-                        case Constants.ORDER_STATUS_PICKUP_COMPLETE:
-                            deliveryIconColor = R.color.colorAccent;
-                            break;
-                        default:
-                            deliveryIconColor = R.color.colorGreen;
-                            break;
-                    }
-
                     final PendingResult<PlaceBuffer> deliveryResult =
                             Places.GeoDataApi.getPlaceById(mClient, order.getDeliveryLocationId());
 
@@ -721,12 +688,8 @@ public class Activity_Main extends AppCompatActivity implements
                                     .infoWindowAnchor(0.5f, 0.5f)
                                     .icon(BitmapDescriptorFactory.defaultMarker(Utils_General.getMarkerColorByStatus(order.getStatus())));
 
-//                                    .icon(Utils_General.vectorToBitmap(Activity_Main.this, R.drawable.ic_place_accent_24dp,
-//                                            ContextCompat.getColor(Activity_Main.this, deliveryIconColor)));
-
                             Marker marker = mGoogleMap.addMarker(markerOptions);
 
-                            //Log.i(Constants.LOG_TAG, "add Marker to list");
                             mLocationMarkers.add(marker);
                             setMapCamera();
                         }
@@ -741,8 +704,6 @@ public class Activity_Main extends AppCompatActivity implements
     }
 
     private void setMapCamera() {
-
-        //Log.i(Constants.LOG_TAG, "setMapCamera called");
 
         builder = new LatLngBounds.Builder();
 
@@ -806,9 +767,9 @@ public class Activity_Main extends AppCompatActivity implements
         super.onDestroy();
         mMapView.onDestroy();
 
-//        if (mFireAdapter != null) {
-//            mFireAdapter.cleanup();
-//        }
+        if (mFireAdapter != null) {
+            mFireAdapter.cleanup();
+        }
         removeDriverFromActive();
     }
 
@@ -830,7 +791,7 @@ public class Activity_Main extends AppCompatActivity implements
     protected void onStop() {
         Log.i(Constants.LOG_TAG, "onstop Called");
         super.onStop();
-        //removeDriverFromActive();
+        removeDriverFromActive();
     }
 
     @Override
@@ -847,14 +808,14 @@ public class Activity_Main extends AppCompatActivity implements
     public void onLocationChanged(Location location) {
 
         // Triggered when the driver's location changes
-        Log.i(Constants.LOG_TAG, "Location Changed");
+        //Log.i(Constants.LOG_TAG, "Location Changed");
 
         if (getApplicationContext() != null) {
 
             mLastLocation = location;
 
             // get the latitude and longitude of the drivers current location
-            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+//            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
             // use the db ref to create a geofire reference to the node
             GeoFire geoFireDriver = new GeoFire(mDriverLocationRef);
@@ -873,6 +834,8 @@ public class Activity_Main extends AppCompatActivity implements
 
     private void removeDriverFromActive() {
 
+        // Runs on sign out or app goes to the background
+
         if (mClient != null && mClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mClient, this);
         }
@@ -884,18 +847,15 @@ public class Activity_Main extends AppCompatActivity implements
             geoFire.removeLocation(userId);
         }
 
-
     }
 
     private Query getDatabaseQueryForList() {
-
         String strQueryStart = mDisplayDateStartTimeInMillis + "_" + mDriver.getUid() + Constants.FIREBASE_STATUS_SORT_PICKUP_COMPLETE;
         String strQueryEnd = mDisplayDateStartTimeInMillis + "_" + mDriver.getUid() + Constants.FIREBASE_STATUS_SORT_COMPLETE;
         return mOrdersRef.orderByChild("queryDateDriverId").startAt(strQueryStart).endAt(strQueryEnd);
     }
 
     private Query getDatabaseQueryForMap() {
-
         String strQuery = "true_" + mDisplayDateStartTimeInMillis + "_" + mDriver.getUid();
         return mOrdersRef.orderByChild("inProgressDateDriverId").equalTo(strQuery);
     }
@@ -961,31 +921,30 @@ public class Activity_Main extends AppCompatActivity implements
     }
 
     private void setDrawerButtons() {
-        Log.i(Constants.LOG_TAG, "setDrawerButtons called");
+        //Log.i(Constants.LOG_TAG, "setDrawerButtons called");
 
         Drawable top;
 
         if (mSelectedOrder == null) {
             top = ContextCompat.getDrawable(this, R.drawable.ic_info_outline_100dp);
             btn_driver_pickup_complete.setEnabled(false);
-            btn_driver_pickup_complete.setText("Select Order");
+            btn_driver_pickup_complete.setText(R.string.btn_select_order);
             btn_driver_pickup_complete.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
 
             btn_driver_delivery_complete.setEnabled(false);
-            btn_driver_delivery_complete.setText("Select Order");
+            btn_driver_delivery_complete.setText(R.string.btn_select_order);
             btn_driver_delivery_complete.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
         } else {
-            Log.i(Constants.LOG_TAG, "Order is not null");
+            //Log.i(Constants.LOG_TAG, "Order is not null");
 
-
-            btn_driver_pickup_complete.setText("Pickup Complete");
-            btn_driver_delivery_complete.setText("Delivery Complete");
+            btn_driver_pickup_complete.setText(R.string.btn_pickup_complete);
+            btn_driver_delivery_complete.setText(R.string.btn_delivery_complete);
 
             Log.i(Constants.LOG_TAG, "Status:" + mSelectedOrder.getStatus());
 
             switch (mSelectedOrder.getStatus()) {
                 case Constants.ORDER_STATUS_ASSIGNED:
-                    Log.i(Constants.LOG_TAG, "Status is assigned");
+                    //Log.i(Constants.LOG_TAG, "Status is assigned");
                     btn_driver_pickup_complete.setEnabled(true);
                     btn_driver_delivery_complete.setEnabled(false);
 
@@ -1024,7 +983,7 @@ public class Activity_Main extends AppCompatActivity implements
 
                     break;
                 default:
-                    Log.i(Constants.LOG_TAG, "Status is default");
+                    //Log.i(Constants.LOG_TAG, "Status is default");
 
             }
 
@@ -1167,10 +1126,12 @@ public class Activity_Main extends AppCompatActivity implements
 
     private void showAlertMessage(String title, String company, String address,
                                   final String cancelText, final String status) {
-        Log.i(Constants.LOG_TAG, "Alert Message called");
+        //Log.i(Constants.LOG_TAG, "Alert Message called");
+
+        final ViewGroup nullParent = null;
 
         LayoutInflater inflater = this.getLayoutInflater();
-        View dialog_confirm = inflater.inflate(R.layout.alert_confirm_location_complete, null);
+        View dialog_confirm = inflater.inflate(R.layout.alert_confirm_location_complete, nullParent);
 
         TextView tv_location_pickup_name = dialog_confirm.findViewById(R.id.tv_location_pickup_name);
         tv_location_pickup_name.setText(company);
