@@ -268,35 +268,35 @@ public class Activity_ShowOrders extends AppCompatActivity implements
 
     }
 
-    public void replaceDetailsFragment() {
-
-        Log.i(Constants.LOG_TAG, "replaceDetailsFragment called()");
-
-        Fragment_OrderDetails frag = Fragment_OrderDetails.newInstance(mSelectedOrder);
-
-        if(!mLandscapeView) mFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
-        FragmentTransaction transaction = mFragmentManager.beginTransaction();
-
-        if (mLandscapeView) {
-            transaction.replace(R.id.container_details, frag, Constants.TAG_FRAGMENT_ORDER_DETAILS);
-            transaction.setCustomAnimations(R.anim.slide_in_left,
-                    R.anim.slide_out_right, R.anim.slide_in_left, R.anim.slide_out_right);
-
-            transaction.replace(R.id.container_details, frag, Constants.TAG_FRAGMENT_ORDER_DETAILS);
-        } else {
-            if (mActionBar != null) {
-                mActionBar.setTitle("Order Details");
-            }
-            // Replace whatever is in the fragment_container view with this fragment,
-            // and add the transaction to the back stack so the user can navigate back
-            transaction.replace(R.id.container_master, frag, Constants.TAG_FRAGMENT_ORDER_DETAILS);
-            transaction.addToBackStack(null);
-        }
-
-        // Commit the transaction
-        transaction.commit();
-    }
+//    public void replaceDetailsFragment() {
+//
+//        Log.i(Constants.LOG_TAG, "replaceDetailsFragment called()");
+//
+//        Fragment_OrderDetails frag = Fragment_OrderDetails.newInstance(mSelectedOrder);
+//
+//        if(!mLandscapeView) mFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//
+//        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+//
+//        if (mLandscapeView) {
+//            transaction.replace(R.id.container_details, frag, Constants.TAG_FRAGMENT_ORDER_DETAILS);
+//            transaction.setCustomAnimations(R.anim.slide_in_left,
+//                    R.anim.slide_out_right, R.anim.slide_in_left, R.anim.slide_out_right);
+//
+//            transaction.replace(R.id.container_details, frag, Constants.TAG_FRAGMENT_ORDER_DETAILS);
+//        } else {
+//            if (mActionBar != null) {
+//                mActionBar.setTitle("Order Details");
+//            }
+//            // Replace whatever is in the fragment_container view with this fragment,
+//            // and add the transaction to the back stack so the user can navigate back
+//            transaction.replace(R.id.container_master, frag, Constants.TAG_FRAGMENT_ORDER_DETAILS);
+//            transaction.addToBackStack(null);
+//        }
+//
+//        // Commit the transaction
+//        transaction.commit();
+//    }
 
     // Date picker listener
     private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {

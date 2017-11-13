@@ -139,7 +139,7 @@ public class Activity_Splash extends AppCompatActivity {
     }
 
     private void onSignedInInitialize(final FirebaseUser user) {
-        //Log.i(Constants.LOG_TAG, "Log the users name:" + user.getDisplayName());
+        Log.i(Constants.LOG_TAG, "Log the users name:" + user.getDisplayName());
 
         tv_splash_message.setText(R.string.msg_splash_initializing_app);
 

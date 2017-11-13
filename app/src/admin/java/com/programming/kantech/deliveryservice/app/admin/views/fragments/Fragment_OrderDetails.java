@@ -173,7 +173,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
         tv_order_status.setText(mOrder.getStatus());
         tv_order_type.setText(mOrder.getType());
         tv_order_distance.setText(mOrder.getDistance_text());
-        tv_order_amount.setText(Utils_General.getCostString(getContext(), mOrder.getAmount()));
+        tv_order_amount.setText(Utils_General.getCostString( mOrder.getAmount()));
         tv_order_date.setText(Utils_General.getFormattedLongDateStringFromLongDate(mOrder.getPickupDate()));
 
         tv_order_driver.setText(mOrder.getDriverName());
@@ -263,10 +263,8 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
     }
 
     private void buildApiClient() {
-        //Log.i(Constants.LOG_TAG, "buildApiClient() called");
 
         if (mClient == null) {
-            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
 
             // Build up the LocationServices API client
             // Uses the addApi method to request the LocationServices API

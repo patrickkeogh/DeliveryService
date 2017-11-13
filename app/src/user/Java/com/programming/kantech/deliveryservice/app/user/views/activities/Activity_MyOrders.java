@@ -272,9 +272,10 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
                     @Override
                     public void onClick(View view) {
 
-                        Log.i(Constants.LOG_TAG, "Show MAp clicked for: " + order.getCustomerName());
+                        //Log.i(Constants.LOG_TAG, "Show MAp clicked for: " + order.getCustomerName());
 
                         Intent intent = new Intent(Activity_MyOrders.this, Activity_MyMap.class);
+                        intent.putExtra(Constants.EXTRA_ORDER, order);
                         startActivity(intent);
 
                     }
@@ -284,7 +285,7 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
                     @Override
                     public void onClick(View view) {
 
-                        Log.i(Constants.LOG_TAG, "Show Details clicked for: " + order.getCustomerName());
+                        //Log.i(Constants.LOG_TAG, "Show Details clicked for: " + order.getCustomerName());
 
                         Intent intent = new Intent(Activity_MyOrders.this, Activity_OrderDetails.class);
                         intent.putExtra(Constants.EXTRA_ORDER, order);

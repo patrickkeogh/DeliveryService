@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -20,25 +19,20 @@ import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
  * Created by patrick on 2017-11-10.
- *
+ * An activity to show the details of a selected order
  */
 
 public class Activity_OrderDetails extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener{
+        GoogleApiClient.OnConnectionFailedListener {
 
     private Order mSelectedOrder;
-    private ActionBar mActionBar;
     private GoogleApiClient mClient;
 
     // Bind the layout views
@@ -73,11 +67,11 @@ public class Activity_OrderDetails extends AppCompatActivity implements GoogleAp
         // Set the support action bar
         setSupportActionBar(mToolbar);
         // Set the action bar back button to look like an up button
-        mActionBar = this.getSupportActionBar();
+        ActionBar mActionBar = this.getSupportActionBar();
 
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(true);
-            mActionBar.setTitle("Order Details");
+            mActionBar.setTitle(R.string.title_order_details);
         }
 
         if (savedInstanceState != null) {
@@ -91,26 +85,18 @@ public class Activity_OrderDetails extends AppCompatActivity implements GoogleAp
 
         if (mSelectedOrder == null) {
             throw new IllegalArgumentException("Must pass EXTRA_ORDER");
-        }else{
+        } else {
 
             tv_order_details_company.setText(mSelectedOrder.getCustomerName());
             tv_order_details_date.setText(Utils_General.getFormattedLongDateStringFromLongDate(mSelectedOrder.getPickupDate()));
             tv_order_details_status.setText(mSelectedOrder.getStatus());
 
-            int scale = 100;
-            BigDecimal num1 = new BigDecimal(mSelectedOrder.getDistance());
-            BigDecimal num2 = new BigDecimal(1000);
-            Log.i(Constants.LOG_TAG, "new method" + num1.divide(num2, scale, RoundingMode.DOWN).toString());
-
             DecimalFormat df = new DecimalFormat(Constants.NUMBER_FORMAT);
             Double km = Double.valueOf(df.format(mSelectedOrder.getDistance() / 1000));
 
-            //Double km = (double) (mOrder.getDistance() / 1000);
-            Log.i(Constants.LOG_TAG, "km:" + km);
-
             String distance_text = km + " km " + " @ $2.13/km";
 
-            String display_amount = Utils_General.getCostString(this, mSelectedOrder.getAmount());
+            String display_amount = Utils_General.getCostString(mSelectedOrder.getAmount());
 
             display_amount += " (" + distance_text + ")";
 

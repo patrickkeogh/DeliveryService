@@ -158,31 +158,52 @@ public class Activity_Splash extends AppCompatActivity {
 
     private void createAuthListener() {
 
-        mFirebaseAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        if (Utils_General.isNetworkAvailable(this)) {
+            Log.i(Constants.LOG_TAG, "we have the internet");
 
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+            // we have the internet
 
-                if (user != null) {
-                    // Signed In
-                    tv_splash_message.setText(R.string.msg_sign_in_complete);
 
-                    onSignedInInitialize(user);
-                } else {
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setIsSmartLockEnabled(!BuildConfig.DEBUG)
-                                    .setTheme(R.style.LoginTheme)
-                                    .setAvailableProviders(
-                                            Arrays.asList(
-                                                    new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()))
-                                    .build(),
-                            Constants.REQUEST_CODE_SIGN_IN);
+            mFirebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+                @Override
+                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+
+                    if (user != null) {
+                        // Signed In
+                        tv_splash_message.setText(R.string.msg_sign_in_complete);
+                        mProgressBar.setVisibility(View.GONE);
+
+                        onSignedInInitialize(user);
+                    } else {
+                        startActivityForResult(
+                                AuthUI.getInstance()
+                                        .createSignInIntentBuilder()
+                                        .setIsSmartLockEnabled(!BuildConfig.DEBUG)
+                                        .setTheme(R.style.LoginTheme)
+                                        .setAvailableProviders(
+                                                Arrays.asList(
+                                                        new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()))
+                                        .build(),
+                                Constants.REQUEST_CODE_SIGN_IN);
+                    }
                 }
-            }
-        };
+            };
+
+        } else {
+            Log.i(Constants.LOG_TAG, "NO internet");
+            // no internet, cannot login
+            // This is only for testing
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    tv_splash_message.setText("You do not have an internet connection.");
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                }
+            }, 2000);
+        }
     }
 
     // Things in this mehod will only be done on new app installs
@@ -193,8 +214,11 @@ public class Activity_Splash extends AppCompatActivity {
     }
 
     private void onSignedInInitialize(final FirebaseUser user) {
+        //Log.i(Constants.LOG_TAG, "onSignedInInitialize called in Splash Driver");
 
         //mUsername = user.getDisplayName();
+        tv_splash_message.setText(R.string.msg_splash_initializing_app);
+        mProgressBar.setVisibility(View.VISIBLE);
 
         // Do a one time fetch to Firebase to get the Driver Info
         DatabaseReference driverRef = mDriverRef.child(user.getUid());
@@ -203,15 +227,16 @@ public class Activity_Splash extends AppCompatActivity {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //Log.i(Constants.LOG_TAG, "onDataChange()called for driver");
+                Log.i(Constants.LOG_TAG, "onDataChange()called for driver");
 
                 // Check if a driver document was found for the use signed in (by userId)
                 if (dataSnapshot.exists()) {
                     // run some code
+                    Log.i(Constants.LOG_TAG, "we have a snapshot");
 
                     mDriver = dataSnapshot.getValue(Driver.class);
 
-                    tv_splash_message.setText(R.string.msg_splash_initializing_app);
+
 
                     if (mDriver != null) {
 
@@ -247,6 +272,7 @@ public class Activity_Splash extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                Log.i(Constants.LOG_TAG, "error");
 
             }
         });
@@ -263,14 +289,15 @@ public class Activity_Splash extends AppCompatActivity {
     private void showDriverNotAuthorized(FirebaseUser user) {
 
         // Notify the user they have not been approved yet.
-        // Will need to add something for when drivers are rejected or blocked
+        // Will need to add something for when drivers are rejected or blocked later
 
-        // ToDo: Check if token has been sent before
-        //if (!Utils_Preferences.getHasTokenBeenSent(getApplicationContext()))
-        sendTokenToServer(user);
+        // Check if token has been sent before
+        if (!Utils_Preferences.getHasTokenBeenSent(getApplicationContext()))
+            sendTokenToServer(user);
 
         //Log.i(Constants.LOG_TAG, "Log the users name:" + user.getDisplayName());
 
+        // This is only for testing
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override

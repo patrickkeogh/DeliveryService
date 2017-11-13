@@ -25,7 +25,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -215,21 +214,21 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 //        }
     }
 
-    private void paintHomeMarker() {
-
-        // Clear any existing markers
+//    private void paintHomeMarker() {
+//
+//        // Clear any existing markers
 //        mGoogleMap.clear();
 //        builder = new LatLngBounds.Builder();
-
-        // Add Marker for home office
-        // This will have to be downloaded
-        // This only hard codes for testing purposes
-//        LatLng home = new LatLng(44.3916, -79.6882);
-//        drawMarker(home, "HOME", "Kan-Tech Delivery Service",
-//                Utils_General.vectorToBitmap(getContext(), R.drawable.ic_menu_home,
-//                        ContextCompat.getColor(getContext(), R.color.colorAccent)));
-
-    }
+//
+////         Add Marker for home office
+////         This will have to be downloaded
+////         This only hard codes for testing purposes
+//        //LatLng home = new LatLng(44.3916, -79.6882);
+////        drawMarker(home, "HOME", "Kan-Tech Delivery Service",
+////                Utils_General.vectorToBitmap(getContext(), R.drawable.ic_menu_home,
+////                        ContextCompat.getColor(getContext(), R.color.colorAccent)));
+//
+//    }
 
     protected synchronized void buildGoogleApiClient() {
 

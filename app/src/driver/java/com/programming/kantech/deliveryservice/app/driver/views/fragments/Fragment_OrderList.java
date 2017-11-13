@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,8 +29,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
-import com.programming.kantech.deliveryservice.app.driver.views.activities.Activity_Main;
-import com.programming.kantech.deliveryservice.app.driver.views.ui.ViewHolder_Order;
 import com.programming.kantech.deliveryservice.app.driver.views.ui.ViewHolder_OrderHistory;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
@@ -43,6 +40,7 @@ import butterknife.ButterKnife;
 
 /**
  * Created by patri on 2017-10-11.
+ * A fragment to show a list of orders
  */
 
 public class Fragment_OrderList extends Fragment implements GoogleApiClient.ConnectionCallbacks,
@@ -267,8 +265,6 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
             @Override
             public void populateViewHolder(final ViewHolder_OrderHistory holder, final Order order, int position) {
                 //Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + order.getCustomerName());
-
-                //mLayout.setBackgroundColor(ContextCompat.getColor(Activity_MyOrders.this, R.color.colorAccent));
 
                 // change the background color of the list item depending on the status
                 switch (order.getStatus()) {

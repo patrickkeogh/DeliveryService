@@ -30,6 +30,7 @@ import butterknife.ButterKnife;
 
 /**
  * Created by patri on 2017-10-11.
+ * A fragment to show order details
  */
 
 public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.ConnectionCallbacks,
@@ -109,12 +110,11 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
             DecimalFormat df = new DecimalFormat(Constants.NUMBER_FORMAT);
             Double km = Double.valueOf(df.format(mSelectedOrder.getDistance() / 1000));
 
-            //Double km = (double) (mOrder.getDistance() / 1000);
-            Log.i(Constants.LOG_TAG, "km:" + km);
+            //Log.i(Constants.LOG_TAG, "km:" + km);
 
             String distance_text = km + " km " + " @ $2.13/km";
 
-            String display_amount = Utils_General.getCostString(getContext(), mSelectedOrder.getAmount());
+            String display_amount = Utils_General.getCostString(mSelectedOrder.getAmount());
 
             display_amount += " (" + distance_text + ")";
 

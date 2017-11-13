@@ -110,6 +110,7 @@ public class Activity_Main extends AppCompatActivity implements
     private ActionBar mActionBar;
     private GoogleMap mGoogleMap;
     private GoogleApiClient mClient;
+    private LatLngBounds.Builder builder;
     private Order mSelectedOrder;
     private FirebaseRecyclerAdapter<Order, ViewHolder_Order> mFireAdapter;
 
@@ -119,10 +120,10 @@ public class Activity_Main extends AppCompatActivity implements
     // Determines if the filter view should be visible on the screen
     private boolean mShowFilter = true;
 
+    private boolean useCameraAnimation = false;
+
     // Marker for the driver
     private Marker mDriverMarker;
-
-    private LatLngBounds.Builder builder;
 
     // Location member variables
     Location mLastLocation;
@@ -194,7 +195,7 @@ public class Activity_Main extends AppCompatActivity implements
         }
 
         if (mDriver == null) {
-            throw new IllegalArgumentException("Must pass EXTRA_DRIVERccc");
+            throw new IllegalArgumentException("Must pass EXTRA_DRIVER");
         }
 
         // use ButterKnife to inject the layout views
@@ -267,8 +268,14 @@ public class Activity_Main extends AppCompatActivity implements
 
         showOrHideFilterView();
 
+    }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
+        // Store thr driver object in state
+        outState.putParcelable(Constants.STATE_INFO_DRIVER, mDriver);
 
     }
 
@@ -660,7 +667,7 @@ public class Activity_Main extends AppCompatActivity implements
                                     .title(order.getCustomerName())
                                     .snippet(places.get(0).getAddress().toString())
                                     .infoWindowAnchor(0.5f, 0.5f)
-                                    .icon(BitmapDescriptorFactory.defaultMarker(Utils_General.getMarkerColorByStatus(order.getStatus())));
+                                    .icon(BitmapDescriptorFactory.defaultMarker(Utils_General.getMarkerColorByStatus(Constants.ORDER_MARKER_LOCATION_TYPE_PICKUP, order.getStatus())));
 
                             Marker marker = mGoogleMap.addMarker(markerOptions);
 
@@ -686,7 +693,7 @@ public class Activity_Main extends AppCompatActivity implements
                                     .title(order.getCustomerName())
                                     .snippet(places.get(0).getAddress().toString())
                                     .infoWindowAnchor(0.5f, 0.5f)
-                                    .icon(BitmapDescriptorFactory.defaultMarker(Utils_General.getMarkerColorByStatus(order.getStatus())));
+                                    .icon(BitmapDescriptorFactory.defaultMarker(Utils_General.getMarkerColorByStatus(Constants.ORDER_MARKER_LOCATION_TYPE_DELIVERY, order.getStatus())));
 
                             Marker marker = mGoogleMap.addMarker(markerOptions);
 
@@ -732,11 +739,28 @@ public class Activity_Main extends AppCompatActivity implements
         }
 
         if (hasPoint) {
-            //mGoogleMap.setMaxZoomPreference(12);
 
-            LatLngBounds bounds = builder.build();
-            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 10);
-            mGoogleMap.animateCamera(cu);
+            mGoogleMap.setMaxZoomPreference(12);
+
+            mGoogleMap.setMinZoomPreference(8);
+
+            mGoogleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                @Override
+                public void onMapLoaded() {
+                    LatLngBounds bounds = builder.build();
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 10);
+
+                    if(useCameraAnimation){
+                        mGoogleMap.animateCamera(cu);
+                    }else{
+                        mGoogleMap.moveCamera(cu);
+                        // we want to skip the animation the first time through
+                        useCameraAnimation = true;
+                    }
+
+
+                }
+            });
         }
     }
 
@@ -789,7 +813,7 @@ public class Activity_Main extends AppCompatActivity implements
 
     @Override
     protected void onStop() {
-        Log.i(Constants.LOG_TAG, "onstop Called");
+        //Log.i(Constants.LOG_TAG, "onstop Called");
         super.onStop();
         removeDriverFromActive();
     }

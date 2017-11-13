@@ -37,6 +37,7 @@
 
         <activity
             android:name="com.programming.kantech.deliveryservice.app.driver.views.activities.Activity_OrderDetails"
+            android:launchMode="singleTop"
             android:label="@string/app_name">
 
             <meta-data

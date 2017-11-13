@@ -118,7 +118,7 @@ public class Activity_OrderDetails extends AppCompatActivity implements GoogleAp
 
         String distance_text = km + " km " + " @ $2.13/km";
 
-        String display_amount = Utils_General.getCostString(this, mOrder.getAmount());
+        String display_amount = Utils_General.getCostString(mOrder.getAmount());
 
         display_amount += " (" + distance_text + ")";
 
