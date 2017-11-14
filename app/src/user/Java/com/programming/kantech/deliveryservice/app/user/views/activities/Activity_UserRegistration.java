@@ -1,6 +1,7 @@
 package com.programming.kantech.deliveryservice.app.user.views.activities;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,8 +17,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.firebase.geofire.core.GeoHashQuery;
-import com.firebase.ui.auth.User;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -29,7 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.AppUser;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Location;
+import com.programming.kantech.deliveryservice.app.user.provider.Contract_DeliveryService;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
@@ -41,13 +40,12 @@ import butterknife.OnClick;
 
 /**
  * Created by patrick keogh on 2017-09-21.
+ * An activity to collect user info and store it in Firebase
  */
-
 public class Activity_UserRegistration extends AppCompatActivity {
 
-    // Member variables
-    private ActionBar mActionBar;
     private FirebaseUser mUser;
+    private DatabaseReference mUserRef;
     private Place mPlace;
 
     @BindView(R.id.toolbar)
@@ -77,7 +75,7 @@ public class Activity_UserRegistration extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_registration);
 
-        Log.i(Constants.LOG_TAG, "onCreate() in User Activity_Main");
+        //Log.i(Constants.LOG_TAG, "onCreate() in User Activity_Main");
 
         ButterKnife.bind(this);
 
@@ -89,15 +87,17 @@ public class Activity_UserRegistration extends AppCompatActivity {
             et_user_add_fullname.setText(mUser.getDisplayName());
         }
 
+        mUserRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_USERS);
+
         // Set the support action bar
         setSupportActionBar(mToolbar);
 
         // Set the action bar back button to look like an up button
-        mActionBar = this.getSupportActionBar();
+        ActionBar mActionBar = this.getSupportActionBar();
 
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(false);
-            mActionBar.setTitle("Customer Registration");
+            mActionBar.setTitle(R.string.title_user_registration);
         }
 
         // Add text watchers for the edit fields
@@ -155,8 +155,8 @@ public class Activity_UserRegistration extends AppCompatActivity {
     @OnClick(R.id.btn_user_register)
     public void registerCustomer() {
 
-        AppUser app_user = new AppUser();
-        final Location location = new Location();
+        final AppUser app_user = new AppUser();
+        //final Location location = new Location();
 
         app_user.setId(mUser.getUid());
         app_user.setCompany(et_user_add_company.getText().toString().trim());
@@ -166,52 +166,31 @@ public class Activity_UserRegistration extends AppCompatActivity {
 
         app_user.setPlaceId(mPlace.getId());
 
-        location.setPlaceId(mPlace.getId());
-        location.setMainAddress(true);
+        // Add location to local db
+        // Insert a new place into DB
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Contract_DeliveryService.PlaceEntry.COLUMN_PLACE_ID, mPlace.getId());
+        getContentResolver().insert(Contract_DeliveryService.PlaceEntry.CONTENT_URI, contentValues);
 
         // Push the new user registration to firebase
-        DatabaseReference mUserRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_USERS).child(mUser.getUid());
+        //mUserRef.child(mUser.getUid()).setValue(app_user);
 
-        mUserRef.setValue(app_user, new DatabaseReference.CompletionListener() {
+        mUserRef.child(mUser.getUid()).setValue(app_user, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError,
                                    DatabaseReference databaseReference) {
 
-                location.setCustId(mUser.getUid());
+                Utils_General.showToast(getApplicationContext(), "Registration complete");
 
-                addLocation(location);
+                Intent intent = new Intent(Activity_UserRegistration.this, Activity_Main.class);
+                intent.putExtra(Constants.EXTRA_USER, app_user);
+                startActivity(intent);
+                finish();
             }
         });
     }
 
-    private void addLocation(final Location location) {
 
-        final DatabaseReference locationRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_LOCATIONS);
-
-        locationRef
-                .child(mUser.getUid())
-                .push()
-                .setValue(location, new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(DatabaseError databaseError,
-                                           DatabaseReference databaseReference) {
-                        String uniqueKey = databaseReference.getKey();
-
-                        location.setId(uniqueKey);
-
-                        locationRef.child(mUser.getUid()).child(uniqueKey).setValue(location);
-
-                        Log.i(Constants.LOG_TAG, "key:" + uniqueKey);
-
-                        Utils_General.showToast(getApplicationContext(), "Registration complete");
-
-                        Intent intent = new Intent(Activity_UserRegistration.this, Activity_Main.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
-
-    }
 
     private void setupForm() {
 

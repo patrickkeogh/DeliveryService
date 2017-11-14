@@ -15,6 +15,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -23,11 +24,12 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
@@ -53,8 +55,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -63,7 +63,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * Created by patri on 2017-09-26.
+ * Created by patrick keogh on 2017-09-26.
+ * Activity that process's credit cards and returns a token from Stripe
+ * Token is sent to the server where the actual charge is made in a Cloud Function
  */
 
 public class Activity_Checkout extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
@@ -74,11 +76,12 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
     private Order mOrder;
     private AppUser mAppUser;
     private Token mToken;
-    private ActionBar mActionBar;
     private GoogleApiClient mClient;
 
+    private MaterialDialog dialog_charging;
+
     // Member variables for the payment fields
-    private String mPaymentName;
+    //private String mPaymentName;
     private String mPaymentMonth;
     private String mPaymentYear;
     private String mPaymentNumber;
@@ -94,6 +97,9 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
 
     @BindView(R.id.btn_user_checkout_confirm_order)
     Button btn_user_checkout_confirm_order;
+
+    @BindView(R.id.btn_user_checkout_cancel_order)
+    Button btn_user_checkout_cancel_order;
 
     @BindView(R.id.sp_user_checkout_exp_month)
     Spinner sp_user_checkout_exp_month;
@@ -198,7 +204,7 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
         setSupportActionBar(mToolbar);
 
         // Set the action bar back button to look like an up button
-        mActionBar = this.getSupportActionBar();
+        ActionBar mActionBar = this.getSupportActionBar();
 
         // Set the toolbar title
         if (mActionBar != null) {
@@ -210,7 +216,7 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
         String[] months = Utils_General.getSpinnerMonths();
 
         // Create an adapter to hold the month values
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.item_spinner, months);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, months);
         sp_user_checkout_exp_month.setAdapter(adapter);
         sp_user_checkout_exp_month.setOnItemSelectedListener(new MonthSelectedListener());
         mPaymentMonth = sp_user_checkout_exp_month.getSelectedItem().toString();
@@ -218,7 +224,7 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
         String[] years = Utils_General.getSpinnerYears();
 
         // Create an adapter to hold the year values
-        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, R.layout.item_spinner, years);
+        ArrayAdapter<String> adapter2 = new ArrayAdapter<>(this, R.layout.item_spinner, years);
         sp_user_checkout_exp_year.setAdapter(adapter2);
         sp_user_checkout_exp_year.setOnItemSelectedListener(new YearSelectedListener());
         mPaymentYear = sp_user_checkout_exp_year.getSelectedItem().toString();
@@ -233,7 +239,18 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
                 .getReference()
                 .child(Constants.FIREBASE_NODE_ORDERS);
 
+    }
 
+    /**
+     * Save the current state of this activity
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Store the driver in the instance state
+        outState.putParcelable(Constants.STATE_INFO_USER, mAppUser);
+        outState.putParcelable(Constants.STATE_INFO_ORDER, mOrder);
     }
 
     @OnClick(R.id.btn_user_checkout_cancel_order)
@@ -249,7 +266,10 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
 
     @OnClick(R.id.btn_user_checkout_confirm_order)
     public void confirmOrder() {
-        Log.i(Constants.LOG_TAG, "btn_user_confirm_order clicked");
+
+        // disable buttons so they cannot be clicked twice
+        btn_user_checkout_confirm_order.setEnabled(false);
+        btn_user_checkout_cancel_order.setEnabled(false);
 
         // Hide the keyboard
         Utils_General.hideKeyboard(this, getWindow().getDecorView().getRootView().getWindowToken());
@@ -257,6 +277,7 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
         int month = Integer.parseInt(mPaymentMonth);
         int year = Integer.parseInt(mPaymentYear);
 
+        // Used for testing
         // Uses live data
         Card card0 = new Card(mPaymentNumber, month, year, mPaymentSecurity);
 
@@ -307,9 +328,7 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
 
                         submitOrder();
 
-                        Log.i(Constants.LOG_TAG, "Token:" + mToken.toString());
-
-
+                        //Log.i(Constants.LOG_TAG, "Token:" + mToken.toString());
                     }
                 });
             } catch (AuthenticationException e) {
@@ -320,35 +339,41 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
 
     private void submitOrder() {
 
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialog_confirm = inflater.inflate(R.layout.alert_confirm_order, null);
-
+        // Stripe will only accept integers
         double amount = (double) (mOrder.getAmount());
         amount = amount / 100;
-        String display_amount = NumberFormat.getCurrencyInstance(new Locale("en", "US")).format(amount);
+        String display_amount = NumberFormat.getCurrencyInstance(Locale.getDefault()).format(amount);
 
-        TextView tv_name = dialog_confirm.findViewById(R.id.tv_user_checkout_confirm_message);
-        tv_name.setText(display_amount);
-
-        new AlertDialog.Builder(this)
-                .setTitle("Your credit card will be charged:")
-                .setView(dialog_confirm)
-                .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+        new MaterialDialog.Builder(this)
+                .title(R.string.msg_charged)
+                .content(display_amount)
+                .positiveText(getString(R.string.confirm))
+                .cancelable(false)
+                .negativeText(getString(R.string.cancel))
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        Utils_General.showToast(Activity_Checkout.this, getString(R.string.order_cancelled));
+                        btn_user_checkout_confirm_order.setEnabled(true);
+                        btn_user_checkout_cancel_order.setEnabled(true);
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
-                        pb_checkout_progress_bar.setVisibility(View.VISIBLE);
+                        MaterialDialog.Builder builder = new MaterialDialog.Builder(Activity_Checkout.this)
+                                .content(R.string.alert_charging)
+                                .cancelable(false)
+                                .progress(true, 0);
 
-
-                        // get today at 00:00 hrs
-                        Calendar date = new GregorianCalendar();
-                        long mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
-
-                        //long startDateMillis = mDisplayDateStartTime.getTimeInMillis();
-                        Log.i(Constants.LOG_TAG, "StartTime for 12th:" + mDisplayDateStartTimeInMillis);
+                        dialog_charging = builder.build();
+                        dialog_charging.show();
 
                         // Get a reference to the locations table
-                        final DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_ORDERS);
+                        final DatabaseReference orderRef =
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child(Constants.FIREBASE_NODE_ORDERS);
 
                         orderRef
                                 .push()
@@ -365,27 +390,17 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
 
                                         // On server we will check for an update to the "token" field
                                         // which will trigger a call to Strips
-                                        orderRef.child(uniqueKey).child("token").setValue(mToken);
+                                        orderRef.child(uniqueKey).child(Constants.FIREBASE_CHILD_TOKEN).setValue(mToken);
 
                                         Utils_General.showToast(Activity_Checkout.this, getString(R.string.order_booked));
 
+
                                         attachChargeListener();
 
-                                        //resetForm();
-
-                                        Log.i(Constants.LOG_TAG, "key:" + uniqueKey);
                                     }
                                 });
 
-                    }
-                })
-                .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
 
-                        Utils_General.showToast(Activity_Checkout.this, getString(R.string.order_cancelled));
-
-                        //resetForm();
                     }
                 })
                 .show();
@@ -407,14 +422,10 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
                     Log.i(Constants.LOG_TAG, dataSnapshot.toString());
-                    Utils_General.showToast(Activity_Checkout.this, "charge added:");
-
-                    pb_checkout_progress_bar.setVisibility(View.GONE);
+                    //Utils_General.showToast(Activity_Checkout.this, "charge added:");
 
                     Charge charge = dataSnapshot.getValue(Charge.class);
                     if (charge != null) {
-                        Log.i(Constants.LOG_TAG, "Wed have a charge");
-
                         Outcome outcome = charge.getOutcome();
 
                         mStatus = charge.getStatus();
@@ -429,7 +440,7 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
                         showAlertMessage(title, outcome.getSeller_message());
 
 
-                        Utils_General.showToast(Activity_Checkout.this, "charge status:" + charge.getStatus());
+                        //Utils_General.showToast(Activity_Checkout.this, "charge status:" + charge.getStatus());
                     } else {
                         Log.i(Constants.LOG_TAG, "No Charge object");
                     }
@@ -442,23 +453,25 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
             };
 
             mOrderRef.child(mOrder.getId()).child("charge").addValueEventListener(mChargeEventListener);
-            Log.i(Constants.LOG_TAG, "Path For Charge:" + mOrderRef.toString());
         }
 
 
     }
 
     private void showAlertMessage(String title, String message) {
-        Log.i(Constants.LOG_TAG, "Alert Message called");
+        //Log.i(Constants.LOG_TAG, "Alert Message called");
+
+        dialog_charging.dismiss();
+
+        final ViewGroup nullParent = null;
 
         LayoutInflater inflater = this.getLayoutInflater();
-        View dialog_confirm = inflater.inflate(R.layout.alert_confirm, null);
+        View dialog_confirm = inflater.inflate(R.layout.alert_confirm, nullParent);
 
         TextView tv_message = dialog_confirm.findViewById(R.id.tv_alert_message);
         tv_message.setText(message);
 
         if (Objects.equals(mStatus, "failed")) {
-            Log.i(Constants.LOG_TAG, "Alert Message called");
             new AlertDialog.Builder(this)
                     .setTitle(title)
                     .setView(dialog_confirm)
@@ -475,6 +488,7 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
 
             Intent intent = new Intent(Activity_Checkout.this, Activity_CheckoutSuccess.class);
             intent.putExtra(Constants.EXTRA_ORDER, mOrder);
+            intent.putExtra(Constants.EXTRA_USER, mAppUser);
 
             startActivity(intent);
         }
@@ -645,12 +659,9 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
 
     private void buildApiClient() {
         if (mClient == null) {
-            Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
-
             mClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
                     .addApi(Places.GEO_DATA_API)
                     .build();
         }

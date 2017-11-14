@@ -15,6 +15,7 @@ import com.programming.kantech.deliveryservice.app.utils.Constants;
 
 /**
  * Created by patrick keogh on 2017-08-27.
+ * A view holder for Firebase Adaapter
  */
 
 public class ViewHolder_Order extends RecyclerView.ViewHolder {
@@ -30,8 +31,6 @@ public class ViewHolder_Order extends RecyclerView.ViewHolder {
 
     private ClickListener mClickListener;
 
-    private Context mContext;
-
     //Interface to send callbacks...
     public interface ClickListener {
         public void onShowMapClick(View view, int position);
@@ -43,13 +42,6 @@ public class ViewHolder_Order extends RecyclerView.ViewHolder {
 
     public ViewHolder_Order(View itemView) {
         super(itemView);
-
-//        itemView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mClickListener.onItemClick(v, getAdapterPosition());
-//            }
-//        });
 
         tv_user_order_date = itemView.findViewById(R.id.tv_user_order_date);
         tv_user_order_pickup_address = itemView.findViewById(R.id.tv_user_order_pickup_address);

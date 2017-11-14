@@ -1,7 +1,7 @@
 package com.programming.kantech.deliveryservice.app.utils;
 
 
-import com.programming.kantech.deliveryservice.app.provider.Contract_DeliveryService;
+
 
 /**
  * Created by patrick keogh on 2017-08-08.
@@ -95,6 +95,7 @@ public class Constants {
     public static final String EXTRA_CUSTOMER_NAME = "com.programming.kantech.deliveryservice.app.extra.customer.name";
     public static final String EXTRA_CUSTOMER = "com.programming.kantech.deliveryservice.app.extra.customer";
     public static final String EXTRA_LOCATION = "com.programming.kantech.deliveryservice.app.extra.location";
+    public static final String EXTRA_PLACE_ID = "com.programming.kantech.deliveryservice.app.extra.place_id";
     public static final String EXTRA_LOCATION_NAME = "com.programming.kantech.deliveryservice.app.extra.location.name";
     public static final String EXTRA_LOCATION_ADDRESS = "com.programming.kantech.deliveryservice.app.extra.location.address";
     public static final String EXTRA_ACTIVITY_REF = "com.programming.kantech.deliveryservice.app.extra.activity_ref";
@@ -164,6 +165,7 @@ public class Constants {
     public static final String FIREBASE_CHILD_INPROGRESS = "inProgress";
     public static final String FIREBASE_CHILD_PICKUP_DATE = "pickupDate";
     public static final String FIREBASE_CHILD_PLACE_ID = "placeId";
+    public static final String FIREBASE_CHILD_TOKEN = "token";
 
     public static final String FIREBASE_CHILD_ORDER_STATUS = "status";
     public static final String FIREBASE_CHILD_ORDER_CUST_ID = "customerId";
@@ -183,13 +185,13 @@ public class Constants {
      * The columns of data that we are interested in displaying within our activity list of
      * drivers
      */
-    public static final String[] LOADER_DRIVER_DETAIL_COLUMNS = {
-            Contract_DeliveryService.Entry_Drivers._ID,
-            Contract_DeliveryService.Entry_Drivers.COLUMN_DRIVER_UID,
-            Contract_DeliveryService.Entry_Drivers.COLUMN_DRIVER_DISPLAY_NAME,
-            Contract_DeliveryService.Entry_Drivers.COLUMN_DRIVER_EMAIL,
-            Contract_DeliveryService.Entry_Drivers.COLUMN_DRIVER_APPROVED
-    };
+//    public static final String[] LOADER_DRIVER_DETAIL_COLUMNS = {
+//            Contract_DeliveryService.Entry_Drivers._ID,
+//            Contract_DeliveryService.Entry_Drivers.COLUMN_DRIVER_UID,
+//            Contract_DeliveryService.Entry_Drivers.COLUMN_DRIVER_DISPLAY_NAME,
+//            Contract_DeliveryService.Entry_Drivers.COLUMN_DRIVER_EMAIL,
+//            Contract_DeliveryService.Entry_Drivers.COLUMN_DRIVER_APPROVED
+//    };
 
     /*
      * We store the indices of the values in the array of Strings above to more quickly be able to

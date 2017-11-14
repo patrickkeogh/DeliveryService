@@ -269,9 +269,9 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
                 // change the background color of the list item depending on the status
                 switch (order.getStatus()) {
                     case Constants.ORDER_STATUS_BOOKED:
-                    case Constants.ORDER_STATUS_ASSIGNED:
                         holder.setBackgroundColor(getContext(), R.color.colorPrimary);
                         break;
+                    case Constants.ORDER_STATUS_ASSIGNED:
                     case Constants.ORDER_STATUS_PICKUP_COMPLETE:
                         holder.setBackgroundColor(getContext(), R.color.colorGreen);
                         break;

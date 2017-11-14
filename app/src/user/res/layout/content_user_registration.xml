@@ -1,172 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginTop="?attr/actionBarSize">
 
-    <LinearLayout
+
+    <ScrollView
+        android:id="@+id/login_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="24dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:orientation="vertical">
+        android:layout_margin="@dimen/margin_8dp"
+        tools:ignore="UselessParent">
 
-        <ScrollView
-            android:id="@+id/login_form"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:text="@string/label_customer_info"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <include layout="@layout/view_accent_line" />
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginBottom="@dimen/padding_4dp"
+                android:layout_marginTop="@dimen/padding_4dp"
+                android:labelFor="@+id/et_user_add_fullname"
+                android:text="@string/title_full_name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+            <EditText
+                android:id="@+id/et_user_add_fullname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_4dp"
+                android:layout_marginTop="@dimen/padding_4dp"
+                android:labelFor="@+id/et_user_add_company"
+                android:text="@string/title_company"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+            <EditText
+                android:id="@+id/et_user_add_company"
+                android:inputType="text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_4dp"
+                android:layout_marginTop="@dimen/padding_4dp"
+                android:labelFor="@+id/et_user_add_phone"
+                android:text="@string/title_phone_no"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+            <EditText
+                android:id="@+id/et_user_add_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone"
+                android:maxLength="14"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:text="@string/title_billing_address"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorPrimaryDark" />
+
+            <include layout="@layout/view_accent_line" />
 
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="@string/label_customer_info"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="@color/colorPrimaryDark" />
+            <LinearLayout
+                android:id="@+id/layout_registration_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="@dimen/divider_view_accent"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:text="Full Name"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                <EditText
-                    android:id="@+id/et_user_add_fullname"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:text="Company"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                <EditText
-                    android:id="@+id/et_user_add_company"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:text="Phone"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                <EditText
-                    android:id="@+id/et_user_add_phone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLength="14"
-                    android:inputType="phone"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Billing Address"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="@color/colorPrimaryDark" />
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="@dimen/divider_view_accent"
-                    android:layout_marginBottom="@dimen/margin_8dp"
-                    android:layout_marginTop="@dimen/margin_8dp"
-                    android:background="@color/colorAccent" />
+                <ImageView
+                    android:layout_width="@dimen/icon_width_height"
+                    android:layout_height="@dimen/icon_width_height"
+                    android:layout_gravity="fill"
+                    android:layout_marginEnd="@dimen/margin_16dp"
+                    android:src="@drawable/ic_place_accent_24dp"
+                    android:contentDescription="@string/content_description_place_icon" />
 
                 <LinearLayout
-                    android:id="@+id/layout_registration_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
-                    <ImageView
-                        android:layout_width="@dimen/icon_width_height"
-                        android:layout_height="@dimen/icon_width_height"
-                        android:layout_gravity="fill"
-                        android:layout_marginEnd="@dimen/margin_16dp"
-                        android:src="@drawable/ic_place_accent_24dp" />
-
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/tv_registration_address_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:maxLines="1"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/colorBlack" />
 
-                        <TextView
-                            android:id="@+id/tv_registration_address_name"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:maxLines="1"
-                            android:textColor="@color/colorBlack"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-
-                        <TextView
-                            android:id="@+id/tv_registration_address"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:maxLines="1"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-                    </LinearLayout>
-
+                    <TextView
+                        android:id="@+id/tv_registration_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
                 </LinearLayout>
-
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="@dimen/divider_view_accent"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/colorAccent" />
-
-                <Button
-                    android:id="@+id/btn_user_register"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_8dp"
-                    android:background="@color/colorPrimaryLight"
-                    android:text="Register"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@color/colorWhite"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_8dp"
-                    android:maxLines="1"
-                    android:textColor="@color/colorAccent"
-                    android:text="All fields are required."
-                    android:gravity="center_horizontal"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
 
             </LinearLayout>
 
+            <include layout="@layout/view_accent_line" />
 
-        </ScrollView>
+            <Button
+                android:id="@+id/btn_user_register"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:background="@color/colorPrimaryLight"
+                android:text="@string/btn_register"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/colorWhite"
+                android:textStyle="bold" />
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:gravity="center_horizontal"
+                android:maxLines="1"
+                android:text="@string/msg_all_fields_are_required"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/colorAccent" />
+
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
 
 </RelativeLayout>

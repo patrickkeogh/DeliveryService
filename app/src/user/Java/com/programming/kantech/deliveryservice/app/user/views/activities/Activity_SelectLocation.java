@@ -1,7 +1,10 @@
 package com.programming.kantech.deliveryservice.app.user.views.activities;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,9 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -25,34 +26,33 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.AppUser;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Location;
+import com.programming.kantech.deliveryservice.app.user.provider.Contract_DeliveryService;
+import com.programming.kantech.deliveryservice.app.user.views.ui.Adapter_PlaceList;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
-import com.programming.kantech.deliveryservice.app.views.ui.ViewHolder_Locations;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * Created by patri on 2017-09-21.
+ * Created by patrick keogh on 2017-09-21.
+ * An activity used to select a google Place from local storage or
+ * from the api
  */
 
 public class Activity_SelectLocation extends AppCompatActivity  implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, Adapter_PlaceList.PlaceListOnClickHandler {
 
-    // Member variables
-    private FirebaseRecyclerAdapter<Location, ViewHolder_Locations> mFireAdapter;
+    // Local member variables
     private GoogleApiClient mClient;
+    private Adapter_PlaceList mAdapter;
     private AppUser mAppUser;
     private int mTitle;
-
-    // Firebase variables
-    private DatabaseReference mLocationsRef;
 
     @BindView(R.id.rv_locations_list)
     RecyclerView mRecyclerView;
@@ -73,25 +73,20 @@ public class Activity_SelectLocation extends AppCompatActivity  implements Googl
         ButterKnife.bind(this);
 
         if (savedInstanceState != null) {
-
-            Log.i(Constants.LOG_TAG, "Activity_Details savedInstanceState is not null");
             if (savedInstanceState.containsKey(Constants.STATE_INFO_USER)) {
                 mAppUser = savedInstanceState.getParcelable(Constants.STATE_INFO_USER);
             }
-
             if (savedInstanceState.containsKey(Constants.STATE_INFO_LOCATION_SELECT_MESSAGE)) {
                 mTitle = savedInstanceState.getInt(Constants.STATE_INFO_LOCATION_SELECT_MESSAGE);
             }
-
         } else {
-            Log.i(Constants.LOG_TAG, "Activity_Details savedInstanceState is null, get data from intent: ");
             mAppUser = getIntent().getParcelableExtra(Constants.EXTRA_USER);
             mTitle = getIntent().getIntExtra(Constants.EXTRA_LOCATION_SELECT_MESSAGE, 0);
         }
 
 
-        if (mAppUser == null) {
-            throw new IllegalArgumentException("Must pass EXTRA_USER");
+        if (mAppUser == null || mTitle == 0) {
+            throw new IllegalArgumentException("Must pass EXTRA_USER & EXTRA_LOCATION_SELECT_MESSAGE ");
         }
 
         // Set the support action bar
@@ -102,7 +97,7 @@ public class Activity_SelectLocation extends AppCompatActivity  implements Googl
 
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(true);
-            mActionBar.setTitle(getResources().getString(R.string.select_pickup_location_title));
+            mActionBar.setTitle(getResources().getString(mTitle));
 
         }
 
@@ -124,22 +119,49 @@ public class Activity_SelectLocation extends AppCompatActivity  implements Googl
          */
         mRecyclerView.setHasFixedSize(false);
 
-        // Get a reference to the locations table
-        mLocationsRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_LOCATIONS);
+        mAdapter = new Adapter_PlaceList(this, null, this);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
+    /**
+     * Save the current state of this activity
+     */
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Store the app bar title in the instance state
+        outState.putInt(Constants.STATE_INFO_LOCATION_SELECT_MESSAGE, mTitle);
+
+        // Store the user in the instance state
+        outState.putParcelable(Constants.STATE_INFO_USER, mAppUser);
+    }
+
+    /***
+     * Called when the Place Picker Activity returns back with a selected place (or after canceling)
+     *
+     * @param requestCode The request code passed when calling startActivityForResult
+     * @param resultCode  The result code specified by the second activity
+     * @param data        The Intent that carries the result data.
+     */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Constants.REQUEST_CODE_PLACE_PICKER && resultCode == Activity.RESULT_OK) {
-
+        if (requestCode == Constants.REQUEST_CODE_PLACE_PICKER && resultCode == RESULT_OK) {
             Place place = PlacePicker.getPlace(this, data);
-
             if (place == null) {
                 Log.i(Constants.LOG_TAG, "No place selected");
                 return;
             }
 
-            addLocationToFirebase(place);
+            // Extract the place information from the API
+            String placeID = place.getId();
+
+            // Insert a new place into DB
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(Contract_DeliveryService.PlaceEntry.COLUMN_PLACE_ID, placeID);
+            getContentResolver().insert(Contract_DeliveryService.PlaceEntry.CONTENT_URI, contentValues);
+
+            // Get live data information
+            refreshPlacesData();
         }
     }
 
@@ -163,10 +185,6 @@ public class Activity_SelectLocation extends AppCompatActivity  implements Googl
     protected void onDestroy() {
         super.onDestroy();
         mClient = null;
-
-        if (mFireAdapter != null) {
-            mFireAdapter.cleanup();
-        }
     }
 
     @Override
@@ -186,7 +204,7 @@ public class Activity_SelectLocation extends AppCompatActivity  implements Googl
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.i(Constants.LOG_TAG, "onConnected called");
-        loadFirebaseAdapter();
+        refreshPlacesData();
 
     }
 
@@ -202,7 +220,7 @@ public class Activity_SelectLocation extends AppCompatActivity  implements Googl
 
     private void buildApiClient() {
         if (mClient == null) {
-            Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
+            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
 
             mClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -213,55 +231,55 @@ public class Activity_SelectLocation extends AppCompatActivity  implements Googl
         }
     }
 
-    private void loadFirebaseAdapter() {
+//    private void loadFirebaseAdapter() {
+//
+//        mFireAdapter = new FirebaseRecyclerAdapter<Location, ViewHolder_Locations>(
+//                Location.class,
+//                R.layout.item_location_pickup,
+//                ViewHolder_Locations.class,
+//                mLocationsRef.child(mAppUser.getId())) {
+//
+//            @Override
+//            public void populateViewHolder(final ViewHolder_Locations holder, final Location location, int position) {
+//                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + location.getPlaceId());
+//
+//                final Place[] thisPlace = new Place[1];
+//
+//                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mClient, location.getPlaceId());
+//
+//                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+//                    @Override
+//                    public void onResult(@NonNull PlaceBuffer places) {
+//
+//                        thisPlace[0] = places.get(0);
+//
+//                        Log.i(Constants.LOG_TAG, "PLACE:" + thisPlace[0].getAddress());
+//
+//                        holder.setName(thisPlace[0].getName().toString());
+//                        holder.setAddress(thisPlace[0].getAddress().toString());
+//
+//
+//                    }
+//                });
+//
+//                holder.itemView.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        // Send the selected customer back to the main activity
+//                        finishTheActivity(location, thisPlace[0]);
+//                    }
+//                });
+//            }
+//        };
+//
+//        mRecyclerView.setAdapter(mFireAdapter);
+//    }
 
-        mFireAdapter = new FirebaseRecyclerAdapter<Location, ViewHolder_Locations>(
-                Location.class,
-                R.layout.item_location_pickup,
-                ViewHolder_Locations.class,
-                mLocationsRef.child(mAppUser.getId())) {
-
-            @Override
-            public void populateViewHolder(final ViewHolder_Locations holder, final Location location, int position) {
-                Log.i(Constants.LOG_TAG, "populateViewHolder() called:" + location.getPlaceId());
-
-                final Place[] thisPlace = new Place[1];
-
-                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mClient, location.getPlaceId());
-
-                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
-                    @Override
-                    public void onResult(@NonNull PlaceBuffer places) {
-
-                        thisPlace[0] = places.get(0);
-
-                        Log.i(Constants.LOG_TAG, "PLACE:" + thisPlace[0].getAddress());
-
-                        holder.setName(thisPlace[0].getName().toString());
-                        holder.setAddress(thisPlace[0].getAddress().toString());
-
-
-                    }
-                });
-
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Send the selected customer back to the main activity
-                        finishTheActivity(location, thisPlace[0]);
-                    }
-                });
-            }
-        };
-
-        mRecyclerView.setAdapter(mFireAdapter);
-    }
-
-    private void finishTheActivity(Location location, Place place) {
+    private void finishTheActivity(Place place) {
 
         Intent resultIntent = new Intent();
 
-        resultIntent.putExtra(Constants.EXTRA_LOCATION, location);
+        resultIntent.putExtra(Constants.EXTRA_PLACE_ID, place.getId());
         resultIntent.putExtra(Constants.EXTRA_LOCATION_NAME, place.getName());
         resultIntent.putExtra(Constants.EXTRA_LOCATION_ADDRESS, place.getAddress());
 
@@ -290,30 +308,39 @@ public class Activity_SelectLocation extends AppCompatActivity  implements Googl
         }
     }
 
-    private void addLocationToFirebase(Place place) {
-        Log.i(Constants.LOG_TAG, "addLocation() calledplaceid:" + place.getId());
+    public void refreshPlacesData() {
+        Uri uri = Contract_DeliveryService.PlaceEntry.CONTENT_URI;
+        Cursor data = getContentResolver().query(
+                uri,
+                null,
+                null,
+                null,
+                null);
 
-        final Location location = new Location();
-        location.setCustId(mAppUser.getId());
-        location.setPlaceId(place.getId());
+        if (data == null || data.getCount() == 0) return;
+        List<String> guids = new ArrayList<>();
+        while (data.moveToNext()) {
+            guids.add(data.getString(data.getColumnIndex(Contract_DeliveryService.PlaceEntry.COLUMN_PLACE_ID)));
+        }
+        PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mClient,
+                guids.toArray(new String[guids.size()]));
 
+        placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+            @Override
+            public void onResult(@NonNull PlaceBuffer places) {
+                mAdapter.swapPlaces(places);
+            }
+        });
 
-        mLocationsRef
-                .child(mAppUser.getId())
-                .push()
-                .setValue(location, new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(DatabaseError databaseError,
-                                           DatabaseReference databaseReference) {
-                        String uniqueKey = databaseReference.getKey();
+        data.close();
+    }
 
-                        location.setId(uniqueKey);
+    @Override
+    public void onClick(long id, Place place) {
+        Log.i(Constants.LOG_TAG, "onClick called in Activity_SelectLocation");
 
-                        mLocationsRef.child(mAppUser.getId()).child(uniqueKey).setValue(location);
-
-                        Log.i(Constants.LOG_TAG, "key:" + uniqueKey);
-                    }
-                });
+        // send selected location back to activity
+        finishTheActivity(place);
 
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="?attr/actionBarSize"
@@ -10,28 +11,31 @@
         android:layout_height="96dp"
         android:background="@color/colorPrimary"
         android:orientation="horizontal"
-        android:weightSum="3">
+        android:weightSum="3"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
 
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/icon_width_height"
+                android:layout_height="@dimen/icon_width_height"
                 android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:src="@drawable/ic_nav_details_fade" />
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:src="@drawable/ic_nav_details_fade"
+                android:contentDescription="@string/content_description_order_icon" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="ORDER INFO"
+                android:text="@string/nav_item_order_info"
                 android:textColor="@color/colorWhiteFade" />
 
         </LinearLayout>
@@ -41,21 +45,23 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
 
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/icon_width_height"
+                android:layout_height="@dimen/icon_width_height"
                 android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:src="@drawable/ic_nav_payment_fade" />
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:src="@drawable/ic_nav_payment_fade"
+                android:contentDescription="@string/content_description_payment_icon" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="PAYMENT"
+                android:text="@string/nav_item_payment"
                 android:textColor="@color/colorWhiteFade" />
 
         </LinearLayout>
@@ -65,21 +71,23 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
 
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/icon_width_height"
+                android:layout_height="@dimen/icon_width_height"
                 android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:src="@drawable/ic_nav_success" />
+                android:layout_marginTop="@dimen/margin_16dp"
+                android:src="@drawable/ic_nav_success"
+                android:contentDescription="@string/content_description_success_icon" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="SUCCESS"
+                android:text="@string/nav_item_success"
                 android:textColor="@color/colorWhite" />
 
         </LinearLayout>
@@ -101,17 +109,16 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:text="PAYMENT RECEIVED"
+            android:text="@string/msg_payment_received"
             android:textColor="@color/colorPrimaryDark" />
 
         <TextView
             android:id="@+id/tv_user_checkout_success_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/margin_8dp"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:text="PAYMENT RECEIVED"
             android:textColor="@color/colorPrimaryDark" />
 
         <TextView
@@ -120,7 +127,7 @@
             android:layout_marginTop="50dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:gravity="center"
-            android:text="You will receive a notification when a driver has been assigned to your order."
+            android:text="@string/msg_success_notification"
             android:textColor="@color/colorRed" />
 
         <ImageView
@@ -129,7 +136,8 @@
             android:layout_height="80dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
-            android:src="@drawable/ic_home_primary" />
+            android:src="@drawable/ic_home_primary"
+            android:contentDescription="@string/content_description_home_icon" />
 
 
 

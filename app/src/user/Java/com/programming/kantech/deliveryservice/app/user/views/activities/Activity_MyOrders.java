@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -25,9 +26,14 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.AppUser;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
@@ -39,7 +45,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by patri on 2017-10-04.
+ * Created by patrick keogh on 2017-10-04.
+ * An activity to display a list of orders for the logged in user
  */
 
 public class Activity_MyOrders extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
@@ -48,9 +55,10 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
     // Member variables
     private ActionBar mActionBar;
     private AppUser mAppUser;
+    private RecyclerView.AdapterDataObserver mObserver;
     private FirebaseRecyclerAdapter<Order, ViewHolder_Order> mFireAdapter;
     private GoogleApiClient mClient;
-    private Order mSelectedOrder;
+    //private Order mSelectedOrder;
     private String mStatusFilter = Constants.ORDER_STATUS_OPEN;
 
     private DatabaseReference mOrdersRef;
@@ -60,6 +68,9 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
 
     @BindView(R.id.rv_user_orders)
     RecyclerView mRecyclerView;
+
+    @BindView(R.id.tv_empty_view)
+    TextView tv_empty_view;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -136,7 +147,19 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
                 loadFirebaseAdapter();
                 return true;
             case R.id.action_sign_out:
-                AuthUI.getInstance().signOut(this);
+                //Log.i(Constants.LOG_TAG, "Sign out clicked:");
+                AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful()) {
+                            Intent intent = new Intent(Activity_MyOrders.this, Activity_Splash.class);
+                            startActivity(intent);
+                            finish();
+                        }
+
+                    }
+                });
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -236,10 +259,21 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
                         holder.btn_order_show_map.setTextColor(ContextCompat.getColor(Activity_MyOrders.this, R.color.colorTextGrey));
                         break;
                     case Constants.ORDER_STATUS_ASSIGNED:
-                        holder.setBackgroundColor(Activity_MyOrders.this, R.color.colorAccent);
+                        holder.setBackgroundColor(Activity_MyOrders.this, R.color.colorGreen);
+                        holder.btn_order_show_map.setEnabled(false);
+                        holder.btn_order_show_map.setTextColor(ContextCompat.getColor(Activity_MyOrders.this, R.color.colorTextGrey));
+                        break;
+                    case Constants.ORDER_STATUS_PICKUP_COMPLETE:
+                        holder.setBackgroundColor(Activity_MyOrders.this, R.color.colorGreen);
                         holder.btn_order_show_map.setEnabled(true);
                         holder.btn_order_show_map.setTextColor(ContextCompat.getColor(Activity_MyOrders.this, R.color.colorGreen));
                         break;
+                    case Constants.ORDER_STATUS_COMPLETE:
+                        holder.setBackgroundColor(Activity_MyOrders.this, R.color.colorAccent);
+                        holder.btn_order_show_map.setEnabled(false);
+                        holder.btn_order_show_map.setTextColor(ContextCompat.getColor(Activity_MyOrders.this, R.color.colorTextGrey));
+                        break;
+
 
                 }
 
@@ -301,6 +335,62 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
 
         mRecyclerView.setAdapter(mFireAdapter);
 
+        Query query = getDatabaseRef();
 
+        // Hide or show the list depending on if there are records
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Perform initial setup, this will only be called once
+                if(dataSnapshot.hasChildren()){
+                    showList(true);
+                }else{
+                    showList(false);
+                }
+
+                // Create an observer to check if the list changes
+                mObserver = new RecyclerView.AdapterDataObserver() {
+                    @Override
+                    public void onItemRangeInserted(int positionStart, int itemCount) {
+
+                        int count = mFireAdapter.getItemCount();
+                        if(count == 0){
+                            showList(false);
+                        }else{
+                            showList(true);
+                        }
+                    }
+
+                    @Override
+                    public void onItemRangeRemoved(int positionStart, int itemCount) {
+                        int count = mFireAdapter.getItemCount();
+                        if(count == 0){
+                            showList(false);
+                        }else{
+                            showList(true);
+                        }
+                    }
+                };
+                mFireAdapter.registerAdapterDataObserver(mObserver);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+
+    private void showList(boolean bShowList) {
+
+        if(bShowList){
+            mRecyclerView.setVisibility(View.VISIBLE);
+            tv_empty_view.setVisibility(View.GONE);
+        }else{
+            mRecyclerView.setVisibility(View.GONE);
+            tv_empty_view.setVisibility(View.VISIBLE);
+        }
     }
 }

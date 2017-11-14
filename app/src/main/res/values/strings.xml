@@ -24,7 +24,7 @@
     <string name="cancel">Cancel</string>
     <string name="order_booked">Order Booked</string>
     <string name="order_cancelled">Order Cancelled</string>
-    <string name="select_pickup_location_title">Select the pickup address</string>
+    <string name="select_pickup_location_title">Select the pickup location</string>
     <string name="select_delivery_location_title">Select a delivery location</string>
     <string name="label_billing_info">Billing Details</string>
     <string name="ok">ok</string>
@@ -137,7 +137,7 @@
     <string name="title_app_driver_application">Driver Application</string>
 
     <string name="msg_approval_failed">Approval failed ...</string>
-    <string name="msg_driver_notification">You will be notified when driver aprroval is complete.</string>
+    <string name="msg_driver_notification">You will be notified when driver approval is complete.</string>
     <string name="msg_signing_in">Signing in ...</string>
     <string name="msg_sign_in_complete">Sign in complete</string>
     <string name="msg_sign_in_cancelled">Sign in cancelled</string>
@@ -148,4 +148,26 @@
     <string name="app_title_driver">Driver Application</string>
     <string name="btn_details">DETAILS</string>
     <string name="btn_live_map">LIVE MAP</string>
+    <string name="msg_charged">Your credit card will be charged:</string>
+    <string name="alert_charging">charging credit card ...</string>
+    <string name="alert_select_date">Select A Date</string>
+    <string name="app_title_user">User Application</string>
+    <string name="title_user_registration">User Registration</string>
+    <string name="content_description_app_logo">app logo</string>
+    <string name="btn_create_order">Create Order</string>
+    <string name="content_description_order_icon">order icon</string>
+    <string name="nav_item_order_info">ORDER INFO</string>
+    <string name="nav_item_payment">PAYMENT</string>
+    <string name="content_description_payment_icon">payment icon</string>
+    <string name="nav_item_success">SUCCESS</string>
+    <string name="content_description_success_icon">success icon</string>
+    <string name="msg_payment_received">PAYMENT RECEIVED</string>
+    <string name="msg_success_notification">You will receive a notification when a driver has been assigned to your order.</string>
+    <string name="content_description_home_icon">home icon</string>
+    <string name="msg_this_order_is_complete">This order is complete.</string>
+    <string name="msg_you_have_no_orders_to_show">You have no orders to show.</string>
+    <string name="title_full_name">Full Name</string>
+    <string name="title_phone_no">Phone No</string>
+    <string name="content_description_place_icon">place icon</string>
+    <string name="btn_register">REGISTER</string>
 </resources>

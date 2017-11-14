@@ -113,24 +113,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/margin_8dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                tools:text="ABC Electronics" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
             <TextView
                 android:id="@+id/tv_user_order_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/margin_8dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                tools:text="Full Name" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
 
             <TextView
                 android:id="@+id/tv_user_order_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/margin_8dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                tools:text="Full Name" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -140,12 +137,7 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 android:textColor="@color/colorPrimaryDark" />
 
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="@dimen/divider_view_accent"
-                android:layout_marginBottom="@dimen/margin_8dp"
-                android:layout_marginTop="@dimen/margin_8dp"
-                android:background="@color/colorAccent" />
+            <include layout="@layout/view_accent_line" />
 
             <LinearLayout
                 android:id="@+id/layout_order_date"
@@ -168,24 +160,18 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@android:color/black"
-                    tools:text="Monday 1" />
+                    android:textColor="@android:color/black" />
             </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_16dp"
+                android:layout_marginTop="@dimen/margin_8dp"
                 android:text="@string/title_pickup_location"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 android:textColor="@color/colorPrimaryDark" />
 
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="@dimen/divider_view_accent"
-                android:layout_marginBottom="@dimen/margin_8dp"
-                android:layout_marginTop="@dimen/margin_8dp"
-                android:background="@color/colorAccent" />
+            <include layout="@layout/view_accent_line" />
 
             <LinearLayout
                 android:id="@+id/layout_order_location_pickup"
@@ -223,21 +209,15 @@
 
             </LinearLayout>
 
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_16dp"
+                android:layout_marginTop="@dimen/margin_8dp"
                 android:text="@string/title_delivery_location"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 android:textColor="@color/colorPrimaryDark" />
 
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="@dimen/divider_view_accent"
-                android:layout_marginBottom="@dimen/margin_8dp"
-                android:layout_marginTop="@dimen/margin_8dp"
-                android:background="@color/colorAccent" />
+            <include layout="@layout/view_accent_line" />
 
             <LinearLayout
                 android:id="@+id/layout_order_location_delivery"

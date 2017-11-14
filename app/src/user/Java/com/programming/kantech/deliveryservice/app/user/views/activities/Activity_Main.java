@@ -14,6 +14,8 @@ import android.view.MenuItem;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.BuildConfig;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -46,10 +48,6 @@ public class Activity_Main extends AppCompatActivity {
     private ActionBar mActionBar;
     private AppUser mAppUser;
 
-    // Member variables for the Firebase Authorization
-    private FirebaseAuth mFirebaseAuth;
-    private FirebaseAuth.AuthStateListener mFirebaseAuthListener;
-
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
@@ -62,6 +60,19 @@ public class Activity_Main extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(Constants.STATE_INFO_USER)) {
+                mAppUser = savedInstanceState.getParcelable(Constants.STATE_INFO_USER);
+            }
+        } else {
+
+            mAppUser = getIntent().getParcelableExtra(Constants.EXTRA_USER);
+        }
+
+        if (mAppUser == null) {
+            throw new IllegalArgumentException("Must pass EXTRA_USER");
+        }
+
         // Set the support action bar
         setSupportActionBar(mToolbar);
 
@@ -70,66 +81,19 @@ public class Activity_Main extends AppCompatActivity {
 
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(false);
+            mActionBar.setTitle(mAppUser.getContact_name());
         }
-
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        FirebaseMessaging.getInstance().subscribeToTopic(Constants.FIREBASE_NOTIFICATION_TOPIC_USER);
-
-        mFirebaseAuthListener = new FirebaseAuth.AuthStateListener(){
-
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-
-                if (user != null) {
-                    // Signed In
-                    Utils_General.showToast(Activity_Main.this, "You are now signed in");
-
-                    onSignedInInitialize(user);
-
-
-                } else {
-
-                    Utils_General.showToast(Activity_Main.this, "Not signed in");
-
-                    // Not signed in
-                    onSignedOutCleanup();
-
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setIsSmartLockEnabled(!BuildConfig.DEBUG)
-                                    .setTheme(R.style.LoginTheme)
-                                    .setAvailableProviders(
-                                            Arrays.asList(
-                                                    new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()))
-                            .build(),
-                            Constants.REQUEST_CODE_SIGN_IN);
-
-
-                }
-
-            }
-        };
     }
 
+    /**
+     * Save the current state of this activity
+     */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-        if (requestCode == Constants.REQUEST_CODE_SIGN_IN) {
-
-            if (resultCode == RESULT_OK) {
-                // Sign-in succeeded, set up the UI
-                Utils_General.showToast(this, "Signed In!");
-
-            } else if (resultCode == RESULT_CANCELED) {
-                // Sign in was canceled by the user, finish the activity
-                Utils_General.showToast(this, "Signed In Cancelled!");
-                finish();
-            }
-        }
+        // Store the driver in the instance state
+        outState.putParcelable(Constants.STATE_INFO_USER, mAppUser);
     }
 
     @Override
@@ -142,7 +106,7 @@ public class Activity_Main extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.i(Constants.LOG_TAG, "onOptionsItemSelected:" + item.getItemId());
+        //Log.i(Constants.LOG_TAG, "onOptionsItemSelected:" + item.getItemId());
         switch (item.getItemId()) {
             case R.id.action_user_orders:
                 Intent intent = new Intent(Activity_Main.this, Activity_MyOrders.class);
@@ -150,7 +114,19 @@ public class Activity_Main extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             case R.id.action_sign_out:
-                AuthUI.getInstance().signOut(this);
+                //Log.i(Constants.LOG_TAG, "Sign out clicked:");
+                AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful()) {
+                            Intent intent = new Intent(Activity_Main.this, Activity_Splash.class);
+                            startActivity(intent);
+                            finish();
+                        }
+
+                    }
+                });
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -170,28 +146,11 @@ public class Activity_Main extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
-        if (mFirebaseAuthListener != null) {
-            mFirebaseAuth.removeAuthStateListener(mFirebaseAuthListener);
-        }
-
-        //detachDatabaseReadListeners();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mFirebaseAuth.addAuthStateListener(mFirebaseAuthListener);
-        //attachDatabaseReadListeners();
-    }
-
-    private void onSignedOutCleanup() {
-        //mUsername = ANONYMOUS;
-
-        //mMessageAdapter.clear();
-        //detachDatabaseReadListeners();
-
-
     }
 
     private void onSignedInInitialize(final FirebaseUser user) {

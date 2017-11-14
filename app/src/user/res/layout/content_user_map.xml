@@ -9,4 +9,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <TextView
+        android:id="@+id/empty_map"
+        android:gravity="center_horizontal|center_vertical"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:text="@string/msg_this_order_is_complete"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </RelativeLayout>

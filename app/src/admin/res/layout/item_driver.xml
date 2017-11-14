@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="72dp"
-    android:paddingBottom="4dp">
+    android:padding="@dimen/padding_4dp">
 
     <LinearLayout
         android:id="@+id/layout_admin_driver"
@@ -15,7 +15,8 @@
             android:id="@+id/layout_admin_driver_inside"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_end_list_item"
+            android:layout_marginEnd="@dimen/margin_8dp"
+            android:layout_marginBottom="2dp"
             android:background="@color/colorWhite"
             android:orientation="horizontal"
             android:padding="@dimen/padding_8dp"

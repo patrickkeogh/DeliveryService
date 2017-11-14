@@ -43,11 +43,7 @@
             </intent-filter>
         </service>
 
-        <!-- Provider -->
-        <provider
-            android:name=".provider.Provider_DeliveryService"
-            android:authorities="com.programming.kantech.deliveryservice.app"
-            android:exported="true" />
+
 
     </application>
 

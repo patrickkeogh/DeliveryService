@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -83,6 +84,9 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     @BindView(R.id.mapView)
     MapView mMapView;
 
+    @BindView(R.id.empty_map)
+    TextView mEmpty_map;
+
     // interface MainDetailsFragmentListener that triggers a callback in the host activity
     MainDetailsFragmentListener mCallback;
 
@@ -112,7 +116,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         if (savedInstanceState != null) {
@@ -158,7 +162,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
      * Save the current state of this fragment
      */
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         // Store the driver in the instance state
@@ -308,7 +312,6 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     }
 
 
-
     private void attachOrderReadListener() {
 
         // Get all orders for the selected date and driver
@@ -322,7 +325,6 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     //Log.i(Constants.LOG_TAG, "onDataChange in attachOrderListener on Fragment_MainDetails");
                     mOrdersList = new ArrayList<>();
-
 
 
                     if (dataSnapshot != null) {
@@ -582,31 +584,43 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 
         builder = new LatLngBounds.Builder();
 
+        boolean hasPoint = false;
+
         // add each driver marker position to the bounds builder
         for (Marker driverMarker : mDriverMarkers) {
-
             builder.include(driverMarker.getPosition());
+            hasPoint = true;
         }
 
         // add each order marker position to the bounds builder
         for (Marker orderMarker : mOrderMarkers) {
-
             builder.include(orderMarker.getPosition());
+            hasPoint = true;
         }
 
         mGoogleMap.setMaxZoomPreference(12);
 
         mGoogleMap.setMinZoomPreference(8);
 
-        mGoogleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
-                LatLngBounds bounds = builder.build();
-                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 10);
-                mGoogleMap.moveCamera(cu);
-                //mGoogleMap.animateCamera(cu);
-            }
-        });
+        if (hasPoint) {
+
+            mMapView.setVisibility(View.VISIBLE);
+            mEmpty_map.setVisibility(View.GONE);
+
+            mGoogleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                @Override
+                public void onMapLoaded() {
+                    LatLngBounds bounds = builder.build();
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 10);
+                    //mGoogleMap.moveCamera(cu);
+                    mGoogleMap.animateCamera(cu);
+                }
+            });
+
+        }else{
+            mMapView.setVisibility(View.GONE);
+            mEmpty_map.setVisibility(View.VISIBLE);
+        }
 
     }
 

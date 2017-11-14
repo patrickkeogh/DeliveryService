@@ -1,37 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="?attr/actionBarSize"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:gravity="center_horizontal"
     android:orientation="vertical">
 
+
     <TextView
-        android:text="Kan-Tech Delivery Service"
-        android:gravity="center"
-        android:textColor="@color/colorAccent"
-
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/app_name_full"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@color/colorAccent" />
 
     <ImageView
-        android:src="@drawable/ic_menu_drive"
-        android:scaleType="fitXY"
-        android:layout_width="match_parent"
-        android:layout_height="300dp" />
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center_horizontal"
+        android:contentDescription="@string/content_description_app_logo"
+        android:src="@drawable/ic_menu_drive" />
 
     <Button
         android:id="@+id/btn_user_place_order"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
-        android:text="Place Order"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_width="match_parent"
-        android:layout_height="100dp" />
-
-
-
-
-
-
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/btn_create_order"
+        android:textColor="@color/colorPrimaryDark" />
 
 </LinearLayout>
+
+
+
+
+
+
+
+
+
+
+

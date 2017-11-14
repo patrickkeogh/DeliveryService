@@ -2,7 +2,6 @@ package com.programming.kantech.deliveryservice.app.admin.views.ui;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -24,7 +23,7 @@ public class ViewHolder_Order extends RecyclerView.ViewHolder {
     private final TextView tv_admin_order_status;
 
     private final LinearLayout layout_admin_order;
-    private final CardView cv_order;
+    private final LinearLayout layout_selected;
 
     private ClickListener mClickListener;
 
@@ -54,7 +53,7 @@ public class ViewHolder_Order extends RecyclerView.ViewHolder {
         tv_admin_order_status = itemView.findViewById(R.id.tv_admin_order_status);
         //tv_admin_order_distance = itemView.findViewById(R.id.tv_admin_order_distance);
 
-        cv_order = itemView.findViewById(R.id.cv_order);
+        layout_selected = itemView.findViewById(R.id.layout_selected);
 
         layout_admin_order = itemView.findViewById(R.id.layout_admin_order);
     }
@@ -73,8 +72,6 @@ public class ViewHolder_Order extends RecyclerView.ViewHolder {
 
     public void setPickupAddress(String address) {
         tv_admin_order_pickup_address.setText(address);
-
-
     }
 
     public void setDeliveryAddress(String address) {
@@ -92,7 +89,7 @@ public class ViewHolder_Order extends RecyclerView.ViewHolder {
 
     public void setSelectedColor(Context context, int colorId){
 
-        cv_order.setBackgroundColor(ContextCompat.getColor(context, colorId));
+        layout_selected.setBackgroundColor(ContextCompat.getColor(context, colorId));
     }
 
 

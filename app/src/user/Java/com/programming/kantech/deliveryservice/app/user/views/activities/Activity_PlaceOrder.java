@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,7 +17,6 @@ import android.widget.TextView;
 
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.AppUser;
-import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Location;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.directions.Distance;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.directions.Leg;
@@ -33,6 +33,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import butterknife.BindView;
@@ -55,11 +56,11 @@ public class Activity_PlaceOrder extends AppCompatActivity {
 
     private ApiInterface apiService;
 
-    private Location mLocationPickup;
+    private String mLocationPickupId = null;
     private String mLocationPickupName;
     private String mLocationPickupAddress;
 
-    private Location mLocationDelivery;
+    private String mLocationDeliveryId = null;
     private String mLocationDeliveryName;
     private String mLocationDeliveryAddress;
 
@@ -99,25 +100,18 @@ public class Activity_PlaceOrder extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_order);
 
-        Log.i(Constants.LOG_TAG, "onCreate() in User Activity_Main");
-
         ButterKnife.bind(this);
 
         apiService = ApiClient.getClient().create(ApiInterface.class);
 
+        // Get the logged user from the intent or the state
         if (savedInstanceState != null) {
-
-            Log.i(Constants.LOG_TAG, "Activity_Details savedInstanceState is not null");
             if (savedInstanceState.containsKey(Constants.STATE_INFO_USER)) {
-                Log.i(Constants.LOG_TAG, "we found the recipe key in savedInstanceState");
                 mAppUser = savedInstanceState.getParcelable(Constants.STATE_INFO_USER);
             }
-
         } else {
-            Log.i(Constants.LOG_TAG, "Activity_Details savedInstanceState is null, get data from intent: ");
             mAppUser = getIntent().getParcelableExtra(Constants.EXTRA_USER);
         }
-
 
         if (mAppUser == null) {
             throw new IllegalArgumentException("Must pass EXTRA_USER");
@@ -137,6 +131,19 @@ public class Activity_PlaceOrder extends AppCompatActivity {
             mActionBar.setDisplayHomeAsUpEnabled(true);
             mActionBar.setTitle("Place An Order");
         }
+
+        setupForm();
+    }
+
+    /**
+     * Save the current state of this activity
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Store the user in the instance state
+        outState.putParcelable(Constants.STATE_INFO_USER, mAppUser);
     }
 
     @Override
@@ -149,12 +156,13 @@ public class Activity_PlaceOrder extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
 
                 // Location was successfully selected
-                Utils_General.showToast(this, "Pickup Location Selected");
+                //Utils_General.showToast(this, "Pickup Location Selected");
 
                 // Get the customer from the intent data
-                mLocationPickup = data.getParcelableExtra(Constants.EXTRA_LOCATION);
+                mLocationPickupId = data.getStringExtra(Constants.EXTRA_PLACE_ID);
                 mLocationPickupName = data.getStringExtra(Constants.EXTRA_LOCATION_NAME);
                 mLocationPickupAddress = data.getStringExtra(Constants.EXTRA_LOCATION_ADDRESS);
+
                 setupForm();
 
             } else if (resultCode == RESULT_CANCELED) {
@@ -165,10 +173,10 @@ public class Activity_PlaceOrder extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
 
                 // Location was successfully selected
-                Utils_General.showToast(this, "Delivery Location Selected");
+                //Utils_General.showToast(this, "Delivery Location Selected");
 
                 // Get the location data from the intent data
-                mLocationDelivery = data.getParcelableExtra(Constants.EXTRA_LOCATION);
+                mLocationDeliveryId = data.getStringExtra(Constants.EXTRA_PLACE_ID);
                 mLocationDeliveryName = data.getStringExtra(Constants.EXTRA_LOCATION_NAME);
                 mLocationDeliveryAddress = data.getStringExtra(Constants.EXTRA_LOCATION_ADDRESS);
                 setupForm();
@@ -196,8 +204,8 @@ public class Activity_PlaceOrder extends AppCompatActivity {
         order.setCustomerContact(mAppUser.getContact_name());
         order.setCustomerPhone(mAppUser.getContact_number());
         order.setDriverName(Constants.FIREBASE_DEFAULT_NO_DRIVER);
-        order.setDeliveryLocationId(mLocationDelivery.getPlaceId());
-        order.setPickupLocationId(mLocationPickup.getPlaceId());
+        order.setDeliveryLocationId(mLocationDeliveryId);
+        order.setPickupLocationId(mLocationPickupId);
         order.setType(Constants.ORDER_TYPE_USER);
         order.setStatus(Constants.ORDER_STATUS_BOOKED);
         long newDate = Utils_General.getStartTimeForDate(mSelectedDate);
@@ -236,7 +244,7 @@ public class Activity_PlaceOrder extends AppCompatActivity {
                 cal.get(Calendar.MONTH),
                 cal.get(Calendar.DAY_OF_MONTH));
         datePicker.setCancelable(false);
-        datePicker.setTitle("Select A Pickup Date");
+        datePicker.setTitle(getString(R.string.alert_select_date));
         datePicker.show();
     }
 
@@ -288,7 +296,6 @@ public class Activity_PlaceOrder extends AppCompatActivity {
 
         if (mSelectedDate == 0) {
             tv_selected_date.setVisibility(View.GONE);
-            //btn_user_get_date.setVisibility(View.VISIBLE);
         } else {
             tv_selected_date.setVisibility(View.VISIBLE);
             SimpleDateFormat format = new SimpleDateFormat(Constants.DATE_FORMAT, Locale.getDefault());
@@ -297,37 +304,30 @@ public class Activity_PlaceOrder extends AppCompatActivity {
 
             dateString = format.format(mSelectedDate);
             tv_selected_date.setText(dateString);
-
-            //btn_user_get_date.setVisibility(View.GONE);
         }
 
-        if (mLocationPickup != null) {
-            //btn_user_get_pickup_location.setVisibility(View.GONE);
+        if (!Objects.equals(mLocationPickupId, "")) {
             tv_location_name_pickup.setText(mLocationPickupName);
             tv_location_address_pickup.setText(mLocationPickupAddress);
         } else {
-            //btn_user_get_pickup_location.setVisibility(View.VISIBLE);
             tv_location_name_pickup.setText("");
             tv_location_address_pickup.setText("");
         }
 
-        if (mLocationDelivery != null) {
-            //btn_user_get_delivery_location.setVisibility(View.GONE);
+        if (!Objects.equals(mLocationDeliveryId, "")) {
             tv_location_name_delivery.setText(mLocationDeliveryName);
             tv_location_address_delivery.setText(mLocationDeliveryAddress);
         } else {
-            //btn_user_get_delivery_location.setVisibility(View.VISIBLE);
             tv_location_name_delivery.setText("");
             tv_location_address_delivery.setText("");
         }
 
-        if (mLocationDelivery != null && mLocationPickup != null) {
+        if (mLocationPickupId != null && mLocationDeliveryId != null) {
 
 
-            String origin = "place_id:" + mLocationPickup.getPlaceId();
+            String origin = "place_id:" + mLocationPickupId;
 
-            String dest = "place_id:" + mLocationDelivery.getPlaceId();
-
+            String dest = "place_id:" + mLocationDeliveryId;
 
             Call<Results> call = apiService.getDistance(origin, dest);
 
@@ -354,7 +354,7 @@ public class Activity_PlaceOrder extends AppCompatActivity {
 
                             Log.i(Constants.LOG_TAG, "Response Distance:" + mDistance.getText());
 
-                            btn_user_place_order.setEnabled(true);
+                            //btn_user_place_order.setEnabled(true);
                         }
                     }
                 }
@@ -366,21 +366,18 @@ public class Activity_PlaceOrder extends AppCompatActivity {
                 }
             });
 
+        }
+        if (mSelectedDate != 0 && mLocationPickupId != null && mLocationDeliveryId != null) {
+            btn_user_place_order.setEnabled(true);
+            btn_user_place_order.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
 
+        }else{
+            btn_user_place_order.setEnabled(false);
+            btn_user_place_order.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
         }
 
 
     }
-
-//    private void resetForm() {
-//        mLocationPickup = null;
-//        mLocationDelivery = null;
-//        mSelectedDate = 0;
-//
-//        setupForm();
-//
-//
-//    }
 
 
 }

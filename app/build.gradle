@@ -80,6 +80,8 @@ dependencies {
 
     compile 'com.stripe:stripe-android:3.0.1'
 
+    compile 'com.afollestad.material-dialogs:core:0.9.5.0'
+
 
 
 

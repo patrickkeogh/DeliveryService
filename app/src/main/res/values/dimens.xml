@@ -25,4 +25,7 @@
     <dimen name="icon_height_width_large">50dp</dimen>
     <dimen name="margin_end_list_item">5dp</dimen>
     <dimen name="padding_4dp">4dp</dimen>
+    <dimen name="padding_16dp">16dp</dimen>
+    <dimen name="padding_24">24dp</dimen>
+    <dimen name="card_corner_radius">4dp</dimen>
 </resources>

@@ -25,7 +25,6 @@
                 android:paddingTop="@dimen/padding_8dp"
                 android:paddingBottom="@dimen/padding_8dp"
                 android:paddingEnd="@dimen/padding_8dp"
-                android:text="Monday March, 1st, 2017"
                 android:layout_width="match_parent"
                 android:layout_height="40dp" />
 

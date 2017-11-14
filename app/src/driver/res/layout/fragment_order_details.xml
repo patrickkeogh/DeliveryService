@@ -40,7 +40,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/margin_8dp"
-                    android:text="Patrick Keogh"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <TextView
@@ -61,7 +60,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/margin_8dp"
-                    android:text="Patrick Keogh"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <TextView

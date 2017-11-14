@@ -16,6 +16,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.programming.kantech.deliveryservice.app.R;
+import com.programming.kantech.deliveryservice.app.data.model.pojo.app.AppUser;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
@@ -29,15 +30,15 @@ import butterknife.ButterKnife;
 
 /**
  * Created by patri on 2017-11-09.
+ * An activity to show order details
  */
 
 public class Activity_OrderDetails extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    // Local Member variables
-    private ActionBar mActionBar;
     private GoogleApiClient mClient;
     private Order mOrder;
+    private AppUser mAppUser;
 
     // View to bind
     @BindView(R.id.toolbar)
@@ -73,15 +74,18 @@ public class Activity_OrderDetails extends AppCompatActivity implements GoogleAp
             if (savedInstanceState.containsKey(Constants.STATE_INFO_ORDER)) {
                 mOrder = savedInstanceState.getParcelable(Constants.STATE_INFO_ORDER);
             }
+            if (savedInstanceState.containsKey(Constants.STATE_INFO_USER)) {
+                mAppUser = savedInstanceState.getParcelable(Constants.STATE_INFO_USER);
+            }
         } else {
-
             mOrder = getIntent().getParcelableExtra(Constants.EXTRA_ORDER);
+            mAppUser = getIntent().getParcelableExtra(Constants.EXTRA_USER);
         }
 
 
-        if (mOrder == null) {
-            throw new IllegalArgumentException("Must pass EXTRA_ORDER");
-        }else{
+        if (mOrder == null || mAppUser == null) {
+            throw new IllegalArgumentException("Must pass EXTRA_ORDER & EXTRA_USER");
+        } else {
             parseOrderFields();
         }
 
@@ -89,13 +93,26 @@ public class Activity_OrderDetails extends AppCompatActivity implements GoogleAp
         setSupportActionBar(mToolbar);
 
         // Set the action bar back button to look like an up button
-        mActionBar = this.getSupportActionBar();
+        ActionBar mActionBar = this.getSupportActionBar();
 
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(true);
             mActionBar.setTitle("Order Details");
         }
 
+    }
+
+    /**
+     * Save the current state of this activity
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Store the user in the instance state
+        outState.putParcelable(Constants.STATE_INFO_USER, mAppUser);
+        // Store the order in the instance state
+        outState.putParcelable(Constants.STATE_INFO_ORDER, mOrder);
     }
 
     private void parseOrderFields() {
@@ -168,7 +185,7 @@ public class Activity_OrderDetails extends AppCompatActivity implements GoogleAp
     private void buildApiClient() {
         //Log.i(Constants.LOG_TAG, "buildApiClient() called");
 
-        if(mClient == null){
+        if (mClient == null) {
             //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
 
             // Build up the LocationServices API client
@@ -186,11 +203,11 @@ public class Activity_OrderDetails extends AppCompatActivity implements GoogleAp
     public void onStart() {
         super.onStart();
 
-        if(mClient == null){
+        if (mClient == null) {
             buildApiClient();
             mClient.connect();
-        }else{
-            if(!mClient.isConnected() ){
+        } else {
+            if (!mClient.isConnected()) {
                 mClient.connect();
             }
         }
@@ -200,7 +217,7 @@ public class Activity_OrderDetails extends AppCompatActivity implements GoogleAp
     public void onPause() {
         super.onPause();
 
-        if(mClient != null){
+        if (mClient != null) {
             mClient.disconnect();
         }
     }
