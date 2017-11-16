@@ -20,7 +20,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -47,7 +46,6 @@ import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 import com.stripe.android.Stripe;
 import com.stripe.android.TokenCallback;
-import com.stripe.android.exception.AuthenticationException;
 import com.stripe.android.model.Card;
 import com.stripe.android.model.Token;
 
@@ -315,8 +313,8 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
         // Hide the keyboard
         Utils_General.hideKeyboard(this, getWindow().getDecorView().getRootView().getWindowToken());
 
-        int month = Integer.parseInt(mPaymentMonth);
-        int year = Integer.parseInt(mPaymentYear);
+        //int month = Integer.parseInt(mPaymentMonth);
+        //int year = Integer.parseInt(mPaymentYear);
 
         // Used for testing
         // Uses live data
@@ -349,7 +347,7 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
         //Card card = card0;
 
         if (!card.validateCard()) {
-            Utils_General.showToast(this, "The card number or cvc is invalid");
+            Utils_General.showToast(this, getString(R.string.toast_invalid_card_number));
         } else {
             Stripe stripe = new Stripe(this, Constants.STRIPE_PUBLIC_KEY);
             stripe.createToken(card, new TokenCallback() {

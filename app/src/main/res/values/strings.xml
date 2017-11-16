@@ -177,4 +177,5 @@
     <string name="msg_no_network">You don not have a network connection!</string>
     <string name="toast_delivery_location_not_selected">Delivery Location Not Selected</string>
     <string name="toast_pickup_location_not_selected">Pickup Location Not Selected</string>
+    <string name="toast_invalid_card_number">The card number or cvc is invalid</string>
 </resources>
