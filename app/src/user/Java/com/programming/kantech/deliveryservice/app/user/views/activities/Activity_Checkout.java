@@ -351,33 +351,29 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
         if (!card.validateCard()) {
             Utils_General.showToast(this, "The card number or cvc is invalid");
         } else {
-            try {
-                Stripe stripe = new Stripe(this, Constants.STRIPE_PUBLIC_KEY);
-                stripe.createToken(card, new TokenCallback() {
-                    @Override
-                    public void onError(Exception error) {
-                        Log.e(Constants.LOG_TAG, error.getMessage());
-                        dialog_charging.dismiss();
-                    }
+            Stripe stripe = new Stripe(this, Constants.STRIPE_PUBLIC_KEY);
+            stripe.createToken(card, new TokenCallback() {
+                @Override
+                public void onError(Exception error) {
+                    Log.e(Constants.LOG_TAG, error.getMessage());
+                    dialog_charging.dismiss();
+                }
 
-                    @Override
-                    public void onSuccess(Token token) {
+                @Override
+                public void onSuccess(Token token) {
 
-                        mToken = token;
+                    mToken = token;
 
-                        dialog_charging.dismiss();
+                    dialog_charging.dismiss();
 
-                        // Now add the order to the database with the token
-                        // A firebase function will use the token to make the actual Stripe charge
+                    // Now add the order to the database with the token
+                    // A firebase function will use the token to make the actual Stripe charge
 
-                        submitOrder();
+                    submitOrder();
 
-                        //Log.i(Constants.LOG_TAG, "Token:" + mToken.toString());
-                    }
-                });
-            } catch (AuthenticationException e) {
-                e.printStackTrace();
-            }
+                    //Log.i(Constants.LOG_TAG, "Token:" + mToken.toString());
+                }
+            });
         }
     }
 

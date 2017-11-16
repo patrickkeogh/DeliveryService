@@ -19,22 +19,21 @@
         android:supportsRtl="true"
         tools:ignore="GoogleAppIndexingWarning"
         android:theme="@style/AppTheme">
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAY4VENShVhvMRUJkj7C_XnHjfKPNOamMU" />
-
-        <meta-data
-            android:value=""
-            android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/colorPrimaryDark" />
-
         <service
             android:name=".services.Service_FirebaseMessaging">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAY4VENShVhvMRUJkj7C_XnHjfKPNOamMU" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorPrimaryDark" />
+
+
 
         <service
             android:name="com.programming.kantech.deliveryservice.app.services.Service_FirebaseInstanceId"
