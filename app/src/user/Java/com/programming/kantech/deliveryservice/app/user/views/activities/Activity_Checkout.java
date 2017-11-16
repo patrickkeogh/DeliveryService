@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -46,6 +47,7 @@ import com.programming.kantech.deliveryservice.app.utils.Constants;
 import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 import com.stripe.android.Stripe;
 import com.stripe.android.TokenCallback;
+import com.stripe.android.exception.AuthenticationException;
 import com.stripe.android.model.Card;
 import com.stripe.android.model.Token;
 
