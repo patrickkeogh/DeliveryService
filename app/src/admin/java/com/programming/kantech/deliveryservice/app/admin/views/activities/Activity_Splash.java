@@ -151,57 +151,64 @@ public class Activity_Splash extends AppCompatActivity {
     private void onSignedInInitialize(final FirebaseUser user) {
         Log.i(Constants.LOG_TAG, "Log the admin name:" + user.getDisplayName());
 
-        tv_splash_message.setText(R.string.msg_splash_initializing_app);
+        if(Utils_General.isNetworkAvailable(this)){
+            tv_splash_message.setText(R.string.msg_splash_initializing_app);
 
-        // get the admins data record, if one does not exist, create one
+            // get the admins data record, if one does not exist, create one
 
-        mAdminRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            mAdminRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
 
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i(Constants.LOG_TAG, "onDataChange()called for driver");
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.i(Constants.LOG_TAG, "onDataChange()called for driver");
 
-                // The driver and admin object have the same fields, so we will use
-                // the Driver object for both and store them in different nodes
+                    // The driver and admin object have the same fields, so we will use
+                    // the Driver object for both and store them in different nodes
 
-                if (dataSnapshot.exists()) {
+                    if (dataSnapshot.exists()) {
 
 
-                    Driver driver = dataSnapshot.getValue(Driver.class);
+                        Driver driver = dataSnapshot.getValue(Driver.class);
 
-                    if (driver != null) {
-                        Log.i(Constants.LOG_TAG, "The admin is in the db:" + driver.toString());
+                        if (driver != null) {
+                            Log.i(Constants.LOG_TAG, "The admin is in the db:" + driver.toString());
+                        }
+
+                    } else {
+                        Log.i(Constants.LOG_TAG, "The admin is not in the database");
+                        // user is not in the admin db. add them
+                        Driver driver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(), "", false, false, "", "");
+
+                        // to do: Not sure which way is better?????
+                        mAdminRef.child(user.getUid()).setValue(driver);
+                        //mDriverDBReference.push().setValue(driver);
+
                     }
 
-                } else {
-                    Log.i(Constants.LOG_TAG, "The admin is not in the database");
-                    // user is not in the admin db. add them
-                    Driver driver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(), "", false, false, "", "");
+                    // This only for testing, maybe lol
 
-                    // to do: Not sure which way is better?????
-                    mAdminRef.child(user.getUid()).setValue(driver);
-                    //mDriverDBReference.push().setValue(driver);
-
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(Activity_Splash.this, Activity_Main.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }, 2000);
                 }
 
-                // This only for testing, maybe lol
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(Activity_Splash.this, Activity_Main.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }, 2000);
-            }
+                }
+            });
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+        }else{
+            Utils_General.showToast(this, getString(R.string.msg_no_network));
+        }
 
-            }
-        });
+
 
     }
 }

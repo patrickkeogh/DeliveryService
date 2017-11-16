@@ -35,6 +35,7 @@ import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Loc
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Location;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
+import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,6 +54,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     private FirebaseRecyclerAdapter<Location, ViewHolder_Locations> mFireAdapter;
     private GoogleApiClient mClient;
     private DatabaseReference mLocationsRef;
+    private Context mContext;
 
     // Views to bind too
     @BindView(R.id.tv_customer_address)
@@ -95,7 +97,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         // Load the saved state if there is one
@@ -133,6 +135,8 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        mContext = context;
 
         // This makes sure that the host activity has implemented the callback interface
         // If not, it throws an exception
@@ -229,15 +233,17 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
 
     private void buildApiClient() {
         if (mClient == null) {
-            // Build up the LocationServices API client
-            // Uses the addApi method to request the LocationServices API
-            // Also uses enableAutoManage to automatically know when to connect/suspend the client
-            mClient = new GoogleApiClient.Builder(getContext())
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .addApi(Places.GEO_DATA_API)
-                    .build();
+            if(Utils_General.isNetworkAvailable(mContext)){
+                mClient = new GoogleApiClient.Builder(mContext)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .addApi(Places.GEO_DATA_API)
+                        .build();
+            }else{
+                Utils_General.showToast(mContext, getString(R.string.msg_no_network));
+            }
+
         }
     }
 
@@ -281,7 +287,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Constants.REQUEST_CODE_LOCATION_PICKER && resultCode == Activity.RESULT_OK) {
-            Place place = PlacePicker.getPlace(getContext(), data);
+            Place place = PlacePicker.getPlace(mContext, data);
 
             if (place == null) {
                 Log.i(Constants.LOG_TAG, "No place selected");
@@ -299,7 +305,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
             // Start a new Activity for the Place Picker API, this will trigger {@code #onActivityResult}
             // when a place is selected or with the user cancels.
             PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-            Intent i = builder.build(getActivity());
+            Intent i = builder.build((Activity)mContext);
             startActivityForResult(i, Constants.REQUEST_CODE_LOCATION_PICKER);
 
         } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
@@ -352,7 +358,7 @@ public class Fragment_CustomerDetails extends Fragment implements GoogleApiClien
      * Save the current state of this fragment
      */
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         // Store the customer in the instance state object

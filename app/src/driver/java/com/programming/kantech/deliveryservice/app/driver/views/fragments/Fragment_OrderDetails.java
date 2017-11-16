@@ -1,5 +1,6 @@
 package com.programming.kantech.deliveryservice.app.driver.views.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,6 +39,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
 
     private Order mSelectedOrder;
     private GoogleApiClient mClient;
+    private Context mContext;
 
     @BindView(R.id.tv_order_details_company)
     TextView tv_order_details_company;
@@ -78,7 +80,7 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.fragment_order_details, container, false);
@@ -127,9 +129,24 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(Constants.STATE_INFO_ORDER, mSelectedOrder);
+    }
+
+    // Override onAttach to make sure that the container activity has implemented the callback
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // This makes sure that the host activity has implemented the callback interface
+        // If not, it throws an exception
+        try {
+            mContext = context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OrderClickListener");
+        }
     }
 
 
@@ -198,19 +215,19 @@ public class Fragment_OrderDetails extends Fragment implements GoogleApiClient.C
     }
 
     private void buildApiClient() {
-        Log.i(Constants.LOG_TAG, "buildApiClient() called");
-
         if (mClient == null) {
-            Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
-
-            // Build up the LocationServices API client
-            // Uses the addApi method to request the LocationServices API
-            // Also uses enableAutoManage to automatically know when to connect/suspend the client
-            mClient = new GoogleApiClient.Builder(getContext())
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(Places.GEO_DATA_API)
-                    .build();
+            if (Utils_General.isNetworkAvailable(mContext)) {
+                // Build up the LocationServices API client
+                // Uses the addApi method to request the LocationServices API
+                // Also uses enableAutoManage to automatically know when to connect/suspend the client
+                mClient = new GoogleApiClient.Builder(mContext)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(Places.GEO_DATA_API)
+                        .build();
+            } else {
+                Utils_General.showToast(mContext, getString(R.string.msg_no_network));
+            }
         }
     }
 }

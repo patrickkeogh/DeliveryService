@@ -115,6 +115,7 @@ public class Activity_CheckoutSuccess extends AppCompatActivity {
         Intent intent = new Intent(Activity_CheckoutSuccess.this, Activity_Main.class);
         intent.putExtra(Constants.EXTRA_USER, mAppUser);
         startActivity(intent);
+        finish();
     }
 
 }

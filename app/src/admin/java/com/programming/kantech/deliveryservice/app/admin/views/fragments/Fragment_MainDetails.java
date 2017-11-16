@@ -62,6 +62,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     private GoogleMap mGoogleMap;
     private GoogleApiClient mGoogleApiClient;
     private LatLngBounds.Builder builder;
+    private Context mContext;
 
     private ArrayList<Driver> mDriversList = new ArrayList<>();
     private ArrayList<Marker> mDriverMarkers = new ArrayList<>();
@@ -141,7 +142,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
         mMapView.onResume(); // needed to get the map to display immediately
 
         try {
-            MapsInitializer.initialize(getActivity().getApplicationContext());
+            MapsInitializer.initialize(mContext);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -173,6 +174,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        mContext = context;
 
         // This makes sure that the host activity has implemented the callback interface
         // If not, it throws an exception
@@ -235,14 +237,20 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
 //    }
 
     protected synchronized void buildGoogleApiClient() {
+        if (Utils_General.isNetworkAvailable(mContext)) {
 
-        mGoogleApiClient = new GoogleApiClient.Builder(getContext())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .build();
-        mGoogleApiClient.connect();
+            mGoogleApiClient = new GoogleApiClient.Builder(mContext)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .addApi(Places.GEO_DATA_API)
+                    .build();
+            mGoogleApiClient.connect();
+        } else {
+            Utils_General.showToast(mContext, getString(R.string.msg_no_network));
+        }
+
+
     }
 
     @Override
@@ -505,7 +513,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                 .snippet("something")
                 .infoWindowAnchor(0.5f, 0.5f)
                 .icon(Utils_General.vectorToBitmap(getContext(), R.drawable.ic_local_shipping_accent_24dp,
-                        ContextCompat.getColor(getContext(), R.color.colorPrimary)));
+                        ContextCompat.getColor(mContext, R.color.colorPrimary)));
 
         Marker marker = mGoogleMap.addMarker(markerOptions);
 
@@ -617,7 +625,7 @@ public class Fragment_MainDetails extends Fragment implements OnMapReadyCallback
                 }
             });
 
-        }else{
+        } else {
             mMapView.setVisibility(View.GONE);
             mEmpty_map.setVisibility(View.VISIBLE);
         }

@@ -56,10 +56,12 @@ import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by patrick keogh on 2017-08-22.
- *
+ * A fragment used to process the new order form and submit the results to Firebase
  */
 
 public class Fragment_NewPhoneOrder extends Fragment {
+
+    private Context mContext;
 
     // Reference to our rest service
     private ApiInterface apiService;
@@ -144,7 +146,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         apiService = ApiClient.getClient().create(ApiInterface.class);
@@ -168,7 +170,7 @@ public class Fragment_NewPhoneOrder extends Fragment {
         Calendar cal = Calendar.getInstance(TimeZone.getDefault()); // Get current date
 
         // Create the DatePickerDialog instance
-        DatePickerDialog datePicker = new DatePickerDialog(getContext(),
+        DatePickerDialog datePicker = new DatePickerDialog(mContext,
                 R.style.ThemeOverlay_AppCompat_Dialog_Alert, datePickerListener,
                 cal.get(Calendar.YEAR),
                 cal.get(Calendar.MONTH),
@@ -223,6 +225,8 @@ public class Fragment_NewPhoneOrder extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
+        mContext = context;
+
         // This makes sure that the host activity has implemented the callback interface
         // If not, it throws an exception
         try {
@@ -237,20 +241,20 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
         if (mSelectedCustomer != null) {
             iv_select_location_pickup.setEnabled(true);
-            iv_select_location_pickup.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_place_accent_24dp));
+            iv_select_location_pickup.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_place_accent_24dp));
 
             iv_select_location_delivery.setEnabled(true);
-            iv_select_location_delivery.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_place_accent_24dp));
+            iv_select_location_delivery.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_place_accent_24dp));
 
             tv_admin_customer_name.setText(mSelectedCustomer.getCompany());
             tv_admin_customer_address.setText(mSelectedCustomer.getContact_name());
 
         } else {
             iv_select_location_pickup.setEnabled(false);
-            iv_select_location_pickup.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_place_disabled_24dp));
+            iv_select_location_pickup.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_place_disabled_24dp));
 
             iv_select_location_delivery.setEnabled(false);
-            iv_select_location_delivery.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_place_disabled_24dp));
+            iv_select_location_delivery.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_place_disabled_24dp));
 
             tv_admin_customer_name.setText("");
             tv_admin_customer_address.setText("");
@@ -286,10 +290,10 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
         if (mDate == 0 || mSelectedCustomer == null || mLocationDelivery == null || mLocationPickup == null) {
             btn_phone_order_add.setEnabled(false);
-            btn_phone_order_add.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
+            btn_phone_order_add.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorPrimaryLight));
         } else {
             btn_phone_order_add.setEnabled(true);
-            btn_phone_order_add.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+            btn_phone_order_add.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorPrimaryDark));
         }
 
     }
@@ -297,52 +301,60 @@ public class Fragment_NewPhoneOrder extends Fragment {
     // Get the distance between the pickup and delivery location
     private void getOrderDistance() {
 
-        if (mLocationDelivery != null && mLocationPickup != null) {
+        if (Utils_General.isNetworkAvailable(mContext)) {
 
-            // Create origin and destination strings for google
-            String origin = "place_id:" + mLocationPickup.getPlaceId();
-            String dest = "place_id:" + mLocationDelivery.getPlaceId();
+            if (mLocationDelivery != null && mLocationPickup != null) {
 
-            Call<Results> call = apiService.getDistance(origin, dest);
+                // Create origin and destination strings for google
+                String origin = "place_id:" + mLocationPickup.getPlaceId();
+                String dest = "place_id:" + mLocationDelivery.getPlaceId();
 
-            call.enqueue(new Callback<Results>() {
-                @Override
-                public void onResponse(@NonNull Call<Results> call, @NonNull Response<Results> response) {
+                Call<Results> call = apiService.getDistance(origin, dest);
 
-                    //Log.i(Constants.LOG_TAG, "Response:" + response);
+                call.enqueue(new Callback<Results>() {
+                    @Override
+                    public void onResponse(@NonNull Call<Results> call, @NonNull Response<Results> response) {
 
-                    if (response.isSuccessful()) {
-                        // Code 200, 201
-                        Results results = response.body();
+                        //Log.i(Constants.LOG_TAG, "Response:" + response);
 
-                        List<Route> routes;
-                        if (results != null) {
-                            routes = results.getRoutes();
-                            Route route = routes.get(0);
+                        if (response.isSuccessful()) {
+                            // Code 200, 201
+                            Results results = response.body();
 
-                            List<Leg> legs = route.getLegs();
+                            List<Route> routes;
+                            if (results != null) {
+                                routes = results.getRoutes();
+                                Route route = routes.get(0);
 
-                            Leg trip = legs.get(0);
+                                List<Leg> legs = route.getLegs();
 
-                            mDistance = trip.getDistance();
+                                Leg trip = legs.get(0);
 
-                            //Log.i(Constants.LOG_TAG, "Response Distance:" + mDistance.getText());
+                                mDistance = trip.getDistance();
+
+                                //Log.i(Constants.LOG_TAG, "Response Distance:" + mDistance.getText());
+                            }
+
+                            //distance_ok(fetchResults);
                         }
-
-                        //distance_ok(fetchResults);
                     }
-                }
 
-                @Override
-                public void onFailure(@NonNull Call<Results> call, @NonNull Throwable t) {
-                    // Log error here since request failed
-                    Log.e(Constants.LOG_TAG, t.toString());
-                    //distance_failed(response.message());
-                }
-            });
+                    @Override
+                    public void onFailure(@NonNull Call<Results> call, @NonNull Throwable t) {
+                        // Log error here since request failed
+                        Log.e(Constants.LOG_TAG, t.toString());
+                        //distance_failed(response.message());
+                    }
+                });
 
 
+            }
+
+        } else {
+            Utils_General.showToast(mContext, getString(R.string.msg_no_network));
         }
+
+
     }
 
     @Override
@@ -411,98 +423,102 @@ public class Fragment_NewPhoneOrder extends Fragment {
 
     private void createNewOrder() {
 
-        // Avoid passing null as parent to dialogs
-        final ViewGroup nullParent = null;
+        if (Utils_General.isNetworkAvailable(mContext)) {
 
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialog_confirm = inflater.inflate(R.layout.alert_confirm_order, nullParent);
+            // Avoid passing null as parent to dialogs
+            final ViewGroup nullParent = null;
 
-        TextView tv_name = dialog_confirm.findViewById(R.id.tv_confirm_order_company);
-        tv_name.setText(mSelectedCustomer.getCompany());
+            LayoutInflater inflater = this.getLayoutInflater();
+            View dialog_confirm = inflater.inflate(R.layout.alert_confirm_order, nullParent);
 
-        new AlertDialog.Builder(getContext())
-                .setTitle(R.string.alert_confirm_new_order)
-                .setView(dialog_confirm)
-                .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+            TextView tv_name = dialog_confirm.findViewById(R.id.tv_confirm_order_company);
+            tv_name.setText(mSelectedCustomer.getCompany());
 
-                        // get today at 00:00 hrs
-                        //Calendar date = new GregorianCalendar();
-                        //long mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
+            new AlertDialog.Builder(mContext)
+                    .setTitle(R.string.alert_confirm_new_order)
+                    .setView(dialog_confirm)
+                    .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
 
-                        final Order order = new Order();
-                        order.setCustomerId(mSelectedCustomer.getId());
-                        order.setCustomerName(mSelectedCustomer.getCompany());
-                        order.setCustomerContact(mSelectedCustomer.getContact_name());
-                        order.setCustomerPhone(mSelectedCustomer.getContact_number());
+                            // get today at 00:00 hrs
+                            //Calendar date = new GregorianCalendar();
+                            //long mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
 
-                        order.setDeliveryLocationId(mLocationDelivery.getPlaceId());
-                        order.setPickupLocationId(mLocationPickup.getPlaceId());
-                        order.setType(Constants.ORDER_TYPE_PHONE);
-                        order.setStatus(Constants.ORDER_STATUS_BOOKED);
-                        order.setDistance(mDistance.getValue());
-                        order.setDistance_text(mDistance.getText());
+                            final Order order = new Order();
+                            order.setCustomerId(mSelectedCustomer.getId());
+                            order.setCustomerName(mSelectedCustomer.getCompany());
+                            order.setCustomerContact(mSelectedCustomer.getContact_name());
+                            order.setCustomerPhone(mSelectedCustomer.getContact_number());
 
-                        order.setDriverName(Constants.FIREBASE_DEFAULT_NO_DRIVER);
+                            order.setDeliveryLocationId(mLocationDelivery.getPlaceId());
+                            order.setPickupLocationId(mLocationPickup.getPlaceId());
+                            order.setType(Constants.ORDER_TYPE_PHONE);
+                            order.setStatus(Constants.ORDER_STATUS_BOOKED);
+                            order.setDistance(mDistance.getValue());
+                            order.setDistance_text(mDistance.getText());
 
-                        DecimalFormat df = new DecimalFormat(Constants.NUMBER_FORMAT);
-                        Double distance = Double.valueOf(df.format(mDistance.getValue() / 1000));
+                            order.setDriverName(Constants.FIREBASE_DEFAULT_NO_DRIVER);
 
-                        // TODO: store in a db so it can be changed from Firebase
-                        double dblAmount = distance * 2.13;
-                        int intAmount = (int) (dblAmount * 100);
+                            DecimalFormat df = new DecimalFormat(Constants.NUMBER_FORMAT);
+                            Double distance = Double.valueOf(df.format(mDistance.getValue() / 1000));
 
-                        order.setAmount(intAmount);
+                            // TODO: store in a db so it can be changed from Firebase
+                            double dblAmount = distance * 2.13;
+                            int intAmount = (int) (dblAmount * 100);
 
-                        long newDate = Utils_General.getStartTimeForDate(mDate);
+                            order.setAmount(intAmount);
 
-                        //Log.i(Constants.LOG_TAG, "THIS:" + newDate);
-                        order.setPickupDate(newDate);
+                            long newDate = Utils_General.getStartTimeForDate(mDate);
 
-                        mOrderRef
-                                .push()
-                                .setValue(order, new DatabaseReference.CompletionListener() {
-                                    @Override
-                                    public void onComplete(DatabaseError databaseError,
-                                                           DatabaseReference databaseReference) {
+                            //Log.i(Constants.LOG_TAG, "THIS:" + newDate);
+                            order.setPickupDate(newDate);
 
-                                        String uniqueKey = databaseReference.getKey();
+                            mOrderRef
+                                    .push()
+                                    .setValue(order, new DatabaseReference.CompletionListener() {
+                                        @Override
+                                        public void onComplete(DatabaseError databaseError,
+                                                               DatabaseReference databaseReference) {
 
-                                        order.setId(uniqueKey);
+                                            String uniqueKey = databaseReference.getKey();
 
-                                        mOrderRef.child(uniqueKey).setValue(order);
+                                            order.setId(uniqueKey);
 
-                                        Utils_General.showToast(getContext(), getString(R.string.order_booked));
+                                            mOrderRef.child(uniqueKey).setValue(order);
 
-                                        mLocationDelivery = null;
-                                        mLocationPickup = null;
-                                        mSelectedCustomer = null;
-                                        mDate = 0;
+                                            Utils_General.showToast(getContext(), getString(R.string.order_booked));
 
-                                        setupForm();
+                                            mLocationDelivery = null;
+                                            mLocationPickup = null;
+                                            mSelectedCustomer = null;
+                                            mDate = 0;
 
-                                        Log.i(Constants.LOG_TAG, "key:" + uniqueKey);
-                                    }
-                                });
+                                            setupForm();
 
-                    }
-                })
-                .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                                            Log.i(Constants.LOG_TAG, "key:" + uniqueKey);
+                                        }
+                                    });
 
-                        Utils_General.showToast(getContext(), getString(R.string.order_cancelled));
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
 
-                        cancelNewOrder();
+                            Utils_General.showToast(getContext(), getString(R.string.order_cancelled));
 
-                        setupForm();
+                            cancelNewOrder();
 
-                    }
-                })
-                .show();
+                            setupForm();
 
+                        }
+                    })
+                    .show();
 
+        } else {
+            Utils_General.showToast(mContext, getString(R.string.msg_no_network));
+        }
     }
 
     // Date picker listener

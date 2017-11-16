@@ -33,7 +33,7 @@ import butterknife.OnClick;
 
 /**
  * Created by patrick keogh on 2017-09-14.
- * NOT BEING USED YET
+ * NOT BEING USED YET*********************
  *
  */
 
@@ -105,13 +105,7 @@ public class Activity_Photo extends AppCompatActivity {
         mDriverRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_DRIVERS).child(mDriver.getUid());
     }
 
-    /**
-     * Save the current state of this activity
-     */
-    @Override
-    public void onSaveInstanceState(Bundle currentState) {
-        currentState.putParcelable(Constants.STATE_INFO_DRIVER, mDriver);
-    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

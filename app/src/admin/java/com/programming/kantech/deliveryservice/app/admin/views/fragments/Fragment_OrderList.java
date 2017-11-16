@@ -54,6 +54,8 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
     private GoogleApiClient mClient;
     private Order mSelectedOrder;
 
+    private Context mContext;
+
     // 12:00 AM of the selected day
     private long mDisplayDateStartTimeInMillis;
 
@@ -108,7 +110,7 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         if (savedInstanceState != null) {
@@ -139,7 +141,7 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
      * Save the current state of this fragment
      */
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         // Store the driver in the instance state
@@ -165,13 +167,14 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
         rv_orders_list.setHasFixedSize(false);
 
 
-
     }
 
     // Override onAttach to make sure that the container activity has implemented the callback
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        mContext = context;
 
         // This makes sure that the host activity has implemented the callback interface
         // If not, it throws an exception
@@ -242,13 +245,18 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
 
     private void buildApiClient() {
         if (mClient == null) {
-            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
+            if (Utils_General.isNetworkAvailable(mContext)) {
 
-            mClient = new GoogleApiClient.Builder(getContext())
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(Places.GEO_DATA_API)
-                    .build();
+                mClient = new GoogleApiClient.Builder(mContext)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(Places.GEO_DATA_API)
+                        .build();
+            } else {
+                Utils_General.showToast(mContext, getString(R.string.msg_no_network));
+            }
+
+
         }
     }
 

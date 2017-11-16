@@ -34,6 +34,7 @@ import android.widget.TextView;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.core.GeoHashQuery;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.common.ConnectionResult;
@@ -346,32 +347,36 @@ public class Activity_Main extends AppCompatActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        if (ActivityCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                        PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this, new String[]{
-                    android.Manifest.permission.ACCESS_FINE_LOCATION}, Constants.REQUEST_CODE_LOCATION_PERMISSION);
-        }
-
         mGoogleMap = googleMap;
         mGoogleMap.setPadding(100, 100, 100, 100);
-
-        //mGoogleMap.setMyLocationEnabled(true);
-
         mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
+
+        if (mClient == null) {
+            buildGoogleApiClients();
+            mClient.connect();
+        } else {
+            if (!mClient.isConnected()) {
+                mClient.connect();
+            }
+        }
 
     }
 
     protected synchronized void buildGoogleApiClients() {
-        mClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .build();
-        mClient.connect();
+
+        if(Utils_General.isNetworkAvailable(this)){
+
+            mClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .addApi(Places.GEO_DATA_API)
+                    .build();
+            mClient.connect();
+        }else{
+            Utils_General.showToast(this, getString(R.string.msg_no_network));
+        }
+
     }
 
     @Override
@@ -382,12 +387,22 @@ public class Activity_Main extends AppCompatActivity implements
         mLocationRequest.setFastestInterval(2000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
+        Log.i(Constants.LOG_TAG, "Here1");
+
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
                 android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(Activity_Main.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, Constants.REQUEST_CODE_LOCATION_PERMISSION);
+            Log.i(Constants.LOG_TAG, "Here2");
+
+            ActivityCompat.requestPermissions(Activity_Main.this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    Constants.REQUEST_CODE_LOCATION_PERMISSION);
+
+            Log.i(Constants.LOG_TAG, "Here3");
         }
+
+        Log.i(Constants.LOG_TAG, "Here4");
 
         // Get the last known location for the driver and force a location changed call
 
@@ -410,6 +425,7 @@ public class Activity_Main extends AppCompatActivity implements
 
         paintDriverLocationToMap();
 
+        Log.i(Constants.LOG_TAG, "Here5");
 
         attachOrderReadListener();
 
@@ -488,15 +504,10 @@ public class Activity_Main extends AppCompatActivity implements
                                             } else {
                                                 holder.setDistance(distance.getText());
                                             }
-
                                         }
-
-
                                     }
-
-
                                 } else {
-                                    Log.i(Constants.LOG_TAG, "A distance could not be fetched");
+                                    //Log.i(Constants.LOG_TAG, "A distance could not be fetched");
                                     holder.setDistance("Unknown");
                                 }
                             }
@@ -574,24 +585,14 @@ public class Activity_Main extends AppCompatActivity implements
                     @Override
                     public void onClick(View v) {
 
-                        // Send the selected customer back to the main activity
-                        //finishTheActivity(location, thisPlace[0]);
-
                         Log.i(Constants.LOG_TAG, "onClick called");
                         orderSelected(order);
-
-
                     }
                 });
-
             }
-
-
         };
 
         mRecyclerView.setAdapter(mFireAdapter);
-
-
     }
 
     private void orderSelected(Order order) {
@@ -750,9 +751,9 @@ public class Activity_Main extends AppCompatActivity implements
                     LatLngBounds bounds = builder.build();
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 10);
 
-                    if(useCameraAnimation){
+                    if (useCameraAnimation) {
                         mGoogleMap.animateCamera(cu);
-                    }else{
+                    } else {
                         mGoogleMap.moveCamera(cu);
                         // we want to skip the animation the first time through
                         useCameraAnimation = true;
@@ -800,15 +801,6 @@ public class Activity_Main extends AppCompatActivity implements
     @Override
     public void onStart() {
         super.onStart();
-
-        if (mClient == null) {
-            buildGoogleApiClients();
-            mClient.connect();
-        } else {
-            if (!mClient.isConnected()) {
-                mClient.connect();
-            }
-        }
     }
 
     @Override
@@ -866,25 +858,25 @@ public class Activity_Main extends AppCompatActivity implements
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
             GeoFire geoFire = new GeoFire(mDriverLocationRef);
             geoFire.removeLocation(userId);
         }
-
     }
 
     private Query getDatabaseQueryForList() {
         String strQueryStart = mDisplayDateStartTimeInMillis + "_" + mDriver.getUid() + Constants.FIREBASE_STATUS_SORT_PICKUP_COMPLETE;
         String strQueryEnd = mDisplayDateStartTimeInMillis + "_" + mDriver.getUid() + Constants.FIREBASE_STATUS_SORT_COMPLETE;
-        return mOrdersRef.orderByChild("queryDateDriverId").startAt(strQueryStart).endAt(strQueryEnd);
+        return mOrdersRef.orderByChild(Constants.FIREBASE_CHILD_QUERY_DATE_DRIVER_ID).startAt(strQueryStart).endAt(strQueryEnd);
     }
 
     private Query getDatabaseQueryForMap() {
         String strQuery = "true_" + mDisplayDateStartTimeInMillis + "_" + mDriver.getUid();
-        return mOrdersRef.orderByChild("inProgressDateDriverId").equalTo(strQuery);
+        return mOrdersRef.orderByChild(Constants.FIREBASE_CHILD_INPROGRESS_DATE_DRIVER_ID).equalTo(strQuery);
     }
 
     private void attachOrderReadListener() {
+
+        Log.i(Constants.LOG_TAG, "Here7");
 
         // Get all orders for the selected date and driver
         mOrdersQuery = getDatabaseQueryForMap();

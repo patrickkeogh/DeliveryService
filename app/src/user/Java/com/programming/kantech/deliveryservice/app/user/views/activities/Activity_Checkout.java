@@ -78,6 +78,8 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
     private Token mToken;
     private GoogleApiClient mClient;
 
+    private MaterialDialog.Builder builder;
+
     private MaterialDialog dialog_charging;
 
     // Member variables for the payment fields
@@ -118,9 +120,6 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
 
     @BindView(R.id.et_user_checkout_card_number_4)
     EditText et_user_checkout_card_number_4;
-
-    @BindView(R.id.pb_checkout_progress_bar)
-    ProgressBar pb_checkout_progress_bar;
 
     @BindView(R.id.tv_user_checkout_company)
     TextView tv_user_checkout_company;
@@ -264,12 +263,54 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
 
     }
 
+//    @OnClick(R.id.btn_user_checkout_good_card)
+//    public void btn_good_card_clicked() {
+//
+//        // This is just for testing
+//        et_user_checkout_card_number_1.setText("4242");
+//        et_user_checkout_card_number_2.setText("4242");
+//        et_user_checkout_card_number_3.setText("4242");
+//        et_user_checkout_card_number_4.setText("4242");
+//
+//        et_user_checkout_svc.setText("123");
+//
+//        sp_user_checkout_exp_month.setSelection(11);
+//        sp_user_checkout_exp_year.setSelection(6);
+//    }
+//
+//    @OnClick(R.id.btn_user_checkout_bad_card)
+//    public void btn_bad_card_clicked() {
+//
+//        // This is just for testing
+//        et_user_checkout_card_number_1.setText("4000");
+//        et_user_checkout_card_number_2.setText("0000");
+//        et_user_checkout_card_number_3.setText("0000");
+//        et_user_checkout_card_number_4.setText("0002");
+//
+//        et_user_checkout_svc.setText("123");
+//
+//        sp_user_checkout_exp_month.setSelection(11);
+//        sp_user_checkout_exp_year.setSelection(6);
+//    }
+
     @OnClick(R.id.btn_user_checkout_confirm_order)
     public void confirmOrder() {
 
         // disable buttons so they cannot be clicked twice
         btn_user_checkout_confirm_order.setEnabled(false);
+        btn_user_checkout_confirm_order.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
         btn_user_checkout_cancel_order.setEnabled(false);
+        btn_user_checkout_cancel_order.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
+
+        // start a dialog while credit card details are verified and until a resulkt from Stripe is received
+
+        builder = new MaterialDialog.Builder(Activity_Checkout.this)
+                .content(R.string.alert_verifying_credit_card)
+                .cancelable(false)
+                .progress(true, 0);
+
+        dialog_charging = builder.build();
+        dialog_charging.show();
 
         // Hide the keyboard
         Utils_General.hideKeyboard(this, getWindow().getDecorView().getRootView().getWindowToken());
@@ -279,19 +320,19 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
 
         // Used for testing
         // Uses live data
-        Card card0 = new Card(mPaymentNumber, month, year, mPaymentSecurity);
+        //Card card = new Card(mPaymentNumber, month, year, mPaymentSecurity);
 
         // Good purchase - test
-        Card card1 = new Card("4242424242424242", 12, 2023, "123");
+        Card card = new Card("4242424242424242", 12, 2023, "123");
 
         // Declined card
-        Card card2 = new Card("4000000000000002", 12, 2023, "123");
+        //Card card2 = new Card("4000000000000002", 12, 2023, "123");
 
         // Wrong number
-        Card card3 = new Card("4242424242424241", 12, 2023, "123");
+        //Card card3 = new Card("4242424242424241", 12, 2023, "123");
 
         // Wrong cvc
-        Card card4 = new Card("4000000000000127", 12, 2023, "999");
+        //Card card4 = new Card("4000000000000127", 12, 2023, "999");
 
 
         //card.setCurrency("usd");
@@ -305,7 +346,7 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
         card.setCVC("123");
         */
 
-        Card card = card1;
+        //Card card = card0;
 
         if (!card.validateCard()) {
             Utils_General.showToast(this, "The card number or cvc is invalid");
@@ -316,12 +357,15 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
                     @Override
                     public void onError(Exception error) {
                         Log.e(Constants.LOG_TAG, error.getMessage());
+                        dialog_charging.dismiss();
                     }
 
                     @Override
                     public void onSuccess(Token token) {
 
                         mToken = token;
+
+                        dialog_charging.dismiss();
 
                         // Now add the order to the database with the token
                         // A firebase function will use the token to make the actual Stripe charge
@@ -338,72 +382,77 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
     }
 
     private void submitOrder() {
+        if (Utils_General.isNetworkAvailable(Activity_Checkout.this)) {
+            // Stripe will only accept integers
+            double amount = (double) (mOrder.getAmount());
+            amount = amount / 100;
+            String display_amount = NumberFormat.getCurrencyInstance(Locale.getDefault()).format(amount);
 
-        // Stripe will only accept integers
-        double amount = (double) (mOrder.getAmount());
-        amount = amount / 100;
-        String display_amount = NumberFormat.getCurrencyInstance(Locale.getDefault()).format(amount);
+            new MaterialDialog.Builder(this)
+                    .title(R.string.msg_charged)
+                    .content(display_amount)
+                    .positiveText(getString(R.string.confirm))
+                    .cancelable(false)
+                    .negativeText(getString(R.string.cancel))
+                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            Utils_General.showToast(Activity_Checkout.this, getString(R.string.order_cancelled));
+                            btn_user_checkout_confirm_order.setEnabled(true);
+                            btn_user_checkout_cancel_order.setEnabled(true);
+                        }
+                    })
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
-        new MaterialDialog.Builder(this)
-                .title(R.string.msg_charged)
-                .content(display_amount)
-                .positiveText(getString(R.string.confirm))
-                .cancelable(false)
-                .negativeText(getString(R.string.cancel))
-                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        Utils_General.showToast(Activity_Checkout.this, getString(R.string.order_cancelled));
-                        btn_user_checkout_confirm_order.setEnabled(true);
-                        btn_user_checkout_cancel_order.setEnabled(true);
-                    }
-                })
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            builder = new MaterialDialog.Builder(Activity_Checkout.this)
+                                    .content(R.string.alert_charging)
+                                    .cancelable(false)
+                                    .progress(true, 0);
 
-                        MaterialDialog.Builder builder = new MaterialDialog.Builder(Activity_Checkout.this)
-                                .content(R.string.alert_charging)
-                                .cancelable(false)
-                                .progress(true, 0);
-
-                        dialog_charging = builder.build();
-                        dialog_charging.show();
-
-                        // Get a reference to the locations table
-                        final DatabaseReference orderRef =
-                                FirebaseDatabase.getInstance().getReference()
-                                        .child(Constants.FIREBASE_NODE_ORDERS);
-
-                        orderRef
-                                .push()
-                                .setValue(mOrder, new DatabaseReference.CompletionListener() {
-                                    @Override
-                                    public void onComplete(DatabaseError databaseError,
-                                                           DatabaseReference databaseReference) {
-
-                                        String uniqueKey = databaseReference.getKey();
-
-                                        mOrder.setId(uniqueKey);
-
-                                        orderRef.child(uniqueKey).setValue(mOrder);
-
-                                        // On server we will check for an update to the "token" field
-                                        // which will trigger a call to Strips
-                                        orderRef.child(uniqueKey).child(Constants.FIREBASE_CHILD_TOKEN).setValue(mToken);
-
-                                        Utils_General.showToast(Activity_Checkout.this, getString(R.string.order_booked));
+                            dialog_charging = builder.build();
+                            dialog_charging.show();
 
 
-                                        attachChargeListener();
+                            // Get a reference to the locations table
+                            final DatabaseReference orderRef =
+                                    FirebaseDatabase.getInstance().getReference()
+                                            .child(Constants.FIREBASE_NODE_ORDERS);
 
-                                    }
-                                });
+                            orderRef
+                                    .push()
+                                    .setValue(mOrder, new DatabaseReference.CompletionListener() {
+                                        @Override
+                                        public void onComplete(DatabaseError databaseError,
+                                                               DatabaseReference databaseReference) {
+
+                                            String uniqueKey = databaseReference.getKey();
+
+                                            mOrder.setId(uniqueKey);
+
+                                            orderRef.child(uniqueKey).setValue(mOrder);
+
+                                            // On server we will check for an update to the "token" field
+                                            // which will trigger a call to Strips
+                                            orderRef.child(uniqueKey).child(Constants.FIREBASE_CHILD_TOKEN).setValue(mToken);
+
+                                            //Utils_General.showToast(Activity_Checkout.this, getString(R.string.order_booked));
 
 
-                    }
-                })
-                .show();
+                                            attachChargeListener();
+
+                                        }
+                                    });
+
+
+                        }
+                    })
+                    .show();
+
+        } else {
+            Utils_General.showToast(Activity_Checkout.this, getString(R.string.msg_no_network));
+        }
     }
 
     private void detachDatabaseReadListeners() {
@@ -443,6 +492,8 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
                         //Utils_General.showToast(Activity_Checkout.this, "charge status:" + charge.getStatus());
                     } else {
                         Log.i(Constants.LOG_TAG, "No Charge object");
+                        // if no charge object, this is not a paymnet update
+
                     }
                 }
 
@@ -491,6 +542,7 @@ public class Activity_Checkout extends AppCompatActivity implements GoogleApiCli
             intent.putExtra(Constants.EXTRA_USER, mAppUser);
 
             startActivity(intent);
+            finish();
         }
     }
 

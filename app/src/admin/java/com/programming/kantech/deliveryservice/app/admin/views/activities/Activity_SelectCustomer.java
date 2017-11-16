@@ -32,6 +32,7 @@ import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Customers;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
+import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import java.util.Objects;
 
@@ -170,15 +171,17 @@ public class Activity_SelectCustomer extends AppCompatActivity implements Google
 
     private void buildApiClient() {
         if (mClient == null) {
-            // Build up the LocationServices API client
-            // Uses the addApi method to request the LocationServices API
-            // Also uses enableAutoManage to automatically know when to connect/suspend the client
-            mClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .addApi(Places.GEO_DATA_API)
-                    .build();
+            if(Utils_General.isNetworkAvailable(this)){
+                mClient = new GoogleApiClient.Builder(this)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .addApi(Places.GEO_DATA_API)
+                        .build();
+            }else{
+                Utils_General.showToast(this, getString(R.string.msg_no_network));
+            }
+
         }
     }
 

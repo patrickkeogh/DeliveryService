@@ -147,19 +147,26 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
                 loadFirebaseAdapter();
                 return true;
             case R.id.action_sign_out:
-                //Log.i(Constants.LOG_TAG, "Sign out clicked:");
-                AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
 
-                        if (task.isSuccessful()) {
-                            Intent intent = new Intent(Activity_MyOrders.this, Activity_Splash.class);
-                            startActivity(intent);
-                            finish();
+                if (Utils_General.isNetworkAvailable(this)) {
+                    //Log.i(Constants.LOG_TAG, "Sign out clicked:");
+                    AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+
+                            if (task.isSuccessful()) {
+                                Intent intent = new Intent(Activity_MyOrders.this, Activity_Splash.class);
+                                startActivity(intent);
+                                finish();
+                            }
+
                         }
+                    });
 
-                    }
-                });
+                } else {
+                    Utils_General.showToast(this, getString(R.string.msg_no_network));
+                }
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -168,15 +175,23 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
     }
 
     private void buildApiClient() {
-        if (mClient == null) {
-            Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
 
-            mClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(Places.GEO_DATA_API)
-                    .build();
+        if(Utils_General.isNetworkAvailable(this)){
+
+            if (mClient == null) {
+                Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
+
+                mClient = new GoogleApiClient.Builder(this)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(Places.GEO_DATA_API)
+                        .build();
+            }
+
+        }else{
+            Utils_General.showToast(this, getString(R.string.msg_no_network));
         }
+
     }
 
     @Override
@@ -228,7 +243,7 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
         }
     }
 
-    private Query getDatabaseRef(){
+    private Query getDatabaseRef() {
         Log.i(Constants.LOG_TAG, "CustId:" + mAppUser.getId());
 
         return mOrdersRef
@@ -252,7 +267,7 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
 
                 //mLayout.setBackgroundColor(ContextCompat.getColor(Activity_MyOrders.this, R.color.colorAccent));
 
-                switch (order.getStatus()){
+                switch (order.getStatus()) {
                     case Constants.ORDER_STATUS_BOOKED:
                         holder.setBackgroundColor(Activity_MyOrders.this, R.color.colorPrimary);
                         holder.btn_order_show_map.setEnabled(false);
@@ -310,6 +325,7 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
 
                         Intent intent = new Intent(Activity_MyOrders.this, Activity_MyMap.class);
                         intent.putExtra(Constants.EXTRA_ORDER, order);
+                        intent.putExtra(Constants.EXTRA_USER, mAppUser);
                         startActivity(intent);
 
                     }
@@ -323,10 +339,10 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
 
                         Intent intent = new Intent(Activity_MyOrders.this, Activity_OrderDetails.class);
                         intent.putExtra(Constants.EXTRA_ORDER, order);
+                        intent.putExtra(Constants.EXTRA_USER, mAppUser);
                         startActivity(intent);
                     }
                 });
-
 
 
             }
@@ -342,9 +358,9 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Perform initial setup, this will only be called once
-                if(dataSnapshot.hasChildren()){
+                if (dataSnapshot.hasChildren()) {
                     showList(true);
-                }else{
+                } else {
                     showList(false);
                 }
 
@@ -354,9 +370,9 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
                     public void onItemRangeInserted(int positionStart, int itemCount) {
 
                         int count = mFireAdapter.getItemCount();
-                        if(count == 0){
+                        if (count == 0) {
                             showList(false);
-                        }else{
+                        } else {
                             showList(true);
                         }
                     }
@@ -364,9 +380,9 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
                     @Override
                     public void onItemRangeRemoved(int positionStart, int itemCount) {
                         int count = mFireAdapter.getItemCount();
-                        if(count == 0){
+                        if (count == 0) {
                             showList(false);
-                        }else{
+                        } else {
                             showList(true);
                         }
                     }
@@ -385,10 +401,10 @@ public class Activity_MyOrders extends AppCompatActivity implements GoogleApiCli
 
     private void showList(boolean bShowList) {
 
-        if(bShowList){
+        if (bShowList) {
             mRecyclerView.setVisibility(View.VISIBLE);
             tv_empty_view.setVisibility(View.GONE);
-        }else{
+        } else {
             mRecyclerView.setVisibility(View.GONE);
             tv_empty_view.setVisibility(View.VISIBLE);
         }

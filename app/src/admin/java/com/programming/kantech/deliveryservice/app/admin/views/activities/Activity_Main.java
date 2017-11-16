@@ -102,7 +102,6 @@ public class Activity_Main extends AppCompatActivity implements
     private FrameLayout container_details;
     private FrameLayout container_master;
 
-
     // Member variables for the Firebase database
     private DatabaseReference mDriverRef;
 
@@ -110,7 +109,6 @@ public class Activity_Main extends AppCompatActivity implements
     private MenuItem mMenuItem_Previous;
     private MenuItem mMenuItem_Next;
     private MenuItem mMenuItem_Date;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -122,7 +120,7 @@ public class Activity_Main extends AppCompatActivity implements
             if (savedInstanceState.containsKey(Constants.STATE_INFO_DATE_FILTER)) {
                 mDisplayDateStartTimeInMillis = savedInstanceState.getLong(Constants.STATE_INFO_DATE_FILTER);
             }
-        }else{
+        } else {
 
             // Create the display date, today at 00:00 hrs
             Calendar date = new GregorianCalendar();
@@ -269,7 +267,7 @@ public class Activity_Main extends AppCompatActivity implements
             Fragment_OrderList frag_order_list = Fragment_OrderList.newInstance(mDisplayDateStartTimeInMillis);
             replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_LIST, frag_order_list, false);
 
-        }else if (id == R.id.nav_admin_filters) {
+        } else if (id == R.id.nav_admin_filters) {
 
             Utils_General.showToast(this, "This option has not been implemented yet!");
 
@@ -371,19 +369,23 @@ public class Activity_Main extends AppCompatActivity implements
                 return true;
 
             case R.id.action_sign_out:
-                //Log.i(Constants.LOG_TAG, "Sign out clicked:");
-                AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+                if (Utils_General.isNetworkAvailable(this)) {
+                    AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
 
-                        if (task.isSuccessful()) {
-                            Intent intent = new Intent(Activity_Main.this, Activity_Splash.class);
-                            startActivity(intent);
-                            finish();
+                            if (task.isSuccessful()) {
+                                Intent intent = new Intent(Activity_Main.this, Activity_Splash.class);
+                                startActivity(intent);
+                                finish();
+                            }
+
                         }
+                    });
 
-                    }
-                });
+                } else {
+                    Utils_General.showToast(this, getString(R.string.msg_no_network));
+                }
 
                 return true;
             case android.R.id.home:
@@ -401,10 +403,10 @@ public class Activity_Main extends AppCompatActivity implements
         Fragment frag = mFragmentManager.findFragmentById(R.id.container_master);
 
         // replace map or order list when filter changes
-        if(frag instanceof Fragment_MainDetails){
+        if (frag instanceof Fragment_MainDetails) {
             Fragment_MainDetails fragment = Fragment_MainDetails.newInstance(mDisplayDateStartTimeInMillis);
             replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_MAIN_DETAILS, fragment, true);
-        }else if(frag instanceof Fragment_OrderList){
+        } else if (frag instanceof Fragment_OrderList) {
             Fragment_OrderList frag_order_list = Fragment_OrderList.newInstance(mDisplayDateStartTimeInMillis);
             replaceFragment(R.id.container_master, Constants.TAG_FRAGMENT_ORDER_LIST, frag_order_list, false);
         }
@@ -563,7 +565,7 @@ public class Activity_Main extends AppCompatActivity implements
                 break;
 
             case Constants.TAG_FRAGMENT_ORDER_DETAILS:
-                if (!mLandscapeView) enableViews(true,getString(R.string.title_order_details));
+                if (!mLandscapeView) enableViews(true, getString(R.string.title_order_details));
                 if (!mLandscapeView) mShowDateNav = false;
                 break;
 

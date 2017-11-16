@@ -31,6 +31,7 @@ import com.programming.kantech.deliveryservice.app.data.model.pojo.app.AppUser;
 import com.programming.kantech.deliveryservice.app.user.provider.Contract_DeliveryService;
 import com.programming.kantech.deliveryservice.app.user.views.ui.Adapter_PlaceList;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
+import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -220,14 +221,19 @@ public class Activity_SelectLocation extends AppCompatActivity  implements Googl
 
     private void buildApiClient() {
         if (mClient == null) {
-            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
 
-            mClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .addApi(Places.GEO_DATA_API)
-                    .build();
+            if(Utils_General.isNetworkAvailable(this)){
+                mClient = new GoogleApiClient.Builder(this)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .addApi(Places.GEO_DATA_API)
+                        .build();
+            }else{
+                Utils_General.showToast(this, getString(R.string.msg_no_network));
+            }
+
+
         }
     }
 

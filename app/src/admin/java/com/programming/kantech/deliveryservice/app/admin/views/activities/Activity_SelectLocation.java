@@ -34,6 +34,7 @@ import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Loc
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Location;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
+import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -216,14 +217,16 @@ public class Activity_SelectLocation extends AppCompatActivity implements Google
 
     private void buildApiClient() {
         if (mClient == null) {
-            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
-
-            mClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .addApi(Places.GEO_DATA_API)
-                    .build();
+            if(Utils_General.isNetworkAvailable(this)){
+                mClient = new GoogleApiClient.Builder(this)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .addApi(Places.GEO_DATA_API)
+                        .build();
+            }else{
+                Utils_General.showToast(this, getString(R.string.msg_no_network));
+            }
         }
     }
 

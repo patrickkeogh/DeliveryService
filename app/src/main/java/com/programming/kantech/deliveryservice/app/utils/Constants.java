@@ -41,6 +41,8 @@ public class Constants {
 
     public static final int ONE_WEEK = 7 * DAY;
 
+    public static final double COST_PER_KM = 2.13;
+
     /**
      * The "Content authority" is a name for the entire content provider, similar to the
      * relationship between a domain name and its website.  A convenient string to use for the
@@ -167,6 +169,9 @@ public class Constants {
     public static final String FIREBASE_CHILD_PLACE_ID = "placeId";
     public static final String FIREBASE_CHILD_TOKEN = "token";
 
+    public static final String FIREBASE_CHILD_QUERY_DATE_DRIVER_ID = "queryDateDriverId";
+    public static final String FIREBASE_CHILD_INPROGRESS_DATE_DRIVER_ID = "inProgressDateDriverId";
+
     public static final String FIREBASE_CHILD_ORDER_STATUS = "status";
     public static final String FIREBASE_CHILD_ORDER_CUST_ID = "customerId";
 
@@ -176,6 +181,7 @@ public class Constants {
     public static final String FIREBASE_NOTIFICATION_TOPIC_USER = "topic_customer";
 
     public final static String FIREBASE_DEFAULT_NO_DRIVER = "No Driver Assigned";
+    public final static String FIREBASE_DEFAULT_UNKNOWN_DISTANCE = "Uknown";
 
 
 

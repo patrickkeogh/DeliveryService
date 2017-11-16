@@ -170,4 +170,11 @@
     <string name="title_phone_no">Phone No</string>
     <string name="content_description_place_icon">place icon</string>
     <string name="btn_register">REGISTER</string>
+    <string name="alert_verifying_credit_card">validating credit card ...</string>
+    <string name="msg_payments_are_not_live">Payments are not live!</string>
+    <string name="alert_fetching">fetching distance ...</string>
+    <string name="title_order_tracker">Order Tracker</string>
+    <string name="msg_no_network">You don not have a network connection!</string>
+    <string name="toast_delivery_location_not_selected">Delivery Location Not Selected</string>
+    <string name="toast_pickup_location_not_selected">Pickup Location Not Selected</string>
 </resources>

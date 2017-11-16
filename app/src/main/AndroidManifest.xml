@@ -25,6 +25,7 @@
             android:value="AIzaSyAY4VENShVhvMRUJkj7C_XnHjfKPNOamMU" />
 
         <meta-data
+            android:value=""
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorPrimaryDark" />
 

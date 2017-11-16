@@ -216,66 +216,71 @@ public class Activity_Splash extends AppCompatActivity {
     private void onSignedInInitialize(final FirebaseUser user) {
         //Log.i(Constants.LOG_TAG, "onSignedInInitialize called in Splash Driver");
 
-        //mUsername = user.getDisplayName();
-        tv_splash_message.setText(R.string.msg_splash_initializing_app);
-        mProgressBar.setVisibility(View.VISIBLE);
+        if(Utils_General.isNetworkAvailable(this)){
+            tv_splash_message.setText(R.string.msg_splash_initializing_app);
+            mProgressBar.setVisibility(View.VISIBLE);
 
-        // Do a one time fetch to Firebase to get the Driver Info
-        DatabaseReference driverRef = mDriverRef.child(user.getUid());
+            // Do a one time fetch to Firebase to get the Driver Info
+            DatabaseReference driverRef = mDriverRef.child(user.getUid());
 
-        driverRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            driverRef.addListenerForSingleValueEvent(new ValueEventListener() {
 
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i(Constants.LOG_TAG, "onDataChange()called for driver");
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.i(Constants.LOG_TAG, "onDataChange()called for driver");
 
-                // Check if a driver document was found for the use signed in (by userId)
-                if (dataSnapshot.exists()) {
-                    // run some code
-                    Log.i(Constants.LOG_TAG, "we have a snapshot");
+                    // Check if a driver document was found for the use signed in (by userId)
+                    if (dataSnapshot.exists()) {
+                        // run some code
+                        Log.i(Constants.LOG_TAG, "we have a snapshot");
 
-                    mDriver = dataSnapshot.getValue(Driver.class);
+                        mDriver = dataSnapshot.getValue(Driver.class);
 
 
 
-                    if (mDriver != null) {
+                        if (mDriver != null) {
 
-                        if (!mDriver.getDriverApproved()) {
-                            showDriverNotAuthorized(user);
-                        } else {
+                            if (!mDriver.getDriverApproved()) {
+                                showDriverNotAuthorized(user);
+                            } else {
 
-                            final Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Intent intent = new Intent(Activity_Splash.this, Activity_Main.class);
-                                    intent.putExtra(Constants.EXTRA_DRIVER, mDriver);
-                                    startActivity(intent);
-                                    finish();
-                                }
-                            }, 5000); // This is just for testing, maybe lol
+                                final Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Intent intent = new Intent(Activity_Splash.this, Activity_Main.class);
+                                        intent.putExtra(Constants.EXTRA_DRIVER, mDriver);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                }, 1000); // This is just for testing, maybe lol
 
+                            }
                         }
+
+
+                    } else {
+                        // User is not in the driver db. add them
+                        mDriver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(), "", false, false, "", "");
+
+                        mDriverRef.child(user.getUid()).setValue(mDriver);
+
+                        showDriverNotAuthorized(user);
+
                     }
+                }
 
-
-                } else {
-                    // User is not in the driver db. add them
-                    mDriver = new Driver(user.getUid(), user.getDisplayName(), user.getEmail(), "", false, false, "", "");
-
-                    mDriverRef.child(user.getUid()).setValue(mDriver);
-
-                    showDriverNotAuthorized(user);
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.i(Constants.LOG_TAG, "error");
 
                 }
-            }
+            });
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.i(Constants.LOG_TAG, "error");
+        }else{
+            Utils_General.showToast(this, getString(R.string.msg_no_network));
+        }
 
-            }
-        });
     }
 
     private void sendTokenToServer(FirebaseUser user) {
@@ -306,7 +311,7 @@ public class Activity_Splash extends AppCompatActivity {
                 tv_splash_message2.setText(R.string.msg_driver_notification);
                 mProgressBar.setVisibility(View.INVISIBLE);
             }
-        }, 5000);
+        }, 1000);
 
     }
 }

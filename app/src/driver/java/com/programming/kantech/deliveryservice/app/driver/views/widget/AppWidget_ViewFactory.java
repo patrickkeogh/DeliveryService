@@ -2,7 +2,6 @@ package com.programming.kantech.deliveryservice.app.driver.views.widget;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -12,16 +11,21 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
+import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Created by patri on 2017-10-10.
+ * Created by patrick keogh on 2017-10-10.
+ * A widget that shows a list of orders for the current day
  */
 
 public class AppWidget_ViewFactory implements RemoteViewsService.RemoteViewsFactory {
@@ -31,34 +35,45 @@ public class AppWidget_ViewFactory implements RemoteViewsService.RemoteViewsFact
     private CountDownLatch mCountDownLatch;
 
     private DatabaseReference mOrdersRef;
-    private FirebaseAuth mFirebaseAuth;
-    private FirebaseUser mFirebaseUser;
+
+    // 12:00 AM of the selected day
+    private long mDisplayDateStartTimeInMillis;
 
     public AppWidget_ViewFactory(Context mContext) {
         this.mContext = mContext;
         this.mOrderList = new ArrayList<>();
     }
 
+    private Query getDatabaseQueryForWidget(String uid) {
+        String strQueryStart = mDisplayDateStartTimeInMillis + "_" + uid + Constants.FIREBASE_STATUS_SORT_PICKUP_COMPLETE;
+        String strQueryEnd = mDisplayDateStartTimeInMillis + "_" + uid + Constants.FIREBASE_STATUS_SORT_COMPLETE;
+        return mOrdersRef.orderByChild(Constants.FIREBASE_CHILD_QUERY_DATE_DRIVER_ID).startAt(strQueryStart).endAt(strQueryEnd);
+    }
+
     private void populateOrdersListView() {
+
+        // get current day at midnight
+        Calendar date = new GregorianCalendar();
+        mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
+
+
 
         //Log.i(Constants.LOG_TAG, "populateOrdersListView called");
         mOrdersRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_ORDERS);
 
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         if (mFirebaseUser != null) {
 
+            Query query = getDatabaseQueryForWidget(mFirebaseUser.getUid());
 
-
-            mOrdersRef.addValueEventListener(new ValueEventListener() {
+            query.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     //Log.i(Constants.LOG_TAG, "onDataChange called in populateOrdersListView()");
 
-                    mOrderList = new ArrayList<Order>();
-
-
+                    mOrderList = new ArrayList<>();
 
                     if (dataSnapshot != null) {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -82,9 +97,6 @@ public class AppWidget_ViewFactory implements RemoteViewsService.RemoteViewsFact
 
                             mCountDownLatch.countDown();
                         }
-
-
-
                     }
                 }
 

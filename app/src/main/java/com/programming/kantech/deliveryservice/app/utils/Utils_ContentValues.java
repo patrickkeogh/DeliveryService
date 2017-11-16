@@ -6,12 +6,8 @@ import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Driver;
 
 public class Utils_ContentValues {
 
-    /**
-     * Extract the values from a recipe to be used with a database.
-     *
-     * @param driver The driver object to be extracted
-     * @return result ContentValues instance with the value of the driver
-     */
+// NOT USED YET
+
 //    public static ContentValues extractDriverValues(Driver driver) {
 //        ContentValues result = new ContentValues();
 //        //result.put(GatheringEntry._ID, gathering.getId());

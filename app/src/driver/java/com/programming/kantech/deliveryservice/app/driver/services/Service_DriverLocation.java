@@ -19,6 +19,7 @@ import com.programming.kantech.deliveryservice.app.utils.Constants;
 
 /**
  * Created by patrick keogh on 2017-09-04.
+ * THIS CLASS IS NOT BEING YET
  */
 
 public class Service_DriverLocation extends Service implements com.google.android.gms.location.LocationListener {
@@ -45,7 +46,7 @@ public class Service_DriverLocation extends Service implements com.google.androi
             // Get the drivers id
             String driverId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-            DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference("driver");
+            DatabaseReference driverAvailable = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_NODE_DRIVERS);
             GeoFire geoFireDriver = new GeoFire(driverAvailable);
 
             geoFireDriver.setLocation(driverId, new GeoLocation(location.getLatitude(), location.getLongitude()));

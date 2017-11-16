@@ -1,6 +1,7 @@
 package com.programming.kantech.deliveryservice.app.user.views.activities;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -241,6 +242,25 @@ public class Activity_Splash extends AppCompatActivity {
         String token = FirebaseInstanceId.getInstance().getToken();
         mUserRef.child(user.getUid()).child(Constants.FIREBASE_CHILD_DEVICE).setValue(token);
         Utils_Preferences.saveHasTokenBeenSent(getApplicationContext(), true);
+
+    }
+
+    public class Task_CheckInternet extends AsyncTask<Void, Void, Boolean> {
+
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            return Utils_General.isInternetWorking(Activity_Splash.this);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean b) {
+            finishInternetCheck(b);
+        }
+    }
+
+    private void finishInternetCheck(Boolean b) {
+
 
     }
 

@@ -172,22 +172,25 @@ public class Activity_UserRegistration extends AppCompatActivity {
         contentValues.put(Contract_DeliveryService.PlaceEntry.COLUMN_PLACE_ID, mPlace.getId());
         getContentResolver().insert(Contract_DeliveryService.PlaceEntry.CONTENT_URI, contentValues);
 
-        // Push the new user registration to firebase
-        //mUserRef.child(mUser.getUid()).setValue(app_user);
+        if(Utils_General.isNetworkAvailable(this)){
+            mUserRef.child(mUser.getUid()).setValue(app_user, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError,
+                                       DatabaseReference databaseReference) {
 
-        mUserRef.child(mUser.getUid()).setValue(app_user, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError,
-                                   DatabaseReference databaseReference) {
+                    Utils_General.showToast(getApplicationContext(), "Registration complete");
 
-                Utils_General.showToast(getApplicationContext(), "Registration complete");
+                    Intent intent = new Intent(Activity_UserRegistration.this, Activity_Main.class);
+                    intent.putExtra(Constants.EXTRA_USER, app_user);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+        }else{
+            Utils_General.showToast(this, getString(R.string.msg_no_network));
+        }
 
-                Intent intent = new Intent(Activity_UserRegistration.this, Activity_Main.class);
-                intent.putExtra(Constants.EXTRA_USER, app_user);
-                startActivity(intent);
-                finish();
-            }
-        });
+
     }
 
 

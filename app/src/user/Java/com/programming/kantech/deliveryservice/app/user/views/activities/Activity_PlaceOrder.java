@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.programming.kantech.deliveryservice.app.R;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.AppUser;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Order;
@@ -30,7 +31,6 @@ import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -55,6 +55,10 @@ public class Activity_PlaceOrder extends AppCompatActivity {
     private Distance mDistance;
 
     private ApiInterface apiService;
+
+    private MaterialDialog.Builder builder;
+
+    private MaterialDialog dialog_charging;
 
     private String mLocationPickupId = null;
     private String mLocationPickupName;
@@ -150,7 +154,7 @@ public class Activity_PlaceOrder extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Log.i(Constants.LOG_TAG, "onActivityResult in PlaceOrder");
+        //Log.i(Constants.LOG_TAG, "onActivityResult in PlaceOrder");
 
         if (requestCode == Constants.REQUEST_CODE_SELECT_PICKUP_LOCATION) {
             if (resultCode == RESULT_OK) {
@@ -166,7 +170,7 @@ public class Activity_PlaceOrder extends AppCompatActivity {
                 setupForm();
 
             } else if (resultCode == RESULT_CANCELED) {
-                Utils_General.showToast(this, "Pickup Location Not Selected");
+                Utils_General.showToast(this, getString(R.string.toast_pickup_location_not_selected));
                 //finish();
             }
         } else if (requestCode == Constants.REQUEST_CODE_SELECT_DELIVERY_LOCATION) {
@@ -182,7 +186,7 @@ public class Activity_PlaceOrder extends AppCompatActivity {
                 setupForm();
 
             } else if (resultCode == RESULT_CANCELED) {
-                Utils_General.showToast(this, "Delivery Location Not Selected");
+                Utils_General.showToast(this, getString(R.string.toast_delivery_location_not_selected));
             }
         }
 
@@ -191,45 +195,52 @@ public class Activity_PlaceOrder extends AppCompatActivity {
     @OnClick(R.id.btn_user_place_order)
     public void placeOrder() {
 
-        // get today at 00:00 hrs
-        Calendar date = new GregorianCalendar();
-        long mDisplayDateStartTimeInMillis = Utils_General.getStartTimeForDate(date.getTimeInMillis());
+        if(Utils_General.isNetworkAvailable(this)){
 
-        //long startDateMillis = mDisplayDateStartTime.getTimeInMillis();
-        Log.i(Constants.LOG_TAG, "StartTime for 12th:" + mDisplayDateStartTimeInMillis);
+            final Order order = new Order();
+            order.setCustomerId(mAppUser.getId());
+            order.setCustomerName(mAppUser.getCompany());
+            order.setCustomerContact(mAppUser.getContact_name());
+            order.setCustomerPhone(mAppUser.getContact_number());
+            order.setDriverName(Constants.FIREBASE_DEFAULT_NO_DRIVER);
+            order.setDeliveryLocationId(mLocationDeliveryId);
+            order.setPickupLocationId(mLocationPickupId);
+            order.setType(Constants.ORDER_TYPE_USER);
+            order.setStatus(Constants.ORDER_STATUS_BOOKED);
 
-        final Order order = new Order();
-        order.setCustomerId(mAppUser.getId());
-        order.setCustomerName(mAppUser.getCompany());
-        order.setCustomerContact(mAppUser.getContact_name());
-        order.setCustomerPhone(mAppUser.getContact_number());
-        order.setDriverName(Constants.FIREBASE_DEFAULT_NO_DRIVER);
-        order.setDeliveryLocationId(mLocationDeliveryId);
-        order.setPickupLocationId(mLocationPickupId);
-        order.setType(Constants.ORDER_TYPE_USER);
-        order.setStatus(Constants.ORDER_STATUS_BOOKED);
-        long newDate = Utils_General.getStartTimeForDate(mSelectedDate);
-        Log.i(Constants.LOG_TAG, "THIS:" + newDate);
-        order.setPickupDate(newDate);
+            long newDate = Utils_General.getStartTimeForDate(mSelectedDate);
+            order.setPickupDate(newDate);
 
-        order.setDistance(mDistance.getValue());
-        order.setDistance_text(mDistance.getText());
+            Double distance;
+            DecimalFormat df = new DecimalFormat(Constants.NUMBER_FORMAT);
 
-        DecimalFormat df = new DecimalFormat("#.##");
-        Double distance = Double.valueOf(df.format(mDistance.getValue() / 1000));
+            if (mDistance != null) {
+                order.setDistance(mDistance.getValue());
+                order.setDistance_text(mDistance.getText());
+                distance = Double.valueOf(df.format(mDistance.getValue() / 1000));
+            } else {
+                order.setDistance(0);
+                order.setDistance_text(Constants.FIREBASE_DEFAULT_UNKNOWN_DISTANCE);
+                distance = 0.0;
+            }
 
-        // TODO: store in a db so it can be changed
-        double dblAmount = distance * 2.13;
-        int intAmount = (int) (dblAmount * 100);
+            // TODO: store price in a db so it can be updated from Firebase
+            double dblAmount = distance * Constants.COST_PER_KM;
+            int intAmount = (int) (dblAmount * 100);
 
-        order.setAmount(intAmount);
+            order.setAmount(intAmount);
 
 
-        Intent intent = new Intent(Activity_PlaceOrder.this, Activity_Checkout.class);
-        intent.putExtra(Constants.EXTRA_ORDER, order);
-        intent.putExtra(Constants.EXTRA_USER, mAppUser);
+            Intent intent = new Intent(Activity_PlaceOrder.this, Activity_Checkout.class);
+            intent.putExtra(Constants.EXTRA_ORDER, order);
+            intent.putExtra(Constants.EXTRA_USER, mAppUser);
 
-        startActivityForResult(intent, 5);
+            startActivity(intent);
+            finish();
+        }else{
+            Utils_General.showToast(this, getString(R.string.msg_no_network));
+        }
+
     }
 
     @OnClick(R.id.layout_order_date)
@@ -324,6 +335,14 @@ public class Activity_PlaceOrder extends AppCompatActivity {
 
         if (mLocationPickupId != null && mLocationDeliveryId != null) {
 
+            builder = new MaterialDialog.Builder(Activity_PlaceOrder.this)
+                    .content(R.string.alert_fetching)
+                    .cancelable(false)
+                    .progress(true, 0);
+
+            dialog_charging = builder.build();
+            dialog_charging.show();
+
 
             String origin = "place_id:" + mLocationPickupId;
 
@@ -335,13 +354,16 @@ public class Activity_PlaceOrder extends AppCompatActivity {
                 @Override
                 public void onResponse(@NonNull Call<Results> call, @NonNull Response<Results> response) {
 
-                    Log.i(Constants.LOG_TAG, "Response:" + response);
+                    //Log.i(Constants.LOG_TAG, "Response:" + response);
+
+                    dialog_charging.dismiss();
 
                     if (response.isSuccessful()) {
                         // Code 200, 201
                         Results results = response.body();
 
                         List<Route> routes;
+
                         if (results != null) {
                             routes = results.getRoutes();
                             Route route = routes.get(0);
@@ -356,6 +378,14 @@ public class Activity_PlaceOrder extends AppCompatActivity {
 
                             //btn_user_place_order.setEnabled(true);
                         }
+
+                        if (mSelectedDate == 0 || mLocationPickupId == null || mLocationDeliveryId == null) {
+                            btn_user_place_order.setEnabled(false);
+                            btn_user_place_order.setBackgroundColor(ContextCompat.getColor(Activity_PlaceOrder.this, R.color.colorPrimaryLight));
+                        } else {
+                            btn_user_place_order.setEnabled(true);
+                            btn_user_place_order.setBackgroundColor(ContextCompat.getColor(Activity_PlaceOrder.this, R.color.colorPrimary));
+                        }
                     }
                 }
 
@@ -367,11 +397,7 @@ public class Activity_PlaceOrder extends AppCompatActivity {
             });
 
         }
-        if (mSelectedDate != 0 && mLocationPickupId != null && mLocationDeliveryId != null) {
-            btn_user_place_order.setEnabled(true);
-            btn_user_place_order.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
-
-        }else{
+        if (mSelectedDate == 0 || mLocationPickupId == null || mLocationDeliveryId == null) {
             btn_user_place_order.setEnabled(false);
             btn_user_place_order.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight));
         }

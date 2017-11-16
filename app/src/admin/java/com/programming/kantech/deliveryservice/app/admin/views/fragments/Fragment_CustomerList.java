@@ -30,6 +30,7 @@ import com.programming.kantech.deliveryservice.app.admin.views.ui.HPLinearLayout
 import com.programming.kantech.deliveryservice.app.admin.views.ui.ViewHolder_Customers;
 import com.programming.kantech.deliveryservice.app.data.model.pojo.app.Customer;
 import com.programming.kantech.deliveryservice.app.utils.Constants;
+import com.programming.kantech.deliveryservice.app.utils.Utils_General;
 
 import java.util.Objects;
 
@@ -49,6 +50,8 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
     private FirebaseRecyclerAdapter<Customer, ViewHolder_Customers> mFireAdapter;
 
     private GoogleApiClient mClient;
+
+    private Context mContext;
 
     private Customer mSelectedCustomer;
     private RecyclerView.AdapterDataObserver mObserver;
@@ -99,7 +102,7 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         // Get the fragment layout for the customer list
@@ -130,7 +133,7 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
      * Save the current state of this fragment
      */
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         // Store the selected driver in the instance state
@@ -161,6 +164,7 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        mContext = context;
 
         // This makes sure that the host activity has implemented the callback interface
         // If not, it throws an exception
@@ -229,15 +233,17 @@ public class Fragment_CustomerList extends Fragment implements GoogleApiClient.C
 
     private void buildApiClient() {
         if (mClient == null) {
-            // Build up the LocationServices API client
-            // Uses the addApi method to request the LocationServices API
-            // Also uses enableAutoManage to automatically know when to connect/suspend the client
-            mClient = new GoogleApiClient.Builder(getContext())
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .addApi(Places.GEO_DATA_API)
-                    .build();
+            if (Utils_General.isNetworkAvailable(mContext)) {
+                mClient = new GoogleApiClient.Builder(mContext)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .addApi(Places.GEO_DATA_API)
+                        .build();
+            } else {
+                Utils_General.showToast(mContext, getString(R.string.msg_no_network));
+            }
+
         }
     }
 

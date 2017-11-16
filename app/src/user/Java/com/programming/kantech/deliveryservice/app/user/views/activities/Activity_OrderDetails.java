@@ -186,16 +186,23 @@ public class Activity_OrderDetails extends AppCompatActivity implements GoogleAp
         //Log.i(Constants.LOG_TAG, "buildApiClient() called");
 
         if (mClient == null) {
-            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
 
-            // Build up the LocationServices API client
-            // Uses the addApi method to request the LocationServices API
-            // Also uses enableAutoManage to automatically know when to connect/suspend the client
-            mClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(Places.GEO_DATA_API)
-                    .build();
+            if(Utils_General.isNetworkAvailable(this)){
+
+                // Build up the LocationServices API client
+                // Uses the addApi method to request the LocationServices API
+                // Also uses enableAutoManage to automatically know when to connect/suspend the client
+                mClient = new GoogleApiClient.Builder(this)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(Places.GEO_DATA_API)
+                        .build();
+            }else{
+                Utils_General.showToast(this, getString(R.string.msg_no_network));
+            }
+
+
+
         }
     }
 

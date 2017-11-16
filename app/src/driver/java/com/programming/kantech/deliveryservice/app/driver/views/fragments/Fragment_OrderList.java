@@ -52,6 +52,7 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
     private RecyclerView.AdapterDataObserver mObserver;
     private Order mSelectedOrder;
     private Driver mDriver;
+    private Context mContext;
 
     @BindView(R.id.rv_orders_list)
     RecyclerView rv_orders_list;
@@ -99,7 +100,7 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         // Get the fragment layout for the driving list
@@ -122,7 +123,7 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
 
         if (mDriver == null || mDisplayDateStartTimeInMillis == 0) {
             throw new IllegalArgumentException("Must pass EXTRA_DRIVER AND EXTRA_DATE_FILTER");
-        }else{
+        } else {
 
             String showDate = Utils_General.getFormattedLongDateStringFromLongDate(mDisplayDateStartTimeInMillis);
             tv_orders_filter_date.setText(showDate);
@@ -138,7 +139,7 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(Constants.STATE_INFO_DRIVER, mDriver);
         outState.putLong(Constants.STATE_INFO_DATE_FILTER, mDisplayDateStartTimeInMillis);
@@ -169,10 +170,13 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
     public void onAttach(Context context) {
         super.onAttach(context);
 
+        mContext = context;
+
         // This makes sure that the host activity has implemented the callback interface
         // If not, it throws an exception
         try {
             mCallback = (Fragment_OrderList.OrderClickListener) context;
+
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement OrderClickListener");
@@ -234,13 +238,17 @@ public class Fragment_OrderList extends Fragment implements GoogleApiClient.Conn
 
     private void buildApiClient() {
         if (mClient == null) {
-            //Log.i(Constants.LOG_TAG, "CREATE NEW GOOGLE CLIENT");
+            if(Utils_General.isNetworkAvailable(mContext)){
+                mClient = new GoogleApiClient.Builder(mContext)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(Places.GEO_DATA_API)
+                        .build();
+            }else{
+                Utils_General.showToast(mContext, getString(R.string.msg_no_network));
+            }
 
-            mClient = new GoogleApiClient.Builder(getContext())
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(Places.GEO_DATA_API)
-                    .build();
+
         }
     }
 

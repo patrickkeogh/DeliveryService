@@ -19,6 +19,9 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -254,6 +257,30 @@ public class Utils_General {
 
 
         return markerColor;
+    }
+
+    public static boolean isInternetWorking(Context c) {
+
+        boolean success = false;
+
+        if(isNetworkAvailable(c)){
+
+            try {
+                URL url = new URL("https://google.com");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(10000);
+                connection.connect();
+                success = connection.getResponseCode() == 200;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            success = false;
+        }
+
+
+
+        return success;
     }
 
     /**

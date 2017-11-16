@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
@@ -16,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.DatePicker;
-import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -37,7 +35,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by patri on 2017-10-11.
+ * Created by patrick keogh on 2017-10-11.
+ * An activity to show driver orders
  */
 
 public class Activity_ShowOrders extends AppCompatActivity implements
@@ -45,7 +44,7 @@ public class Activity_ShowOrders extends AppCompatActivity implements
 
     private ActionBar mActionBar;
     private Driver mDriver;
-    private Order mSelectedOrder;
+    //private Order mSelectedOrder;
     private FragmentManager mFragmentManager;
 
     private static final String BACKSTACK_NAME= "detailFragment";
@@ -184,16 +183,21 @@ public class Activity_ShowOrders extends AppCompatActivity implements
 
                 return true;
             case R.id.action_sign_out:
-                //Utils_General.showToast(this, "Signout called");
-                AuthUI.getInstance()
-                        .signOut(this)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            public void onComplete(@NonNull Task<Void> task) {
-                                // user is now signed out
-                                startActivity(new Intent(Activity_ShowOrders.this, Activity_Splash.class));
-                                finish();
-                            }
-                        });
+                if(Utils_General.isNetworkAvailable(this)){
+
+                    AuthUI.getInstance()
+                            .signOut(this)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    // user is now signed out
+                                    startActivity(new Intent(Activity_ShowOrders.this, Activity_Splash.class));
+                                    finish();
+                                }
+                            });
+                }else{
+                    Utils_General.showToast(this, getString(R.string.msg_no_network));
+                }
+
 
                 return true;
             default:
@@ -236,7 +240,7 @@ public class Activity_ShowOrders extends AppCompatActivity implements
     public void onOrderClicked(Order order) {
         Log.i(Constants.LOG_TAG, "On order clicked in Fragment and returned to activity");
 
-        mSelectedOrder = order;
+        //mSelectedOrder = order;
 
         //replaceDetailsFragment();
 
@@ -245,7 +249,7 @@ public class Activity_ShowOrders extends AppCompatActivity implements
             // adding or replacing the detail fragment using a
             // fragment transaction.
 
-            Fragment_OrderDetails frag_details = Fragment_OrderDetails.newInstance(mSelectedOrder);
+            Fragment_OrderDetails frag_details = Fragment_OrderDetails.newInstance(order);
 
             mFragmentManager
                     .beginTransaction()
@@ -262,7 +266,7 @@ public class Activity_ShowOrders extends AppCompatActivity implements
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
             Intent intent_details = new Intent(this, Activity_OrderDetails.class);
-            intent_details.putExtra(Constants.EXTRA_ORDER, mSelectedOrder);
+            intent_details.putExtra(Constants.EXTRA_ORDER, order);
             startActivity(intent_details);
         }
 

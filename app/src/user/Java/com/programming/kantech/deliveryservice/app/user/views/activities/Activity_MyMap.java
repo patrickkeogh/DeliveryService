@@ -10,6 +10,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -73,6 +75,9 @@ public class Activity_MyMap extends AppCompatActivity implements OnMapReadyCallb
     @BindView(R.id.mapView)
     MapView mMapView;
 
+    @BindView(R.id.empty_map)
+    TextView mEmpty_map;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -122,7 +127,7 @@ public class Activity_MyMap extends AppCompatActivity implements OnMapReadyCallb
 
         if (mActionBar != null) {
             mActionBar.setDisplayHomeAsUpEnabled(true);
-            mActionBar.setTitle("Order Details");
+            mActionBar.setTitle(R.string.title_order_tracker);
         }
     }
 
@@ -410,10 +415,10 @@ public class Activity_MyMap extends AppCompatActivity implements OnMapReadyCallb
             hasPoint = true;
         }
 
-        if(mPickupMarker != null){
-            builder.include(mPickupMarker.getPosition());
-            hasPoint = true;
-        }
+//        if(mPickupMarker != null){
+//            builder.include(mPickupMarker.getPosition());
+//            hasPoint = true;
+//        }
 
         if(mDeliveryMarker != null){
             builder.include(mDeliveryMarker.getPosition());
@@ -428,10 +433,8 @@ public class Activity_MyMap extends AppCompatActivity implements OnMapReadyCallb
 
         if (hasPoint) {
 
-
-            mGoogleMap.setMaxZoomPreference(12);
-
-            mGoogleMap.setMinZoomPreference(8);
+            mMapView.setVisibility(View.VISIBLE);
+            mEmpty_map.setVisibility(View.GONE);
 
             mGoogleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                 @Override
@@ -440,17 +443,12 @@ public class Activity_MyMap extends AppCompatActivity implements OnMapReadyCallb
                     LatLngBounds bounds = builder.build();
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 10);
                     mGoogleMap.animateCamera(cu);
-//                    if(useCameraAnimation){
-//
-//                    }else{
-//                        mGoogleMap.moveCamera(cu);
-//                        // we want to skip the animation the first time through
-//                        useCameraAnimation = true;
-//                    }
-
 
                 }
             });
+        }else{
+            mMapView.setVisibility(View.GONE);
+            mEmpty_map.setVisibility(View.VISIBLE);
         }
 
     }

@@ -337,12 +337,61 @@
 
             </LinearLayout>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingBottom="@dimen/padding_8dp"
+                android:paddingTop="@dimen/padding_8dp"
+                android:text="@string/msg_payments_are_not_live"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@color/colorAccent" />
+
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="2dp"
                 android:layout_marginBottom="4dp"
                 android:layout_marginTop="4dp"
                 android:background="@color/colorAccent" />
+
+            <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:orientation="horizontal">-->
+
+            <!--<Button-->
+            <!--android:id="@+id/btn_user_checkout_good_card"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginTop="@dimen/margin_8dp"-->
+            <!--android:layout_weight=".45"-->
+            <!--android:background="@color/colorTextGrey"-->
+            <!--android:paddingEnd="@dimen/padding_8dp"-->
+            <!--android:text="Good Card"-->
+            <!--android:textAppearance="@style/TextAppearance.AppCompat.Medium"-->
+            <!--android:textColor="@color/colorWhite"-->
+            <!--android:textStyle="bold"-->
+            <!--tools:ignore="RtlSymmetry" />-->
+
+            <!--<View-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight=".05" />-->
+
+            <!--<Button-->
+            <!--android:id="@+id/btn_user_checkout_bad_card"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginTop="@dimen/margin_8dp"-->
+            <!--android:layout_weight=".45"-->
+            <!--android:background="@color/colorTextGrey"-->
+            <!--android:text="Bad Card"-->
+            <!--android:textAppearance="@style/TextAppearance.AppCompat.Medium"-->
+            <!--android:textColor="@color/colorWhite"-->
+            <!--android:textStyle="bold" />-->
+
+
+            <!--</LinearLayout>-->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -382,14 +431,6 @@
 
 
             </LinearLayout>
-
-            <ProgressBar
-                android:id="@+id/pb_checkout_progress_bar"
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:indeterminate="true"
-                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/tv_user_checkout_message"

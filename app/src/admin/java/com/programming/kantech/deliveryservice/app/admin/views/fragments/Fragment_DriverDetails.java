@@ -2,6 +2,7 @@ package com.programming.kantech.deliveryservice.app.admin.views.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -77,7 +78,7 @@ public class Fragment_DriverDetails extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         // Get the fragment layout for the driving list
@@ -200,7 +201,7 @@ public class Fragment_DriverDetails extends Fragment {
      * Save the current state of this fragment
      */
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         // Store the driver in the instance state

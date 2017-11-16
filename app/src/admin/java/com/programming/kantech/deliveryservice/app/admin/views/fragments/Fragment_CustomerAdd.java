@@ -5,15 +5,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.telephony.PhoneNumberFormattingTextWatcher;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -36,10 +39,13 @@ import butterknife.OnClick;
 
 /**
  * Created by patrick keogh on 2017-08-18.
- *
+ * An activity to add new customers
  */
 
 public class Fragment_CustomerAdd extends Fragment {
+
+    //  Local member variables
+    private Context mContext;
 
     // Views to bind to
     @BindView(R.id.et_customer_add_company)
@@ -61,6 +67,9 @@ public class Fragment_CustomerAdd extends Fragment {
     @BindView(R.id.tv_location_address)
     TextView tv_location_address;
 
+    @BindView(R.id.btn_customer_add)
+    TextView btn_customer_add;
+
     // Firebase member variables
     private DatabaseReference mCustomerRef;
     private DatabaseReference mLocationsRef;
@@ -77,6 +86,7 @@ public class Fragment_CustomerAdd extends Fragment {
     // after a new customer has been saved
     public interface SaveCustomerListener {
         void onCustomerSaved(Customer customer);
+
         void onFragmentLoaded(String tag);
     }
 
@@ -91,7 +101,7 @@ public class Fragment_CustomerAdd extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         // Get the fragment layout for the driving list
@@ -104,20 +114,69 @@ public class Fragment_CustomerAdd extends Fragment {
         mCustomer = new Customer();
         mLocation = new Location();
 
-        Button btn_add_customer = rootView.findViewById(R.id.btn_customer_add);
-
-        btn_add_customer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onAddCustomerClicked();
-            }
-        });
-
         mCustomerRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_CUSTOMERS);
         mLocationsRef = FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE_NODE_LOCATIONS);
 
+        setupTextListeners();
+        setupForm();
+
         return rootView;
 
+    }
+
+    private void setupTextListeners() {
+
+        et_customer_add_company.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                setupForm();
+            }
+        });
+
+        et_customer_add_contact.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                setupForm();
+            }
+        });
+
+        et_customer_add_phone.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                setupForm();
+            }
+        });
+    }
+
+
+    @OnClick(R.id.btn_customer_add)
+    public void btnAddCustomerClicked() {
+
+        onAddCustomerClicked();
     }
 
     @OnClick(R.id.iv_select_location)
@@ -144,11 +203,12 @@ public class Fragment_CustomerAdd extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
+        mContext = context;
         // This makes sure that the host activity has implemented the callback interface
         // If not, it throws an exception
         try {
             mCallback = (Fragment_CustomerAdd.SaveCustomerListener) context;
+
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement SaveCustomerListener");
@@ -158,9 +218,9 @@ public class Fragment_CustomerAdd extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Constants.REQUEST_CODE_PLACE_PICKER && resultCode == Activity.RESULT_OK) {
-            Place place = PlacePicker.getPlace(getContext(), data);
+            Place place = PlacePicker.getPlace(mContext, data);
             if (place == null) {
-                //Log.i(Constants.LOG_TAG, "No place selected");
+                Log.i(Constants.LOG_TAG, "No place selected");
                 return;
             }
 
@@ -168,6 +228,8 @@ public class Fragment_CustomerAdd extends Fragment {
 
             tv_location_address.setText(mPlace.getAddress().toString());
             tv_location_name.setText(mPlace.getName().toString());
+
+            setupForm();
         }
     }
 
@@ -181,7 +243,7 @@ public class Fragment_CustomerAdd extends Fragment {
             // Start a new Activity for the Place Picker API, this will trigger {@code #onActivityResult}
             // when a place is selected or with the user cancels.
             PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-            Intent i = builder.build(getActivity());
+            Intent i = builder.build((Activity) mContext);
             startActivityForResult(i, Constants.REQUEST_CODE_PLACE_PICKER);
 
         } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
@@ -196,6 +258,7 @@ public class Fragment_CustomerAdd extends Fragment {
      *
      */
     public void onAddCustomerClicked() {
+
         boolean hasErrors = false;
 
         // Validate the customer info
@@ -215,60 +278,68 @@ public class Fragment_CustomerAdd extends Fragment {
             hasErrors = true;
         }
 
+
         if (hasErrors) {
             Utils_General.showToast(getContext(), getString(R.string.error_msg));
         } else {
 
-            // Avoid passing null as parent to dialogs
-            final ViewGroup nullParent = null;
+            if(Utils_General.isNetworkAvailable(mContext)){
 
-            LayoutInflater inflater = this.getLayoutInflater();
-            View dialog_confirm = inflater.inflate(R.layout.alert_confirm_customer, nullParent);
+                // Avoid passing null as parent to dialogs
+                final ViewGroup nullParent = null;
 
-            TextView tv_confirm_company_name = dialog_confirm.findViewById(R.id.tv_confirm_company_name);
-            tv_confirm_company_name.setText(et_customer_add_company.getText().toString());
+                LayoutInflater inflater = this.getLayoutInflater();
+                View dialog_confirm = inflater.inflate(R.layout.alert_confirm_customer, nullParent);
 
-            TextView tv_confirm_company_address = dialog_confirm.findViewById(R.id.tv_confirm_company_address);
-            tv_confirm_company_address.setText(mPlace.getAddress());
+                TextView tv_confirm_company_name = dialog_confirm.findViewById(R.id.tv_confirm_company_name);
+                tv_confirm_company_name.setText(et_customer_add_company.getText().toString());
 
-            new AlertDialog.Builder(getContext())
-            .setTitle(R.string.alert_title_add_new_customer)
-            .setView(dialog_confirm)
-            .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+                TextView tv_confirm_company_address = dialog_confirm.findViewById(R.id.tv_confirm_company_address);
+                tv_confirm_company_address.setText(mPlace.getAddress());
 
-                    // Add the customer and display message
-                    mCustomer.setCompany(et_customer_add_company.getText().toString());
-                    mCustomer.setEmail(et_customer_add_email.getText().toString());
-                    mCustomer.setContact_name(et_customer_add_contact.getText().toString());
-                    mCustomer.setContact_number(et_customer_add_phone.getText().toString());
-                    mCustomer.setPlaceId(mPlace.getId());
 
-                    mLocation.setPlaceId(mPlace.getId());
-                    mLocation.setMainAddress(true);
+                new AlertDialog.Builder(mContext)
+                        .setTitle(R.string.alert_title_add_new_customer)
+                        .setView(dialog_confirm)
+                        .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
 
-                    //Log.i(Constants.LOG_TAG, "Customer:" + mCustomer.toString());
+                                // Add the customer and display message
+                                mCustomer.setCompany(et_customer_add_company.getText().toString());
+                                mCustomer.setEmail(et_customer_add_email.getText().toString());
+                                mCustomer.setContact_name(et_customer_add_contact.getText().toString());
+                                mCustomer.setContact_number(et_customer_add_phone.getText().toString());
+                                mCustomer.setPlaceId(mPlace.getId());
 
-                    mCustomerRef.push()
-                    .setValue(mCustomer, new DatabaseReference.CompletionListener() {
-                        @Override
-                        public void onComplete(DatabaseError databaseError,
-                                               DatabaseReference databaseReference) {
-                            String uniqueKey = databaseReference.getKey();
+                                mLocation.setPlaceId(mPlace.getId());
+                                mLocation.setMainAddress(true);
 
-                            mCustomer.setId(uniqueKey);
+                                //Log.i(Constants.LOG_TAG, "Customer:" + mCustomer.toString());
 
-                            mCustomerRef.child(uniqueKey).setValue(mCustomer);
+                                mCustomerRef.push()
+                                        .setValue(mCustomer, new DatabaseReference.CompletionListener() {
+                                            @Override
+                                            public void onComplete(DatabaseError databaseError,
+                                                                   DatabaseReference databaseReference) {
+                                                String uniqueKey = databaseReference.getKey();
 
-                            mLocation.setCustId(uniqueKey);
+                                                mCustomer.setId(uniqueKey);
 
-                            addLocation();
-                        }
-                    });
-                }
-            })
-            .show();
+                                                mCustomerRef.child(uniqueKey).setValue(mCustomer);
+
+                                                mLocation.setCustId(uniqueKey);
+
+                                                addLocation();
+                                            }
+                                        });
+                            }
+                        })
+                        .show();
+
+            }else{
+                Utils_General.showToast(mContext, getString(R.string.msg_no_network));
+            }
         }
     }
 
@@ -295,6 +366,43 @@ public class Fragment_CustomerAdd extends Fragment {
 
                     }
                 });
+
+    }
+
+    private void setupForm() {
+
+        boolean hasErrors = false;
+
+        // Validate the customer info
+
+        if (et_customer_add_company.getText().length() == 0) {
+            et_customer_add_company.setError(getString(R.string.error_company_is_required));
+            hasErrors = true;
+        }
+
+        if (et_customer_add_contact.getText().length() == 0) {
+            et_customer_add_contact.setError(getString(R.string.error_contact_name_is_required));
+            hasErrors = true;
+        }
+
+        if (et_customer_add_phone.getText().length() != 14) {
+            et_customer_add_phone.setError(getString(R.string.error_phone_number));
+            hasErrors = true;
+        }
+
+        if (mPlace == null) {
+            hasErrors = true;
+        }
+
+        if (hasErrors) {
+            btn_customer_add.setEnabled(false);
+            btn_customer_add.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorPrimaryLight));
+
+        } else {
+            btn_customer_add.setEnabled(true);
+            btn_customer_add.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
+        }
+
 
     }
 }
